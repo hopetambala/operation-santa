@@ -44,6 +44,7 @@ Each spec file launches a fresh app.
   - The coordinator imports: 10 field changes merge, and 1 clash is resolved in the conflict dialog. Also checked: who cleaned each letter, and the change log.
 - **`specs/airtable-sync.e2e.ts`:** paged Airtable read, refresh of an expired drawing link, and an idempotent re-sync.
 - **`specs/season-security.e2e.ts`:** keychain "remember passphrase" with fallback, and the purge.
+- **`specs/updates.e2e.ts`:** updates are offered, install only after "Install and restart", and pause Dec 20–26 (the updater plugin is mocked).
 - **`specs/planning-and-pickup.e2e.ts`:** locked routes, freeze, and the pickup-event packet.
 
 Shared setup lives in `support/season.ts` (`routedSeason()`), UI helpers in `support/app.ts`, and PDF reading in `support/pdf.ts`.

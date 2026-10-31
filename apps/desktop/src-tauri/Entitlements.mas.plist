@@ -4,9 +4,9 @@
   application-identifier and team-identifier must match the provisioning profile, or App Store Connect
   rejects the upload. Team 95SV963967 is the team that holds the Apple Distribution certificate.
 
-  The sandbox only lets the app touch the file the volunteer picked. Until the season-file changes in
-  docs/RELEASE.md § Sandbox blockers land, this build cannot create the -wal/-shm, .opsanta.lock or
-  .opsanta.backups/ files beside a season, so creating or opening a season fails.
+  The sandbox only lets the app touch the file the volunteer picked. Seasons keep their working copy, WAL,
+  backups and packet scratch files in app data (docs/RELEASE.md § Season files under the sandbox), and every
+  open goes through the dialog, so no bookmark entitlement is needed.
 -->
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -22,9 +22,6 @@
   <true/>
   <!-- Open/Save dialogs for .opsanta seasons, packets and exports. -->
   <key>com.apple.security.files.user-selected.read-write</key>
-  <true/>
-  <!-- Security-scoped bookmarks, so a season can be reopened without the dialog. -->
-  <key>com.apple.security.files.bookmarks.app-scope</key>
   <true/>
 </dict>
 </plist>

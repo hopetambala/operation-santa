@@ -9,7 +9,7 @@
 import {cpSync,existsSync,mkdirSync,mkdtempSync,readdirSync,rmSync,symlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {basename,join} from 'node:path';
-import {ROOT,TAURI_DIR,TARGET,OUT,fail,run,capture,tauriConf,buildFrontend,gateOrFail,updaterSetup,tauriBuild,hasCargoFeature} from './release-common.mjs';
+import {ROOT,TAURI_DIR,TARGET,OUT,fail,run,capture,tauriConf,buildFrontend,gateOrFail,updaterSetup,tauriBuild} from './release-common.mjs';
 
 const BUNDLE_ID='org.pasadenajaycees.opsanta';
 const args=process.argv.slice(2);
@@ -88,9 +88,7 @@ console.log(`Operation Santa ${version} · ${channel.toUpperCase()} · signing a
 // ---------- build ----------
 
 const distHash=buildFrontend();
-// The sandbox behavior (season journal, lock and backups inside the container) sits behind Cargo feature `mas`.
-const updater=channel==='dmg'?updaterSetup():{features:hasCargoFeature('mas')?['mas']:[],config:{},env:{}};
-if(channel==='mas'&&!updater.features.includes('mas'))console.log('Warning: no Cargo feature `mas` yet, so this build keeps the season files the sandbox blocks (docs/RELEASE.md § Sandbox blockers).');
+const updater=channel==='dmg'?updaterSetup():{features:[],config:{},env:{}};
 const macOS=channel==='dmg'
   ?{signingIdentity:signer,hardenedRuntime:true,entitlements:join(TAURI_DIR,'Entitlements.plist')}
   :{signingIdentity:signer,hardenedRuntime:true,entitlements:join(TAURI_DIR,'Entitlements.mas.plist'),files:{'embedded.provisionprofile':profile},bundleVersion:buildNumber};

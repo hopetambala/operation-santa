@@ -4,7 +4,7 @@
 #                      and it is what makes the updater (latest.json) see the new version.
 #   Run workflow       the same builds as workflow artifacts only, no Release. Tick "testflight" to also upload the Mac App Store build.
 #
-# The Mac App Store job runs only when the repository variable MAS_ENABLED is "true" (after the sandbox blockers in docs/RELEASE.md land).
+# The Mac App Store job runs only when the repository variable MAS_ENABLED is "true" (after the sandboxed build is proven: docs/RELEASE.md § Season files under the sandbox).
 # Unverified until its first run on GitHub. Actions are pinned to commit SHAs; Node and Rust to exact versions.
 name: Release
 on:

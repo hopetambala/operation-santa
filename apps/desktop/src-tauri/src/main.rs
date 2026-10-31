@@ -8,7 +8,8 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use fs2::FileExt;
 use zeroize::Zeroize;
-struct OpenSeason { conn:Connection, path:PathBuf, _lock:File }
+// The database runs on a private working copy in app data; `path` is the user's file, rewritten in place after every save.
+struct OpenSeason { conn:Connection, path:PathBuf, work:PathBuf, root:PathBuf, _lock:File }
 #[derive(Default)]
 struct Store(Mutex<Option<OpenSeason>>);
 fn keyed(path:&Path,pass:&str,create:bool)->Result<Connection,String>{
@@ -30,14 +31,30 @@ fn connection(path:&Path,pass:&str,create:bool)->Result<Connection,String>{
  conn.execute_batch("PRAGMA journal_mode=WAL; PRAGMA secure_delete=ON; CREATE TABLE IF NOT EXISTS season_state(id INTEGER PRIMARY KEY CHECK(id=1), data TEXT NOT NULL); CREATE TABLE IF NOT EXISTS asset(hash TEXT PRIMARY KEY, mime TEXT NOT NULL, bytes INTEGER NOT NULL, data BLOB NOT NULL, created_at TEXT); PRAGMA user_version=1;").map_err(|e|e.to_string())?;
  Ok(conn)
 }
-fn lock_file(path:&Path)->Result<File,String>{let file=OpenOptions::new().create(true).truncate(false).read(true).write(true).open(path.with_extension("opsanta.lock")).map_err(|_|"Cannot create season lock.")?;file.try_lock_exclusive().map_err(|_|"This season is already open in another app. Close it there first.")?;Ok(file)}
 fn validate(data:&str)->Result<(),String>{let value:serde_json::Value=serde_json::from_str(data).map_err(|_|"Invalid season data.")?;if value["schema"]!=1||!value["families"].is_array()||!value["routes"].is_array(){return Err("Unsupported season format.".into())}Ok(())}
 // Season storage, independent of Tauri so it can be tested. `root` is the app's private data folder.
-fn create_in(path:&Path,pass:&str,data:&str,_root:&Path)->Result<OpenSeason,String>{validate(data)?;if path.exists(){return Err("A file already exists at this location. Choose a new name.".into())}let lock=lock_file(path)?;let conn=connection(path,pass,true)?;conn.execute("INSERT INTO season_state(id,data) VALUES(1,?1)",[data]).map_err(|e|e.to_string())?;Ok(OpenSeason{conn,path:path.into(),_lock:lock})}
-fn open_in(path:&Path,pass:&str,_root:&Path)->Result<(OpenSeason,String),String>{if !path.is_file(){return Err("Season file not found.".into())}let lock=lock_file(path)?;let conn=connection(path,pass,false)?;let data:String=conn.query_row("SELECT data FROM season_state WHERE id=1",[],|r|r.get(0)).map_err(|_|"This is not an Operation Santa season.")?;validate(&data)?;Ok((OpenSeason{conn,path:path.into(),_lock:lock},data))}
-fn save_to(s:&mut OpenSeason,data:&str)->Result<(),String>{validate(data)?;let tx=s.conn.transaction().map_err(|e|e.to_string())?;tx.execute("UPDATE season_state SET data=?1 WHERE id=1",[data]).map_err(|e|e.to_string())?;tx.commit().map_err(|e|e.to_string())}
-fn backup_of(s:&OpenSeason)->Result<PathBuf,String>{s.conn.execute_batch("PRAGMA wal_checkpoint(TRUNCATE);").map_err(|e|e.to_string())?;let dir=s.path.with_extension("opsanta.backups");fs::create_dir_all(&dir).map_err(|e|e.to_string())?;let stamp=std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis();let dest=dir.join(format!("{stamp}.opsanta"));fs::copy(&s.path,&dest).map_err(|e|e.to_string())?;let mut entries=fs::read_dir(&dir).map_err(|e|e.to_string())?.filter_map(Result::ok).map(|e|e.path()).filter(|p|p.extension().is_some_and(|e|e=="opsanta")).collect::<Vec<_>>();entries.sort();let remove=entries.len().saturating_sub(20);for p in entries.into_iter().take(remove){fs::remove_file(p).map_err(|e|e.to_string())?;}Ok(dest)}
-fn close_out(s:OpenSeason)->Result<(),String>{drop(s);Ok(())}
+// The App Store sandbox (and synced folders like Google Drive) only tolerate the one file the user chose, so the
+// SQLite WAL, backups and lock all live elsewhere: WAL and backups in `root`, the lock on the file itself.
+fn sha_hex(bytes:&[u8])->String{hex::encode(Sha256::digest(bytes))}
+fn key_of(path:&Path)->String{sha_hex(path.to_string_lossy().as_bytes())}
+fn work_of(root:&Path,path:&Path)->PathBuf{root.join(format!("{}.opsanta",key_of(path)))}
+fn published_of(root:&Path,path:&Path)->PathBuf{root.join(format!("{}.published",key_of(path)))}
+fn remove_work(work:&Path){for ext in ["","-wal","-shm"]{let _=fs::remove_file(format!("{}{ext}",work.display()));}}
+fn lock_season(path:&Path)->Result<File,String>{let f=OpenOptions::new().read(true).open(path).map_err(|_|"Cannot open season file.")?;f.try_lock_exclusive().map_err(|_|"This season is already open in another app. Close it there first.")?;Ok(f)}
+// Write the working copy back into the user's file in place (no temp or sidecar files beside it).
+fn publish(s:&OpenSeason)->Result<(),String>{s.conn.execute_batch("PRAGMA wal_checkpoint(TRUNCATE);").map_err(|e|e.to_string())?;let bytes=fs::read(&s.work).map_err(|_|"Cannot read the working copy.")?;let mut out=OpenOptions::new().write(true).truncate(true).open(&s.path).map_err(|_|"Cannot write the season file.")?;std::io::Write::write_all(&mut out,&bytes).and_then(|_|out.sync_all()).map_err(|_|"Cannot write the season file.")?;fs::write(published_of(&s.root,&s.path),sha_hex(&bytes)).map_err(|_|"Cannot record the save.".into())}
+fn create_in(path:&Path,pass:&str,data:&str,root:&Path)->Result<OpenSeason,String>{validate(data)?;if path.exists(){return Err("A file already exists at this location. Choose a new name.".into())}let work=work_of(root,path);remove_work(&work);let conn=connection(&work,pass,true)?;conn.execute("INSERT INTO season_state(id,data) VALUES(1,?1)",[data]).map_err(|e|e.to_string())?;OpenOptions::new().write(true).create_new(true).open(path).map_err(|_|"Cannot create the season file.")?;let lock=lock_season(path)?;let s=OpenSeason{conn,path:path.into(),work,root:root.into(),_lock:lock};publish(&s)?;Ok(s)}
+fn open_in(path:&Path,pass:&str,root:&Path)->Result<(OpenSeason,String),String>{if !path.is_file(){return Err("Season file not found.".into())}let lock=lock_season(path)?;let work=work_of(root,path);let file=fs::read(path).map_err(|_|"Unable to read season file.")?;
+ // Reuse the working copy only if the user's file is exactly what we last wrote: it may hold a save that crashed before publishing.
+ // If the file changed outside the app (restored backup, another computer), the file wins.
+ let ours=work.is_file()&&fs::read_to_string(published_of(root,path)).is_ok_and(|h|h.trim()==sha_hex(&file));if !ours{remove_work(&work);fs::write(&work,&file).map_err(|_|"Cannot prepare the working copy.")?;}
+ let conn=connection(&work,pass,false)?;let data:String=conn.query_row("SELECT data FROM season_state WHERE id=1",[],|r|r.get(0)).map_err(|_|"This is not an Operation Santa season.")?;validate(&data)?;let s=OpenSeason{conn,path:path.into(),work,root:root.into(),_lock:lock};if ours{publish(&s)?;}Ok((s,data))}
+fn save_to(s:&mut OpenSeason,data:&str)->Result<(),String>{validate(data)?;let tx=s.conn.transaction().map_err(|e|e.to_string())?;tx.execute("UPDATE season_state SET data=?1 WHERE id=1",[data]).map_err(|e|e.to_string())?;tx.commit().map_err(|e|e.to_string())?;publish(s)}
+fn backup_of(s:&OpenSeason)->Result<PathBuf,String>{s.conn.execute_batch("PRAGMA wal_checkpoint(TRUNCATE);").map_err(|e|e.to_string())?;let dir=s.root.join("backups").join(key_of(&s.path));fs::create_dir_all(&dir).map_err(|e|e.to_string())?;let stamp=std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis();let dest=dir.join(format!("{stamp:015}-{:04x}.opsanta",rand::random::<u16>()));fs::copy(&s.work,&dest).map_err(|e|e.to_string())?;let mut entries=fs::read_dir(&dir).map_err(|e|e.to_string())?.filter_map(Result::ok).map(|e|e.path()).filter(|p|p.extension().is_some_and(|e|e=="opsanta")).collect::<Vec<_>>();entries.sort();let remove=entries.len().saturating_sub(20);for p in entries.into_iter().take(remove){fs::remove_file(p).map_err(|e|e.to_string())?;}Ok(dest)}
+// After a purge succeeds, backups taken before it would still hold children's data, so they go too.
+fn purge_backups_of(s:&OpenSeason)->Result<u32,String>{let dir=s.root.join("backups").join(key_of(&s.path));if !dir.is_dir(){return Ok(0)}let n=fs::read_dir(&dir).map_err(|e|e.to_string())?.filter_map(Result::ok).filter(|e|e.path().extension().is_some_and(|x|x=="opsanta")).count() as u32;fs::remove_dir_all(&dir).map_err(|_|"Could not delete this season's backups.")?;Ok(n)}
+// A clean close publishes and deletes the working copy, so app data keeps no extra copy of families' records.
+fn close_out(s:OpenSeason)->Result<(),String>{publish(&s)?;let work=s.work.clone();drop(s);remove_work(&work);Ok(())}
 fn seasons_root(app:&tauri::AppHandle)->Result<PathBuf,String>{use tauri::Manager;let d=app.path().app_data_dir().map_err(|_|"No app data folder.")?.join("seasons");fs::create_dir_all(&d).map_err(|_|"Cannot create the app data folder.")?;Ok(d)}
 #[tauri::command]
 fn create_season(path:String,mut passphrase:String,data:String,app:tauri::AppHandle,store:tauri::State<Store>)->Result<(),String>{let root=seasons_root(&app)?;let r=create_in(Path::new(&path),&passphrase,&data,&root);passphrase.zeroize();*store.0.lock().map_err(|_|"Season is busy.")?=Some(r?);Ok(())}
@@ -47,6 +64,11 @@ fn open_season(path:String,mut passphrase:String,app:tauri::AppHandle,store:taur
 fn save_season(data:String,store:tauri::State<Store>)->Result<(),String>{let mut g=store.0.lock().map_err(|_|"Season is busy.")?;save_to(g.as_mut().ok_or("No encrypted season is open.")?,&data)}
 #[tauri::command]
 fn backup_season(store:tauri::State<Store>)->Result<String,String>{let g=store.0.lock().map_err(|_|"Season is busy.")?;Ok(backup_of(g.as_ref().ok_or("No season open.")?)?.display().to_string())}
+// After an update installs (only when the coordinator clicked "Install and restart").
+#[tauri::command]
+fn restart_app(app:tauri::AppHandle){app.restart()}
+#[tauri::command]
+fn purge_backups(store:tauri::State<Store>)->Result<u32,String>{let g=store.0.lock().map_err(|_|"Season is busy.")?;purge_backups_of(g.as_ref().ok_or("No encrypted season is open.")?)}
 #[tauri::command]
 fn close_season(store:tauri::State<Store>)->Result<(),String>{let s=store.0.lock().map_err(|_|"Season is busy.")?.take();match s{Some(s)=>close_out(s),None=>Ok(())}}
 const SERVICE:&str="org.pasadenajaycees.opsanta";
@@ -182,25 +204,30 @@ fn asset_get(hash:String,store:tauri::State<Store>)->Result<Option<Asset>,String
 #[tauri::command(async)]
 fn asset_prune(keep:Vec<String>,store:tauri::State<Store>)->Result<u32,String>{with_season(&store,|c|prune_assets(c,&keep))}
 #[tauri::command(async)]
-fn vacuum_season(store:tauri::State<Store>)->Result<(),String>{with_season(&store,|c|c.execute_batch("VACUUM; PRAGMA wal_checkpoint(TRUNCATE);").map_err(|e|e.to_string()))}
+fn vacuum_season(store:tauri::State<Store>)->Result<(),String>{let g=store.0.lock().map_err(|_|"Season is busy.")?;let s=g.as_ref().ok_or("No encrypted season is open.")?;s.conn.execute_batch("VACUUM;").map_err(|e|e.to_string())?;publish(s)}
 fn packet_ok(data:&str)->Result<(),String>{let v:serde_json::Value=serde_json::from_str(data).map_err(|_|"Invalid packet data.")?;if v["kind"]!="opsanta-packet"{return Err("Unsupported packet format.".into())}Ok(())}
-fn write_packet(path:&Path,pass:&str,data:&str)->Result<(),String>{
+// Packets are built and read inside app data, so SQLite's journal never appears beside the user's file (App Store sandbox).
+fn scratch_in(root:&Path)->PathBuf{root.join(format!("packet-{}.tmp",rand::random::<u64>()))}
+fn drop_scratch(p:&Path){for ext in ["","-journal"]{let _=fs::remove_file(format!("{}{ext}",p.display()));}}
+fn write_packet(path:&Path,pass:&str,data:&str,root:&Path)->Result<(),String>{
  packet_ok(data)?;if path.exists(){return Err("A file already exists at this location. Choose a new name.".into())}
- let r=keyed(path,pass,true).and_then(|c|{c.execute_batch("PRAGMA journal_mode=DELETE; PRAGMA secure_delete=ON; CREATE TABLE packet_state(id INTEGER PRIMARY KEY CHECK(id=1), data TEXT NOT NULL); PRAGMA user_version=1;").map_err(|e|e.to_string())?;c.execute("INSERT INTO packet_state(id,data) VALUES(1,?1)",[data]).map_err(|e|e.to_string())?;Ok(())});
- if r.is_err(){let _=fs::remove_file(path);}r
+ let tmp=scratch_in(root);let r=keyed(&tmp,pass,true).and_then(|c|{c.execute_batch("PRAGMA journal_mode=DELETE; PRAGMA secure_delete=ON; CREATE TABLE packet_state(id INTEGER PRIMARY KEY CHECK(id=1), data TEXT NOT NULL); PRAGMA user_version=1;").map_err(|e|e.to_string())?;c.execute("INSERT INTO packet_state(id,data) VALUES(1,?1)",[data]).map_err(|e|e.to_string())?;Ok(())}).and_then(|_|fs::copy(&tmp,path).map(|_|()).map_err(|_|"Unable to write the packet file.".to_string()));
+ drop_scratch(&tmp);if r.is_err(){let _=fs::remove_file(path);}r
 }
-fn read_packet(path:&Path,pass:&str)->Result<String,String>{if !path.is_file(){return Err("Packet file not found.".into())}let c=keyed(path,pass,false)?;let data:String=c.query_row("SELECT data FROM packet_state WHERE id=1",[],|r|r.get(0)).map_err(|_|"This is not an Operation Santa packet.")?;packet_ok(&data)?;Ok(data)}
+fn read_packet(path:&Path,pass:&str,root:&Path)->Result<String,String>{if !path.is_file(){return Err("Packet file not found.".into())}let tmp=scratch_in(root);fs::copy(path,&tmp).map_err(|_|"Unable to read the packet file.")?;let r=keyed(&tmp,pass,false).and_then(|c|{let data:String=c.query_row("SELECT data FROM packet_state WHERE id=1",[],|r|r.get(0)).map_err(|_|"This is not an Operation Santa packet.")?;packet_ok(&data)?;Ok(data)});drop_scratch(&tmp);r}
 #[tauri::command(async)]
-fn export_packet(path:String,mut passphrase:String,data:String)->Result<(),String>{let r=write_packet(Path::new(&path),&passphrase,&data);passphrase.zeroize();r}
+fn export_packet(path:String,mut passphrase:String,data:String,app:tauri::AppHandle)->Result<(),String>{let root=seasons_root(&app)?;let r=write_packet(Path::new(&path),&passphrase,&data,&root);passphrase.zeroize();r}
 #[tauri::command(async)]
-fn open_packet(path:String,mut passphrase:String)->Result<String,String>{let r=read_packet(Path::new(&path),&passphrase);passphrase.zeroize();r}
+fn open_packet(path:String,mut passphrase:String,app:tauri::AppHandle)->Result<String,String>{let root=seasons_root(&app)?;let r=read_packet(Path::new(&path),&passphrase,&root);passphrase.zeroize();r}
 fn export_ext_ok(p:&Path)->bool{p.extension().and_then(|e|e.to_str()).is_some_and(|e|["pdf","csv","json","txt","md","docx","zip"].contains(&e.to_ascii_lowercase().as_str()))}
 #[tauri::command(async)]
 fn write_export(path:String,data:String)->Result<(),String>{let p=PathBuf::from(path);if !p.is_absolute()||!export_ext_ok(&p){return Err("Exports can only be saved as PDF, CSV, JSON, TXT, MD, DOCX, or ZIP files.".into())}fs::write(&p,b64(&data)?).map_err(|_|"Unable to write the export file.")?;Ok(())}
 fn main(){let builder=tauri::Builder::default();
  #[cfg(all(debug_assertions,feature="e2e"))]
  let builder=builder.plugin(tauri_plugin_wdio_webdriver::init()).plugin(tauri_plugin_wdio::init());
- builder.plugin(tauri_plugin_dialog::init()).manage(Store::default()).invoke_handler(tauri::generate_handler![create_season,open_season,save_season,backup_season,close_season,fetch_attachment,airtable_get,secret_set,secret_get,secret_delete,geocode_census,geocode_nominatim,travel_matrix_ors,asset_put,asset_get,asset_prune,vacuum_season,export_packet,open_packet,write_export]).run(tauri::generate_context!()).expect("Unable to launch Operation Santa");}
+ #[cfg(feature="updater")]
+ let builder=builder.plugin(tauri_plugin_updater::Builder::new().build());
+ builder.plugin(tauri_plugin_dialog::init()).manage(Store::default()).invoke_handler(tauri::generate_handler![create_season,open_season,save_season,backup_season,close_season,fetch_attachment,airtable_get,secret_set,secret_get,secret_delete,geocode_census,geocode_nominatim,travel_matrix_ors,asset_put,asset_get,asset_prune,vacuum_season,purge_backups,restart_app,export_packet,open_packet,write_export]).run(tauri::generate_context!()).expect("Unable to launch Operation Santa");}
 #[cfg(test)] mod tests {use super::*;#[test]fn encrypted_roundtrip(){let p=std::env::temp_dir().join(format!("opsanta-{}.opsanta",rand::random::<u64>()));{let c=connection(&p,"a test passphrase",true).unwrap();c.execute("INSERT INTO season_state VALUES(1,?1)",["private synthetic family"]).unwrap();}let bytes=fs::read(&p).unwrap();assert!(!bytes.windows(7).any(|w|w==b"private"));assert!(!bytes.starts_with(b"SQLite format 3"));assert!(connection(&p,"incorrect password",false).is_err());let c=connection(&p,"a test passphrase",false).unwrap();let text:String=c.query_row("SELECT data FROM season_state",[],|r|r.get(0)).unwrap();assert_eq!(text,"private synthetic family");drop(c);fs::remove_file(p).unwrap();}
 fn tmp(ext:&str)->PathBuf{std::env::temp_dir().join(format!("opsanta-{}.{ext}",rand::random::<u64>()))}
 #[test]fn attachment_allowlist(){
@@ -227,13 +254,30 @@ fn tmp(ext:&str)->PathBuf{std::env::temp_dir().join(format!("opsanta-{}.{ext}",r
  assert!(!valid_secret("passphrase:123E4567-E89B-12D3-A456-426614174000"));assert!(!valid_secret("passphrase:123e4567"));assert!(!valid_secret("passphrase:../../123e4567-e89b-12d3-a456-4266141740"));assert!(!valid_secret("other"));assert!(!valid_secret(""));
 }
 #[test]fn export_extensions(){assert!(export_ext_ok(Path::new("/x/route.PDF")));assert!(export_ext_ok(Path::new("/x/a.docx")));assert!(!export_ext_ok(Path::new("/x/a.opsanta")));assert!(!export_ext_ok(Path::new("/x/a")));assert!(!export_ext_ok(Path::new("/x/a.sh")));}
+// App Store sandbox (and synced folders): a season may touch only the one file the user chose.
+fn season_dirs()->(PathBuf,PathBuf){let base=std::env::temp_dir().join(format!("opsanta-season-{}",rand::random::<u64>()));let (dir,root)=(base.join("chosen"),base.join("appdata"));fs::create_dir_all(&dir).unwrap();fs::create_dir_all(&root).unwrap();(dir,root)}
+fn listing(dir:&Path)->Vec<String>{if !dir.exists(){return vec![]}let mut v=fs::read_dir(dir).unwrap().filter_map(Result::ok).map(|e|e.file_name().to_string_lossy().into_owned()).collect::<Vec<_>>();v.sort();v}
+const PASS:&str="a test passphrase";
+fn season_json(tag:&str)->String{format!(r#"{{"schema":1,"families":[],"routes":[],"tag":"{tag}"}}"#)}
+fn read_file_data(path:&Path)->String{let copy=std::env::temp_dir().join(format!("opsanta-copy-{}.opsanta",rand::random::<u64>()));fs::copy(path,&copy).unwrap();let c=keyed(&copy,PASS,false).unwrap();let d:String=c.query_row("SELECT data FROM season_state WHERE id=1",[],|r|r.get(0)).unwrap();drop(c);let _=fs::remove_file(&copy);d}
+#[test]fn season_touches_only_its_own_file(){let (dir,root)=season_dirs();let path=dir.join("Season.opsanta");let mut s=create_in(&path,PASS,&season_json("v1"),&root).unwrap();save_to(&mut s,&season_json("v2")).unwrap();backup_of(&s).unwrap();assert_eq!(listing(&dir),vec!["Season.opsanta"],"while open");close_out(s).unwrap();assert_eq!(listing(&dir),vec!["Season.opsanta"],"after closing");let (s,_)=open_in(&path,PASS,&root).unwrap();assert_eq!(listing(&dir),vec!["Season.opsanta"],"after reopening");close_out(s).unwrap();}
+#[test]fn season_file_is_complete_after_every_save(){let (dir,root)=season_dirs();let path=dir.join("Season.opsanta");let mut s=create_in(&path,PASS,&season_json("v1"),&root).unwrap();save_to(&mut s,&season_json("v2")).unwrap();assert!(read_file_data(&path).contains("v2"),"a copy of the file taken mid-session has the latest save");close_out(s).unwrap();}
+#[test]fn backups_go_to_app_data(){let (dir,root)=season_dirs();let path=dir.join("Season.opsanta");let s=create_in(&path,PASS,&season_json("v1"),&root).unwrap();let b=backup_of(&s).unwrap();assert!(b.starts_with(&root),"backup at {b:?} should be under {root:?}");assert!(read_file_data(&b).contains("v1"));close_out(s).unwrap();}
+#[test]fn reopen_sees_the_last_save(){let (dir,root)=season_dirs();let path=dir.join("Season.opsanta");let mut s=create_in(&path,PASS,&season_json("v1"),&root).unwrap();save_to(&mut s,&season_json("v2")).unwrap();close_out(s).unwrap();let (s,data)=open_in(&path,PASS,&root).unwrap();assert!(data.contains("v2"));assert!(open_in(&path,PASS,&root).is_err(),"a second open of the same season is refused");close_out(s).unwrap();}
+#[test]fn a_save_that_never_reached_the_file_is_recovered(){let (dir,root)=season_dirs();let path=dir.join("Season.opsanta");let s=create_in(&path,PASS,&season_json("v1"),&root).unwrap();
+ // Simulate a crash after the database committed but before the file was rewritten.
+ s.conn.execute("UPDATE season_state SET data=?1 WHERE id=1",[season_json("v2-unpublished")]).unwrap();drop(s);assert!(read_file_data(&path).contains("v1"));let (s,data)=open_in(&path,PASS,&root).unwrap();assert!(data.contains("v2-unpublished"),"the working copy's newer save is used");assert!(read_file_data(&path).contains("v2-unpublished"),"and written back to the file");close_out(s).unwrap();}
+#[test]fn a_file_replaced_outside_the_app_wins(){let (dir,root)=season_dirs();let path=dir.join("Season.opsanta");let mut s=create_in(&path,PASS,&season_json("v1"),&root).unwrap();let old=backup_of(&s).unwrap();save_to(&mut s,&season_json("v2")).unwrap();s.conn.execute("UPDATE season_state SET data=?1 WHERE id=1",[season_json("v3-unpublished")]).unwrap();drop(s);
+ // The coordinator restores last week's backup over the season file.
+ fs::copy(&old,&path).unwrap();let (s,data)=open_in(&path,PASS,&root).unwrap();assert!(data.contains("v1"),"the restored file is what opens, not the stale working copy: {data}");close_out(s).unwrap();}
+#[test]fn purging_backups_leaves_none_for_this_season(){let (dir,root)=season_dirs();let path=dir.join("Season.opsanta");let s=create_in(&path,PASS,&season_json("v1"),&root).unwrap();backup_of(&s).unwrap();backup_of(&s).unwrap();let other=create_in(&dir.join("Other.opsanta"),PASS,&season_json("x"),&root).unwrap();backup_of(&other).unwrap();assert_eq!(purge_backups_of(&s).unwrap(),2);assert!(listing(&root.join("backups").join(key_of(&path))).is_empty(),"no backups left for the purged season");assert_eq!(listing(&root.join("backups").join(key_of(&dir.join("Other.opsanta")))).len(),1,"other seasons' backups are untouched");close_out(s).unwrap();close_out(other).unwrap();}
 #[test]fn packet_roundtrip(){
- let p=tmp("opsanta-packet");let data=r#"{"kind":"opsanta-packet","rows":[{"note":"synthetic cleanup row"}]}"#;
- assert!(write_packet(&p,"a test passphrase",r#"{"kind":"season"}"#).is_err());assert!(!p.exists());
- write_packet(&p,"a test passphrase",data).unwrap();assert!(write_packet(&p,"a test passphrase",data).is_err());
+ let (dir,root)=season_dirs();let p=dir.join("Cleanup.opsanta-packet");let data=r#"{"kind":"opsanta-packet","rows":[{"note":"synthetic cleanup row"}]}"#;
+ assert!(write_packet(&p,"a test passphrase",r#"{"kind":"season"}"#,&root).is_err());assert!(!p.exists());
+ write_packet(&p,"a test passphrase",data,&root).unwrap();assert!(write_packet(&p,"a test passphrase",data,&root).is_err());
  let bytes=fs::read(&p).unwrap();assert!(!bytes.windows(9).any(|w|w==b"synthetic"));
- assert!(read_packet(&p,"incorrect password").is_err());assert_eq!(read_packet(&p,"a test passphrase").unwrap(),data);
- fs::remove_file(p).unwrap();
+ assert!(read_packet(&p,"incorrect password",&root).is_err());assert_eq!(read_packet(&p,"a test passphrase",&root).unwrap(),data);
+ assert_eq!(listing(&dir),vec!["Cleanup.opsanta-packet"],"nothing beside the packet");assert!(listing(&root).is_empty(),"no scratch files left in app data: {:?}",listing(&root));
 }
 #[test]fn asset_roundtrip(){
  let p=tmp("opsanta");let mut c=connection(&p,"a test passphrase",true).unwrap();
