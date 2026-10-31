@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Mac App Store / TestFlight build (docs/RELEASE.md § Mac App Store).
+  application-identifier and team-identifier must match the provisioning profile, or App Store Connect
+  rejects the upload. Team 95SV963967 is the team that holds the Apple Distribution certificate.
+
+  The sandbox only lets the app touch the file the volunteer picked. Until the season-file changes in
+  docs/RELEASE.md § Sandbox blockers land, this build cannot create the -wal/-shm, .opsanta.lock or
+  .opsanta.backups/ files beside a season, so creating or opening a season fails.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>com.apple.security.app-sandbox</key>
+  <true/>
+  <key>com.apple.application-identifier</key>
+  <string>95SV963967.org.pasadenajaycees.opsanta</string>
+  <key>com.apple.developer.team-identifier</key>
+  <string>95SV963967</string>
+  <!-- Census geocoder, Nominatim, OpenRouteService, Airtable. -->
+  <key>com.apple.security.network.client</key>
+  <true/>
+  <!-- Open/Save dialogs for .opsanta seasons, packets and exports. -->
+  <key>com.apple.security.files.user-selected.read-write</key>
+  <true/>
+  <!-- Security-scoped bookmarks, so a season can be reopened without the dialog. -->
+  <key>com.apple.security.files.bookmarks.app-scope</key>
+  <true/>
+</dict>
+</plist>

@@ -1,0 +1,34 @@
+[package]
+name = "opsanta"
+version = "0.1.0"
+edition = "2021"
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.37", features = ["bundled-sqlcipher-vendored-openssl", "backup"] }
+argon2 = "0.5"
+rand = "0.8"
+hex = "0.4"
+zeroize = "1"
+fs2 = "0.4"
+reqwest = { version = "=0.13.5", default-features = false, features = ["json", "multipart", "rustls"] }
+keyring = { version = "=3.6.3", features = ["apple-native", "windows-native"] }
+base64 = "=0.22.1"
+sha2 = "=0.10.9"
+csv = "=1.4.0"
+opsanta-solver = { path = "../../../crates/solver" }
+# E2E only: WebdriverIO's embedded WebDriver server (the only WebDriver path for WKWebView on macOS) and its plugin.
+# The server listens on 127.0.0.1:4445 with no auth, so it is registered only in debug builds made with
+# `--features e2e` (npm run e2e:build). Plain `tauri dev` and release builds never start it.
+[features]
+e2e = ["dep:tauri-plugin-wdio-webdriver", "dep:tauri-plugin-wdio"]
+[dependencies.tauri-plugin-wdio-webdriver]
+version = "=1.5.0"
+optional = true
+[dependencies.tauri-plugin-wdio]
+version = "=1.5.0"
+optional = true

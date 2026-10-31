@@ -1,0 +1,16 @@
+node_modules/
+target/
+dist/
+*.opsanta*
+*.pdf
+.DS_Store
+.env*
+e2e/.artifacts/
+
+qa/
+release/
+logs/
+*.provisionprofile
+*.p8
+*.p12
+*.key

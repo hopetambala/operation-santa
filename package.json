@@ -1,0 +1,53 @@
+{
+  "name": "opsanta",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 1420",
+    "build": "tsc -b && vite build",
+    "test": "vitest run",
+    "tauri": "cd apps/desktop && tauri",
+    "desktop": "cd apps/desktop && tauri dev",
+    "desktop:build": "cd apps/desktop && tauri build",
+    "e2e:build": "node e2e/build.mjs",
+    "e2e": "wdio run e2e/wdio.conf.ts",
+    "live-check": "cargo test -p opsanta -- --ignored live_ --nocapture --test-threads=1",
+    "release:gate": "node scripts/release-gate.mjs",
+    "release:mac": "node scripts/release-mac.mjs --channel dmg",
+    "release:mas": "node scripts/release-mac.mjs --channel mas",
+    "release:windows": "node scripts/release-windows.mjs",
+    "release:manifest": "node scripts/release-manifest.mjs"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "2.8.0",
+    "@tauri-apps/plugin-dialog": "2.4.0",
+    "exceljs": "4.4.0",
+    "jspdf": "3.0.3",
+    "jszip": "3.10.1",
+    "lucide-react": "0.468.0",
+    "papaparse": "5.5.3",
+    "pdfjs-dist": "4.10.38",
+    "qrcode": "1.5.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.8.4",
+    "@types/papaparse": "5.3.16",
+    "@types/qrcode": "1.5.5",
+    "@types/react": "18.3.24",
+    "@types/react-dom": "18.3.7",
+    "@vitejs/plugin-react": "4.7.0",
+    "@wdio/cli": "9.32.0",
+    "@wdio/local-runner": "9.32.0",
+    "@wdio/mocha-framework": "9.32.0",
+    "@wdio/spec-reporter": "9.32.0",
+    "@wdio/tauri-plugin": "1.5.0",
+    "@wdio/tauri-service": "1.5.0",
+    "typescript": "5.9.2",
+    "vite": "6.3.6",
+    "vitest": "3.2.4",
+    "webdriverio": "9.32.0"
+  }
+}

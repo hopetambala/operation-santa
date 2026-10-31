@@ -1,0 +1,2 @@
+use std::io::{self,Read};
+fn main(){let result=(||->Result<(),String>{let mut text=String::new();io::stdin().read_to_string(&mut text).map_err(|e|e.to_string())?;let input=serde_json::from_str(&text).map_err(|e|format!("Invalid input: {e}"))?;let output=opsanta_solver::solve(&input)?;println!("{}",serde_json::to_string_pretty(&output).map_err(|e|e.to_string())?);Ok(())})();if let Err(e)=result{eprintln!("{e}");std::process::exit(1)}}

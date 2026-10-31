@@ -1,0 +1,53 @@
+# Unit tests, Rust tests and the real-app E2E suite on macOS and Windows (PRD §14–15).
+# Unverified until the first run on GitHub: this folder had no repository when it was written (problems log A9).
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24, cache: npm}
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: npm ci
+      - run: npx tsc --noEmit -p .
+      - run: npm test
+      - run: cargo test --workspace
+      - run: npm run build
+  e2e:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24, cache: npm}
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: npm ci
+      - run: npm run e2e:build
+      - run: npm run e2e
+      # Synthetic data only: season files, PDFs and screenshots from the fixture families.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-evidence-${{ matrix.os }}
+          path: e2e/.artifacts/
+          retention-days: 14

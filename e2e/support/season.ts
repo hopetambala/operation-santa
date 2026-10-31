@@ -1,0 +1,18 @@
+import {$,$$} from '@wdio/globals';
+import {csv} from './fixture';
+import {PASSPHRASE,SEASON_PATH,click,fill,nav,toast,noError,reasonIfAsked,dialogText,importCsv,installMocks,queueOpen,setInput} from './app';
+// The committee's setup steps, shared by specs that start from a season with routes.
+// journey.e2e.ts walks the same steps with assertions at each one; these only wait for each step to land.
+export const TEAMS=[{name:'Team Rudolph',lead:'Robin Lead',phone:'(626) 555-0101',spanish:false},{name:'Team Comet',lead:'Casey Lead',phone:'(626) 555-0102',spanish:true}];
+export async function createSeason(){await $('button.avatar').click();await click('Create new season');await dialogText('Start a new season');await $('[role="dialog"] input[type=password]').setValue(PASSPHRASE);await click('Choose save location');await toast(/Encrypted season created/);}
+export async function importFixture(){await importCsv(csv());await dialogText('Review your import');await click('Accept import');await toast(/Uploads: 1 converted/,60000);await noError();}
+export async function resolveAddresses(){await nav('Address review');await click('Geocode 10');await toast(/Geocoded 10/);await click('Out of area (1)');await click('Move to pickup');await reasonIfAsked('moved_to_pickup');await $('//button[contains(.,"Out of area (0)")]').waitForExist();await click('Addresses (1)');await click('Accept suggestion');await $('//*[contains(text(),"Every address reviewed")]').waitForExist();await click('Proposed flags (3)');await click('Accept all');await $('//button[contains(.,"Proposed flags (0)")]').waitForExist();}
+export async function addTeams(){await nav('Teams');for(const t of TEAMS){await click('Add team');await dialogText('Santa team');await fill('Team name',t.name);await fill('Team lead',t.lead);await fill('Lead phone',t.phone);if(t.spanish)await $('//label[contains(.,"Spanish-speaking team member")]/input').click();await click('Save team');await $('[role="dialog"]').waitForExist({reverse:true});}}
+export async function approveAll(){await nav('Letter cleanup');let n=0;while(!(await $('//*[contains(text(),"Every letter has had a little care")]').isExisting())){await click('Approve');if(++n>40)throw Error('cleanup queue did not drain');}return n;}
+// route label → family names in stop order, as the planner shows them
+export async function readRoutes(){const routes:Record<string,string[]>={};for(const card of await $$('.route-card')){await card.click();const label=(await card.$('strong').getText()).trim();routes[label]=await Promise.all(await $$('.stop .stop-family strong').map(s=>s.getText()));}return routes;}
+export async function planRoutes(teams=2){await nav('Route planner');await setInput($('input[aria-label="Team count"]'),String(teams));await click('Rebalance unlocked');await toast(new RegExp(`${teams} routes planned`));await noError();return readRoutes();}
+export async function lockSeason(){await $('button.avatar').click();await click('Lock now');await toast(/Season locked/);}
+export async function openSeason(){await queueOpen(SEASON_PATH);await $('button.avatar').click();await click('Open encrypted season');await dialogText('Unlock your season');await $('[role="dialog"] input[type=password]').setValue(PASSPHRASE);await click('Open season');await toast(/Encrypted season open/);}
+// A fresh app with an encrypted season: sign-ups imported, addresses resolved, two teams, routes planned.
+export async function routedSeason(o:{approveLetters:boolean}){await $('h1').waitForDisplayed({timeout:60000});const mocks=await installMocks();await createSeason();await importFixture();await resolveAddresses();await addTeams();if(o.approveLetters)await approveAll();const routes=await planRoutes(2);return {mocks,routes};}

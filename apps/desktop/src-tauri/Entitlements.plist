@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Developer ID (DMG) build: hardened runtime, no sandbox (docs/RELEASE.md).
+  Intentionally empty. WKWebView's JIT runs in WebKit's own processes, so the app needs no allow-jit; the
+  keychain, outbound HTTPS and files beside the season file need no entitlement outside the sandbox.
+  Add an entitlement only with the failure that proves it is needed.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict/>
+</plist>

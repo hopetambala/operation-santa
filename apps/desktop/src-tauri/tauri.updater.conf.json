@@ -1,0 +1,1 @@
+{"bundle":{"createUpdaterArtifacts":true},"plugins":{"updater":{"pubkey":"REPLACE_WITH_UPDATER_PUBLIC_KEY","endpoints":["https://github.com/hopetambala/operation-santa/releases/latest/download/latest.json"],"windows":{"installMode":"passive"}}}}

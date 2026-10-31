@@ -1,0 +1,155 @@
+# Release Operation Santa (docs/RELEASE.md). The same scripts run here as on a Mac: npm run release:mac / release:mas / release:windows.
+#
+#   push tag vX.Y.Z    tests → notarized DMG + unsigned Windows installer → DRAFT GitHub Release. Publishing the draft is a person's click,
+#                      and it is what makes the updater (latest.json) see the new version.
+#   Run workflow       the same builds as workflow artifacts only, no Release. Tick "testflight" to also upload the Mac App Store build.
+#
+# The Mac App Store job runs only when the repository variable MAS_ENABLED is "true" (after the sandbox blockers in docs/RELEASE.md land).
+# Unverified until its first run on GitHub. Actions are pinned to commit SHAs; Node and Rust to exact versions.
+name: Release
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      testflight:
+        description: Upload the Mac App Store build to App Store Connect / TestFlight
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  NODE_VERSION: 24.14.1
+  RUST_VERSION: 1.97.1
+jobs:
+  test:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: {node-version: '${{ env.NODE_VERSION }}', cache: npm}
+      - run: rustup toolchain install "$RUST_VERSION" --profile minimal && rustup default "$RUST_VERSION"
+      - name: Tag must match the app version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          conf="$(node -p "require('./apps/desktop/src-tauri/tauri.conf.json').version")"
+          pkg="$(node -p "require('./package.json').version")"
+          test "v$conf" = "$GITHUB_REF_NAME" && test "$pkg" = "$conf" || { echo "Tag $GITHUB_REF_NAME, tauri.conf.json $conf, package.json $pkg must agree."; exit 1; }
+      - run: npm ci
+      - run: npx tsc --noEmit -p .
+      - run: npm test
+      - run: cargo test --workspace
+
+  mac-dmg:
+    needs: test
+    runs-on: macos-14
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: {node-version: '${{ env.NODE_VERSION }}', cache: npm}
+      - run: rustup toolchain install "$RUST_VERSION" --profile minimal --target aarch64-apple-darwin,x86_64-apple-darwin && rustup default "$RUST_VERSION"
+      - run: npm ci
+      - name: Signing keychain
+        env:
+          APPLE_DEVELOPER_ID_P12: ${{ secrets.APPLE_DEVELOPER_ID_P12 }}
+          APPLE_DEVELOPER_ID_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_PASSWORD }}
+          APPLE_API_KEY_BODY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: scripts/release-ci-keychain.sh APPLE_DEVELOPER_ID
+      - name: Build, sign, gate${{ startsWith(github.ref, 'refs/tags/v') && ', notarize, staple' || '' }}
+        env:
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npm run release:mac -- ${{ startsWith(github.ref, 'refs/tags/v') && '--notarize' || '' }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with: {name: mac-dmg, path: release/, if-no-files-found: error, retention-days: 30}
+
+  mac-app-store:
+    needs: test
+    if: vars.MAS_ENABLED == 'true'
+    runs-on: macos-14
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: {node-version: '${{ env.NODE_VERSION }}', cache: npm}
+      - run: rustup toolchain install "$RUST_VERSION" --profile minimal --target aarch64-apple-darwin,x86_64-apple-darwin && rustup default "$RUST_VERSION"
+      - run: npm ci
+      - name: Signing keychain and provisioning profile
+        env:
+          APPLE_DISTRIBUTION_P12: ${{ secrets.APPLE_DISTRIBUTION_P12 }}
+          APPLE_DISTRIBUTION_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_PASSWORD }}
+          APPLE_INSTALLER_P12: ${{ secrets.APPLE_INSTALLER_P12 }}
+          APPLE_INSTALLER_PASSWORD: ${{ secrets.APPLE_INSTALLER_PASSWORD }}
+          APPLE_API_KEY_BODY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          MAS_PROVISION_PROFILE: ${{ secrets.MAS_PROVISION_PROFILE }}
+        run: |
+          scripts/release-ci-keychain.sh APPLE_DISTRIBUTION APPLE_INSTALLER
+          test -n "$MAS_PROVISION_PROFILE" || { echo "Secret MAS_PROVISION_PROFILE is not set."; exit 1; }
+          printf '%s' "$MAS_PROVISION_PROFILE" | base64 --decode > "$RUNNER_TEMP/mas.provisionprofile"
+          echo "OPSANTA_MAS_PROFILE=$RUNNER_TEMP/mas.provisionprofile" >> "$GITHUB_ENV"
+      - name: Build, sign, gate, package${{ inputs.testflight && ', upload to TestFlight' || '' }}
+        env:
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: npm run release:mas -- ${{ inputs.testflight && '--upload' || '' }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with: {name: mac-app-store, path: release/, if-no-files-found: error, retention-days: 30}
+
+  windows:
+    needs: test
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: {node-version: '${{ env.NODE_VERSION }}', cache: npm}
+      - run: rustup toolchain install "$env:RUST_VERSION" --profile minimal; rustup default "$env:RUST_VERSION"
+      - run: npm ci
+      - name: Build NSIS installer, gate
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npm run release:windows
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with: {name: windows, path: release/, if-no-files-found: error, retention-days: 30}
+
+  draft-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [mac-dmg, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: {node-version: '${{ env.NODE_VERSION }}'}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with: {path: release/, merge-multiple: true}
+      - name: Updater manifest (only when update artifacts were signed)
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          if ls "release/$v"/*.sig >/dev/null 2>&1; then npm run release:manifest; else echo "No signed update artifacts; no latest.json."; fi
+      - name: Draft GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          cd "release/$v"
+          shasum -a 256 *.dmg *.exe > SHA256SUMS.txt
+          {
+            echo "Operation Santa $v"; echo
+            echo "- macOS (Apple silicon and Intel): Operation-Santa-$v-universal.dmg. Signed with Developer ID, notarized and stapled."
+            echo "- Windows: Operation-Santa-$v-x64-setup.exe. Not code-signed yet: SmartScreen asks once (More info, then Run anyway)."
+            echo; echo "SHA-256:"; echo '```'; cat SHA256SUMS.txt; echo '```'
+          } > "$RUNNER_TEMP/notes.md"
+          gh release create "$GITHUB_REF_NAME" --draft --title "Operation Santa $v" --notes-file "$RUNNER_TEMP/notes.md" ./*

@@ -1,0 +1,1 @@
+{"app":{"withGlobalTauri":true,"security":{"capabilities":["default",{"identifier":"e2e","description":"WebdriverIO E2E harness; only in builds made with npm run e2e:build","windows":["main"],"permissions":["core:window:default","wdio:default","wdio-webdriver:default"]}]}}}
