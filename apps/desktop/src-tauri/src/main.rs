@@ -12,6 +12,9 @@ use zeroize::Zeroize;
 // `file` is the one handle on the user's file: it holds the lock, and all reads and writes go through it, because
 // Windows file locks are mandatory and would block a second handle from the app itself.
 struct OpenSeason { conn:Connection, path:PathBuf, work:PathBuf, root:PathBuf, file:File }
+// Unlock explicitly before the handle closes: Windows may release a closed handle's lock late, so an immediate reopen
+// (or anything else reading the file) would still see it locked.
+impl Drop for OpenSeason { fn drop(&mut self){ let _=FileExt::unlock(&self.file); } }
 #[derive(Default)]
 struct Store(Mutex<Option<OpenSeason>>);
 fn keyed(path:&Path,pass:&str,create:bool)->Result<Connection,String>{
