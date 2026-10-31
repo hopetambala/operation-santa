@@ -21,7 +21,7 @@ npm run e2e
 
 ## What the specs cover
 
-Each spec file launches a fresh app.
+Each spec file gets a fresh app: `wdio.conf.ts` stops the app after every spec file, and the Tauri service starts a new one.
 
 - **`specs/journey.e2e.ts`**
   1. **Sign-ups → routes:**

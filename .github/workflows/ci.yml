@@ -50,4 +50,5 @@ jobs:
         with:
           name: e2e-evidence-${{ matrix.os }}
           path: e2e/.artifacts/
+          include-hidden-files: true
           retention-days: 14

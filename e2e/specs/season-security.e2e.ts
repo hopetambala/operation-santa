@@ -10,7 +10,8 @@ import {importFixture,lockSeason} from '../support/season';
 // R-SEA-2 (keychain) and R-DSH-3 (purge). The OS keychain is mocked so the run never touches the real login keychain.
 let mocks:Awaited<ReturnType<typeof installMocks>>;let key='';
 // Backups live in the app's data folder, keyed by the season file's path (see main.rs `key_of`).
-const backupsDir=()=>path.join(os.homedir(),'Library','Application Support','org.pasadenajaycees.opsanta','seasons','backups',createHash('sha256').update(SEASON_PATH).digest('hex'));
+const appData=process.platform==='win32'?process.env.APPDATA!:process.platform==='darwin'?path.join(os.homedir(),'Library','Application Support'):process.env.XDG_DATA_HOME||path.join(os.homedir(),'.local','share');
+const backupsDir=()=>path.join(appData,'org.pasadenajaycees.opsanta','seasons','backups',createHash('sha256').update(SEASON_PATH).digest('hex'));
 const backupCount=()=>existsSync(backupsDir())?readdirSync(backupsDir()).length:0;
 async function reopen(){await queueOpen(SEASON_PATH);await $('button.avatar').click();await click('Open encrypted season');}
 describe('Season security: remembered passphrase and post-season purge',()=>{
