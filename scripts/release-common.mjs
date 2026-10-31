@@ -80,9 +80,13 @@ export function updaterSetup(){
   }
   const conf=JSON.parse(readFileSync(join(TAURI_DIR,'tauri.updater.conf.json'),'utf8'));
   if(!conf.plugins?.updater?.pubkey||/REPLACE/.test(conf.plugins.updater.pubkey))fail('Updater: tauri.updater.conf.json still has no public key. See docs/RELEASE.md § Updater.');
-  if(!process.env.TAURI_SIGNING_PRIVATE_KEY)fail('Updater: TAURI_SIGNING_PRIVATE_KEY is not set, so update artifacts cannot be signed. See docs/RELEASE.md § Updater.');
-  const env={TAURI_SIGNING_PRIVATE_KEY:process.env.TAURI_SIGNING_PRIVATE_KEY};
-  if(process.env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD!==undefined)env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD=process.env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD;
+  // CI passes the key in the environment; on Hope's Mac it lives in the login keychain (docs/RELEASE.md § Updater).
+  const fromKeychain=s=>{if(process.platform!=='darwin')return undefined;const r=spawnSync('security',['find-generic-password','-s',s,'-w'],{encoding:'utf8'});return r.status===0?r.stdout.replace(/\n$/,''):undefined};
+  const key=process.env.TAURI_SIGNING_PRIVATE_KEY||fromKeychain('Operation Santa updater private key');
+  if(!key)fail('Updater: no TAURI_SIGNING_PRIVATE_KEY and no "Operation Santa updater private key" in the keychain, so update artifacts cannot be signed. See docs/RELEASE.md § Updater.');
+  const env={TAURI_SIGNING_PRIVATE_KEY:key};
+  const password=process.env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD??fromKeychain('Operation Santa updater key password');
+  if(password!==undefined)env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD=password;
   console.log('Updater: on. Building signed update artifacts.');
   return {features:['updater'],config:conf,env};
 }
