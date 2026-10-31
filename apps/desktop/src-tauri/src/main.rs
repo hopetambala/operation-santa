@@ -12,8 +12,7 @@ use zeroize::Zeroize;
 // `file` is the one handle on the user's file: it holds the lock, and all reads and writes go through it, because
 // Windows file locks are mandatory and would block a second handle from the app itself.
 struct OpenSeason { conn:Connection, path:PathBuf, work:PathBuf, root:PathBuf, file:File }
-// Unlock explicitly before the handle closes: Windows may release a closed handle's lock late, so an immediate reopen
-// (or anything else reading the file) would still see it locked.
+// Release the lock deterministically when the season closes, rather than leaving it to the handle's close.
 impl Drop for OpenSeason { fn drop(&mut self){ let _=FileExt::unlock(&self.file); } }
 #[derive(Default)]
 struct Store(Mutex<Option<OpenSeason>>);
@@ -274,7 +273,7 @@ fn decrypt_data(bytes:&[u8])->String{let copy=std::env::temp_dir().join(format!(
 #[test]fn reopen_sees_the_last_save(){let (dir,root)=season_dirs();let path=dir.join("Season.opsanta");let mut s=create_in(&path,PASS,&season_json("v1"),&root).unwrap();save_to(&mut s,&season_json("v2")).unwrap();close_out(s).unwrap();let (s,data)=open_in(&path,PASS,&root).unwrap();assert!(data.contains("v2"));assert!(open_in(&path,PASS,&root).is_err(),"a second open of the same season is refused");close_out(s).unwrap();}
 #[test]fn a_save_that_never_reached_the_file_is_recovered(){let (dir,root)=season_dirs();let path=dir.join("Season.opsanta");let s=create_in(&path,PASS,&season_json("v1"),&root).unwrap();
  // Simulate a crash after the database committed but before the file was rewritten.
- s.conn.execute("UPDATE season_state SET data=?1 WHERE id=1",[season_json("v2-unpublished")]).unwrap();drop(s);assert!(read_file_data(&path).contains("v1"));let (s,data)=open_in(&path,PASS,&root).unwrap();assert!(data.contains("v2-unpublished"),"the working copy's newer save is used");assert!(read_file_data(&path).contains("v2-unpublished"),"and written back to the file");close_out(s).unwrap();}
+ s.conn.execute("UPDATE season_state SET data=?1 WHERE id=1",[season_json("v2-unpublished")]).unwrap();drop(s);assert!(read_file_data(&path).contains("v1"));let (s,data)=open_in(&path,PASS,&root).unwrap();assert!(data.contains("v2-unpublished"),"the working copy's newer save is used");assert!(decrypt_data(&read_through(&s.file).unwrap()).contains("v2-unpublished"),"and written back to the file");close_out(s).unwrap();}
 #[test]fn a_file_replaced_outside_the_app_wins(){let (dir,root)=season_dirs();let path=dir.join("Season.opsanta");let mut s=create_in(&path,PASS,&season_json("v1"),&root).unwrap();let old=backup_of(&s).unwrap();save_to(&mut s,&season_json("v2")).unwrap();s.conn.execute("UPDATE season_state SET data=?1 WHERE id=1",[season_json("v3-unpublished")]).unwrap();drop(s);
  // The coordinator restores last week's backup over the season file.
  fs::copy(&old,&path).unwrap();let (s,data)=open_in(&path,PASS,&root).unwrap();assert!(data.contains("v1"),"the restored file is what opens, not the stale working copy: {data}");close_out(s).unwrap();}
