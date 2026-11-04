@@ -139,17 +139,19 @@ jobs:
         run: |
           v="${GITHUB_REF_NAME#v}"
           if ls "release/$v"/*.sig >/dev/null 2>&1; then npm run release:manifest; else echo "No signed update artifacts; no latest.json."; fi
-      - name: Draft GitHub Release
+      - name: Draft GitHub Release (a person publishes it)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          v="${GITHUB_REF_NAME#v}"
+          tag="$GITHUB_REF_NAME"; v="${tag#v}"
+          npm run release:notes -- --dir "release/$v"
+          mv "release/$v/NOTES.md" "$RUNNER_TEMP/notes.md"
           cd "release/$v"
-          shasum -a 256 *.dmg *.exe > SHA256SUMS.txt
-          {
-            echo "Operation Santa $v"; echo
-            echo "- macOS (Apple silicon and Intel): Operation-Santa-$v-universal.dmg. Signed with Developer ID, notarized and stapled."
-            echo "- Windows: Operation-Santa-$v-x64-setup.exe. Not code-signed yet: SmartScreen asks once (More info, then Run anyway)."
-            echo; echo "SHA-256:"; echo '```'; cat SHA256SUMS.txt; echo '```'
-          } > "$RUNNER_TEMP/notes.md"
-          gh release create "$GITHUB_REF_NAME" --draft --title "Operation Santa $v" --notes-file "$RUNNER_TEMP/notes.md" ./*
+          if gh release view "$tag" >/dev/null 2>&1; then
+            # A re-run replaces the files on the draft. A published Release is never changed by CI.
+            test "$(gh release view "$tag" --json isDraft --jq .isDraft)" = "true" || { echo "Release $tag is already published; CI will not change it."; exit 1; }
+            gh release upload "$tag" ./* --clobber
+            gh release edit "$tag" --notes-file "$RUNNER_TEMP/notes.md"
+          else
+            gh release create "$tag" --draft --verify-tag --title "Operation Santa $v" --notes-file "$RUNNER_TEMP/notes.md" ./*
+          fi

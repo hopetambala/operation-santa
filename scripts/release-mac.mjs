@@ -1,7 +1,7 @@
 // macOS release build (docs/RELEASE.md). Universal (Apple silicon + Intel).
 //
 //   npm run release:mac                    Developer ID .app + signed DMG in release/<version>/. Sends nothing to Apple.
-//   npm run release:mac -- --notarize      ...then notarytool submit --wait, staple, validate, spctl. Sends the DMG to Apple.
+//   npm run release:mac -- --notarize      ...notarizes and staples the app, then the DMG, and checks spctl. Sends both to Apple.
 //   npm run release:mas                    Mac App Store .app + signed .pkg. Sends nothing to Apple.
 //   npm run release:mas -- --upload        ...then altool validate + upload to App Store Connect (TestFlight).
 //
@@ -118,7 +118,34 @@ const outDir=join(OUT,version);
 mkdirSync(outDir,{recursive:true});
 
 if(channel==='dmg'){
+  /** notarytool submit --wait; fails unless Apple answers Accepted. */
+  const submit=(file,what)=>{
+    console.log(`\nNotarizing the ${what} via ${route.name}. This uploads it to Apple and waits.`);
+    const sub=capture('xcrun',['notarytool','submit',file,'--wait',...route.args]);
+    console.log(sub.out);
+    if(!sub.ok||!/status:\s*Accepted/.test(sub.out))fail(`Notarization of the ${what} was not accepted. Read the log: xcrun notarytool log <submission id> with the same credentials.`);
+  };
+
+  // Update artifacts first: Tauri made them from the signed app, and the updater installs without quarantine.
+  for(const f of readdirSync(bundleDir).filter(f=>/\.app\.tar\.gz(\.sig)?$/.test(f)))
+    cpSync(join(bundleDir,f),join(outDir,f.replace(/^.*\.app\.tar\.gz/,`Operation-Santa-${version}-universal.app.tar.gz`)));
+
+  // The app gets its own ticket, stapled before it goes in the DMG, so the copy a volunteer drags to
+  // Applications opens without a Gatekeeper warning even offline. The DMG then gets one of its own.
+  if(notarize){
+    const zip=join(mkdtempSync(join(tmpdir(),'opsanta-notary-')),`${product}.zip`);
+    run('ditto',['-c','-k','--keepParent',app,zip]);
+    submit(zip,'app');
+    rmSync(zip,{force:true});
+    run('xcrun',['stapler','staple',app]);
+    run('xcrun',['stapler','validate',app]);
+    const exec=capture('spctl',['--assess','--type','execute','--verbose=4',app]);
+    console.log(exec.out.trim());
+    if(!exec.ok||!/source=Notarized Developer ID/.test(exec.out))fail('spctl does not accept the notarized app');
+  }
+
   // hdiutil, not Tauri's DMG bundler: that drives Finder over AppleScript, which fails on headless CI (phos does the same).
+  // The window shows the app beside an Applications shortcut to drag it onto.
   const dmg=join(outDir,`Operation-Santa-${version}-universal.dmg`);
   const stage=mkdtempSync(join(tmpdir(),'opsanta-dmg-'));
   cpSync(app,join(stage,`${product}.app`),{recursive:true,verbatimSymlinks:true});
@@ -130,24 +157,18 @@ if(channel==='dmg'){
   run('codesign',['--verify','--strict','--verbose=2',dmg]);
   console.log(`✓ DMG signed: ${dmg}`);
 
-  for(const f of readdirSync(bundleDir).filter(f=>/\.app\.tar\.gz(\.sig)?$/.test(f)))
-    cpSync(join(bundleDir,f),join(outDir,f.replace(/^.*\.app\.tar\.gz/,`Operation-Santa-${version}-universal.app.tar.gz`)));
-
   if(!notarize){
     // The DMG's verdict is the one a volunteer meets. The .app alone can read "accepted" on the Mac that built it.
     console.log(`spctl (DMG, before notarization; "rejected … Unnotarized Developer ID" is expected): ${capture('spctl',['--assess','--type','open','--context','context:primary-signature','--verbose=4',dmg]).out.trim()}`);
-    console.log(`\nNot notarized. Gatekeeper will block this DMG on other Macs until it is.\nNotarize (sends the DMG to Apple): npm run release:mac -- --notarize`);
+    console.log(`\nNot notarized. Gatekeeper will block this DMG on other Macs until it is.\nNotarize (sends the app and the DMG to Apple): npm run release:mac -- --notarize`);
   }else{
-    console.log(`\nNotarizing via ${route.name}. This uploads the DMG to Apple and waits.`);
-    const sub=capture('xcrun',['notarytool','submit',dmg,'--wait',...route.args]);
-    console.log(sub.out);
-    if(!sub.ok||!/status:\s*Accepted/.test(sub.out))fail('Notarization was not accepted. Read the log: xcrun notarytool log <submission id> with the same credentials.');
+    submit(dmg,'DMG');
     run('xcrun',['stapler','staple',dmg]);
     run('xcrun',['stapler','validate',dmg]);
     const assess=capture('spctl',['--assess','--type','open','--context','context:primary-signature','--verbose=4',dmg]);
     console.log(assess.out.trim());
-    if(!assess.ok||!/accepted/.test(assess.out))fail('spctl does not accept the notarized DMG');
-    console.log(`✓ Notarized, stapled and accepted by Gatekeeper: ${dmg}`);
+    if(!assess.ok||!/source=Notarized Developer ID/.test(assess.out))fail('spctl does not accept the notarized DMG');
+    console.log(`✓ App and DMG notarized, stapled and accepted by Gatekeeper: ${dmg}`);
   }
 }else{
   const pkg=join(outDir,`Operation-Santa-${version}-${buildNumber}.pkg`);

@@ -17,7 +17,8 @@
     "release:mac": "node scripts/release-mac.mjs --channel dmg",
     "release:mas": "node scripts/release-mac.mjs --channel mas",
     "release:windows": "node scripts/release-windows.mjs",
-    "release:manifest": "node scripts/release-manifest.mjs"
+    "release:manifest": "node scripts/release-manifest.mjs",
+    "release:notes": "node scripts/release-notes.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "2.12.4",
