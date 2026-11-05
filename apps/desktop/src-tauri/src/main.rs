@@ -229,7 +229,11 @@ fn open_packet(path:String,mut passphrase:String,app:tauri::AppHandle)->Result<S
 fn export_ext_ok(p:&Path)->bool{p.extension().and_then(|e|e.to_str()).is_some_and(|e|["pdf","csv","json","txt","md","docx","zip"].contains(&e.to_ascii_lowercase().as_str()))}
 #[tauri::command(async)]
 fn write_export(path:String,data:String)->Result<(),String>{let p=PathBuf::from(path);if !p.is_absolute()||!export_ext_ok(&p){return Err("Exports can only be saved as PDF, CSV, JSON, TXT, MD, DOCX, or ZIP files.".into())}fs::write(&p,b64(&data)?).map_err(|_|"Unable to write the export file.")?;Ok(())}
-fn main(){let builder=tauri::Builder::default();
+// E2E builds write panics, with a backtrace, to the file CI uploads: on Windows a panic inside a webview callback
+// ends the app without a trace, and several runs lost the app mid-test.
+#[cfg(feature="e2e")]
+fn record_panics(){let Ok(path)=std::env::var("OPSANTA_E2E_LOG") else {return};let previous=std::panic::take_hook();std::panic::set_hook(Box::new(move|info|{use std::io::Write;if let Ok(mut f)=OpenOptions::new().create(true).append(true).open(&path){let _=writeln!(f,"[{:?}] {info}\n{}",std::thread::current().name(),std::backtrace::Backtrace::force_capture());}previous(info)}));}
+fn main(){#[cfg(feature="e2e")]record_panics();let builder=tauri::Builder::default();
  #[cfg(all(debug_assertions,feature="e2e"))]
  let builder=builder.plugin(tauri_plugin_wdio_webdriver::init()).plugin(tauri_plugin_wdio::init());
  #[cfg(feature="updater")]
