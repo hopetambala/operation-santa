@@ -19,8 +19,15 @@ In 2025 the routing tool was a website with paid accounts whose logins were pass
 
 ## Mac
 
-{: .note }
-**Draft:** the committee hasn't yet confirmed which Mac install the volunteers will use for 2026: the downloadable DMG, TestFlight, or both. Both are described here.
+Install from **TestFlight** if you can. If TestFlight doesn't work for you, use the download (DMG) instead.
+
+### From TestFlight
+
+1. Install **TestFlight** from the Mac App Store.
+2. Open the invitation email or link the coordinator sent, and click **Accept** or **View in TestFlight**.
+3. In TestFlight, click **Install** next to Operation Santa.
+
+TestFlight updates the app for you. TestFlight builds expire after 90 days, so the coordinator sends a fresh build before the season if needed.
 
 ### From the download (DMG)
 
@@ -31,14 +38,6 @@ In 2025 the routing tool was a website with paid accounts whose logins were pass
 5. Open **Applications** and double-click **Operation Santa**. If the Mac asks whether you're sure you want to open an app downloaded from the internet, click **Open**.
 
 <!-- screenshot: the DMG window with the app icon and the Applications folder -->
-
-### From TestFlight
-
-1. Install **TestFlight** from the Mac App Store.
-2. Open the invitation email or link the coordinator sent, and click **Accept** or **View in TestFlight**.
-3. In TestFlight, click **Install** next to Operation Santa.
-
-TestFlight updates the app for you. TestFlight builds expire after 90 days, so the coordinator sends a fresh build before the season if needed.
 
 ## Windows
 
