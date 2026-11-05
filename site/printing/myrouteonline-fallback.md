@@ -40,16 +40,22 @@ The file isn't encrypted. Delete it once it's uploaded.
 
 ## Plan in MyRouteOnline
 
-As in 2025, roughly:
+These steps follow MyRouteOnline's own import guide and pricing page as of November 5, 2026.
 
 1. Sign in to the club's MyRouteOnline account. Keep the login in the club's password manager, not in an email.
-2. Import `MyRouteOnline.csv` as the address list.
-3. Set the start and end to the North Pole, the start time (4:30 PM), and a service time per stop. 2025 used 10 minutes; the app's own estimate averages more because of apartments, gates and big families.
-4. Set the number of routes and generate them.
-5. Print or export each route.
+2. Click **Import & Reload** ▸ **Import Excel file**, and choose `MyRouteOnline.csv`. CSV files up to 5 MB are accepted; a season's file is far smaller.
+3. In the Import Wizard:
+   - Check **Ignore the first row**: it's the column header.
+   - Check that the "Title" column is set to **Title** and "Address" to **Address**. Columns with those names are usually matched for you.
+   - Set the North Pole as the **First** and **Last** address.
+   - Click **Import Now**.
+4. Fix any address shown in **red** before planning: MyRouteOnline couldn't find it on the map. Correct the text or place the pin by hand.
+5. Set the start time (4:30 PM) and a service time per stop. 2025 used 10 minutes; the app's own estimate averages more because of apartments, gates and big families.
+6. Set the number of routes and generate them.
+7. Print or export each route.
 
 {: .note }
-**Draft:** MyRouteOnline's screens and pricing change from year to year; check the steps against the live site before relying on them. Its pricing is per unique address, so a full season needs enough address credits.
+MyRouteOnline charges per unique address: one address uses one credit, and it can be reused for 30 days at no extra cost. Routing in 2025 used about 635 credits, so check the account has enough before December 19. Its 500-credit plan wouldn't cover a season; the 1,200-credit plan would. Nonprofits get 50% extra credits on any plan, so ask.
 
 ## What you lose
 

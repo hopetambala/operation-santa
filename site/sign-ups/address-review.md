@@ -79,7 +79,7 @@ The **Out of area** tab lists home-delivery families outside the service area: t
 A family you leave on this tab can still be delivered: create a [special route]({{ '/routing/route-planner/' | relative_url }}#special-routes) for them, such as an out-of-area run. Rebalancing never puts them on an ordinary route.
 
 {: .note }
-**Draft:** the service area is drawn as circles around each city, so some neighbouring-city addresses count as inside. The committee is still deciding whether to tighten it.
+The service area is drawn as a circle around each city in Settings, so some addresses in neighbouring cities, such as parts of San Gabriel and Arcadia, count as inside. If one of those families shouldn't be delivered, open them on the Families page and set **Delivery** to pickup or special.
 
 ## Proposed flags
 

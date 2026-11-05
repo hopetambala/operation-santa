@@ -84,9 +84,6 @@ There's no restore button yet. To go back to a backup:
 4. Copy the backup you want to a safe place, such as next to the season file, and give it a clear name like `Operation Santa 2026 restored.opsanta`.
 5. Open the app and use **Open encrypted season** on that copy, with the usual passphrase.
 
-{: .note }
-**Draft:** the Windows folder above follows Tauri's standard app-data location. Confirm it on a Windows install before publishing.
-
 ## On a new computer
 
 Copy the `.opsanta` file to the new computer (a USB stick or the club's shared drive), install the app, and open the file with the passphrase. Remembered passphrases and the Airtable token stay in each computer's own keychain, so enter them again there.
