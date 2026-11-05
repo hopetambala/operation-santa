@@ -50,6 +50,11 @@ jobs:
       - run: npm ci
       - run: npm run e2e:build
       - run: npm run e2e
+      # When the app dies mid-test on Windows, the Application event log names the faulting module and exception code.
+      - name: Windows crash report
+        if: failure() && runner.os == 'Windows'
+        shell: pwsh
+        run: Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName='Application Error','Windows Error Reporting','.NET Runtime'} -MaxEvents 15 -ErrorAction SilentlyContinue | Format-List TimeCreated,ProviderName,Id,Message
       # Synthetic data only: season files, PDFs and screenshots from the fixture families.
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
