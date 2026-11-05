@@ -46,7 +46,7 @@ The token goes into this computer's keychain only, never into the season file. T
 3. Put the part starting with `tbl` (or the table's name) in "Table ID or name".
 4. Click **Save settings** at the bottom of the settings form.
 
-<!-- screenshot: Settings with the Airtable connection panel showing "Token saved" (no real token visible) -->
+![Settings, with the Airtable connection panel showing "Token saved" (no token visible)]({{ '/assets/images/airtable-token-saved.png' | relative_url }})
 
 ## Sync
 

@@ -37,7 +37,7 @@ The list shows the first 400 matches; narrow the search to see others. The foote
 | FLAGS | Short codes: SS Spanish speaker, ET extra toys, AAF adopt-a-family, DNSWV held by coordinator ("do not share with volunteers"). A **?** means proposed flags are waiting. |
 | ADDRESS | verified or manual (good to route), or pending, review or failed (needs a look). |
 
-<!-- screenshot: Families list on the demo season with the filter menu open -->
+![The Families list on the demo season, with the filter next to the search box]({{ '/assets/images/families-filter.png' | relative_url }})
 
 ## Edit a family
 

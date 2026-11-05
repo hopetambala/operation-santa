@@ -18,7 +18,8 @@
     "release:mas": "node scripts/release-mac.mjs --channel mas",
     "release:windows": "node scripts/release-windows.mjs",
     "release:manifest": "node scripts/release-manifest.mjs",
-    "release:notes": "node scripts/release-notes.mjs"
+    "release:notes": "node scripts/release-notes.mjs",
+    "guides:screenshots": "wdio run e2e/wdio.guides.conf.ts"
   },
   "dependencies": {
     "@tauri-apps/api": "2.12.4",

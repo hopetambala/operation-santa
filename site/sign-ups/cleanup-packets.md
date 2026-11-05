@@ -45,7 +45,7 @@ You can keep working on the same letters while the packet is out. If you both ch
 {: .warning }
 Packet mode doesn't save as you go. Click **Save edited packet** before you close the app, or your edits are lost.
 
-<!-- screenshot: packet mode with the yellow "Packet mode: you are editing … families' letters" note -->
+![Packet mode, with the yellow "Packet mode: you are editing 5 families' letters" note]({{ '/assets/images/packet-mode.png' | relative_url }})
 
 ## For the coordinator: merge a returned packet
 

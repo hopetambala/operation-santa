@@ -52,7 +52,7 @@ The app takes one last backup in case something goes wrong, purges, then deletes
 {: .warning }
 The purge can't be undone. That's the point.
 
-<!-- screenshot: the "Purge sensitive records" box with the confirmation field (demo season) -->
+![The "Purge sensitive records" box with the confirmation field (demo season)]({{ '/assets/images/purge-dialog.png' | relative_url }})
 
 After January 31, Settings reminds you: "It is past January 31. Please purge this season."
 

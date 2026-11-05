@@ -18,7 +18,7 @@ In 2025 the routing settings lived in each MyRouteOnline account and the print l
 
 Change any value under "Season settings", then click **Save settings** at the bottom. After the plan is frozen or printed, the app asks for a reason, and every changed setting is recorded in the [Change log]({{ '/reference/change-log/' | relative_url }}).
 
-<!-- screenshot: Settings page on the demo season -->
+![The Settings page on the demo season]({{ '/assets/images/settings.png' | relative_url }})
 
 ## Season
 

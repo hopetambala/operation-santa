@@ -50,7 +50,7 @@ Read the yellow warnings, if any. They name the problem and what to do. For exam
 
 Click **Accept import** to bring it in, or **Cancel import** to change nothing.
 
-<!-- screenshot: "Review your import" with the five counts and one expanded "changed" family (demo data) -->
+!["Review your import" with its five counts and one changed demo family expanded]({{ '/assets/images/import-review.png' | relative_url }})
 
 ## 4. Let the uploads download
 

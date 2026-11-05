@@ -11,7 +11,7 @@ Every Christmas Eve, Pasadena Jaycees Santa teams visit hundreds of local famili
 
 These guides follow the season in order. Find the step you're on, or start with [your role]({{ '/roles/' | relative_url }}).
 
-<!-- screenshot: Overview page of the built-in demo season (fictional families), showing the stat cards and task list -->
+![The Overview page of the built-in demo season (fictional families): stat cards, route overview and task list]({{ '/assets/images/overview.png' | relative_url }})
 
 ## The season at a glance
 

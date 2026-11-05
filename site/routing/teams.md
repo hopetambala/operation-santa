@@ -31,7 +31,7 @@ A team lead's name and phone number go on the cover of their packet, and on the 
 
 To change a team, click the **⋯** button on its card. **Remove team** is at the bottom of that box; it also takes the team off its route.
 
-<!-- screenshot: Teams page on the demo season with eight team cards -->
+![The Teams page on the demo season with eight team cards]({{ '/assets/images/teams.png' | relative_url }})
 
 ## Import teams from a spreadsheet
 

@@ -41,7 +41,7 @@ In **Print center**, under the banner:
 3. Hold the printed page against a sheet of labels, up to a window or a light. Each box ("Avery 5163 · slot 1", and so on) should sit inside a label.
 4. If the boxes are off, check the printer's scale and paper-size settings (US Letter) and try again before using label sheets.
 
-<!-- screenshot: the alignment test page next to an Avery 5163 sheet -->
+![The label alignment test page for Avery 5163, with ten numbered slots]({{ '/assets/images/label-alignment-test.png' | relative_url }})
 
 ## Start on a part-used sheet
 

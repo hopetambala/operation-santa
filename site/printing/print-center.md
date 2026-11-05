@@ -29,7 +29,7 @@ Each route's packet runs in this order. Every page carries the route, its versio
 
 See [Your team packet]({{ '/christmas-eve/team-lead/' | relative_url }}) for how a team lead uses it.
 
-<!-- screenshot: the cover page of a demo route packet (fictional families) -->
+![The cover page of a demo route packet: route, team lead, map and phone-navigation QR code]({{ '/assets/images/route-packet-cover.png' | relative_url }})
 
 ## 1. Check before printing
 

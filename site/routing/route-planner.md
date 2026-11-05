@@ -48,7 +48,7 @@ The read-outs at the top show:
 - "LONGEST · SPREAD": the longest route, and the gap between the longest and shortest. Aim for a spread of 45 minutes or less.
 - "UNROUTED": home-delivery families not on any route, with out-of-area families counted separately.
 
-<!-- screenshot: Route planner on the demo season after a rebalance, with the route list and one route open -->
+![The Route planner on the demo season: the route list, and Route 01 selected on the map]({{ '/assets/images/route-planner.png' | relative_url }})
 
 ### When families don't fit
 

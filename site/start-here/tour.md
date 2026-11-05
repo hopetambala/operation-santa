@@ -13,7 +13,7 @@ description: "The top bar, the Overview task list, and the reason prompt you'll 
 1. TOC
 {:toc}
 
-<!-- screenshot: the whole window on the demo season's Overview, with the top bar labelled -->
+![The whole app window on the demo season's Overview, with the navigation along the top]({{ '/assets/images/overview.png' | relative_url }})
 
 ## The top bar
 

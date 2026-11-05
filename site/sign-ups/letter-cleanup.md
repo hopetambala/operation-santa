@@ -54,7 +54,7 @@ Some iPhone photos (HEIC) can't be decoded on every computer: "HEIC photo could 
    - **Hold from print**: this letter won't print. The packet says "Letter held by coordinator." in its place.
    - **Next letter** / **Previous**: move without deciding.
 
-<!-- screenshot: a demo letter with the original on the left and the cleaned letter on the right -->
+![A demo letter: the original on the left, the cleaned letter on the right]({{ '/assets/images/letter-cleanup.png' | relative_url }})
 
 ### What to change, and what to leave
 

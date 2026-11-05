@@ -27,7 +27,7 @@ The season holds children's names, letters and drawings, and families' addresses
 
 The top right now says "Encrypted · saved on this device", and a message says "Encrypted season created. Changes save automatically."
 
-<!-- screenshot: the "Start a new season" box with the passphrase field and keychain checkbox -->
+![The "Start a new season" box with the passphrase field and the keychain checkbox]({{ '/assets/images/new-season-dialog.png' | relative_url }})
 
 {: .warning }
 **There is no way to recover a season without its passphrase.** Store it in the club's password manager straight away, and give a sealed copy to the treasurer. Don't email it or write it in a shared document.

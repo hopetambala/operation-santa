@@ -30,7 +30,7 @@ Check these before you leave:
 
 The map shows your stops as numbered circles and the North Pole as **NP**. It isn't a driving map: use the QR codes.
 
-<!-- screenshot: a demo route cover page with the QR codes -->
+![A demo route cover page with the phone-navigation QR code]({{ '/assets/images/route-packet-cover.png' | relative_url }})
 
 ### Phone navigation
 
