@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {saver} from './saving';
+import {saver,autosave} from './saving';
 // A save rewrites the whole encrypted file, so at season size one takes a moment. Approving letters one after another
 // must not queue one save per click (at 740 families that made each click take ~2 s on CI).
 const slowDisk=()=>{const saved:string[]=[];let open:(()=>void)[]=[];const save=(d:string)=>new Promise<void>(r=>{saved.push(d);open.push(r)});const finish=()=>{const o=open;open=[];o.forEach(r=>r())};return {saved,save,finish};};
@@ -11,4 +11,11 @@ describe('Saving the season',()=>{
  it('reports a failed save, and still saves later changes',async()=>{let fail=true;const saved:string[]=[];const s=saver(async d=>{if(fail){fail=false;throw Error('disk full')}saved.push(d)});await expect(s.schedule(()=>'a')).rejects.toThrow('disk full');await s.schedule(()=>'b');expect(saved).toEqual(['b']);});
  it('keeps saving after building the data throws',async()=>{const saved:string[]=[];const {schedule,idle}=saver(async d=>{saved.push(d)});await expect(schedule(()=>{throw Error('cannot serialize')})).rejects.toThrow('cannot serialize');await schedule(()=>'b');await idle();expect(saved).toEqual(['b']);});
  it('a change made after a failure is not lost',async()=>{let fail=true;const saved:string[]=[];const s=saver(async d=>{if(fail){fail=false;throw Error('disk full')}saved.push(d)});const first=s.schedule(()=>'a').catch(()=>'failed');s.schedule(()=>'b');expect(await first).toBe('failed');await s.idle();expect(saved.at(-1)).toBe('b');});
+ // Each change is a full copy of the season (4.6 MB at 740 families). A save keeps running while letters are approved,
+ // so nothing may hold on to the copies in between: 1,500 of them crashed the app on CI.
+ it('lets go of older states while a save is still running',async()=>{const gc=(globalThis as {gc?:()=>void}).gc;expect(gc,'run vitest with --expose-gc').toBeTypeOf('function');let release=()=>{};const a=autosave<{rows:number[]}>(()=>new Promise<void>(r=>{release=r}),{clean:()=>{},failed:()=>{}});const refs:WeakRef<object>[]=[];
+  (()=>{for(let i=0;i<20;i++){const state={rows:new Array(10_000).fill(i)};refs.push(new WeakRef(state));a.change(state)}})();
+  await flush();gc!();const alive=refs.map(r=>r.deref()!==undefined);expect(alive[0],'the state being saved').toBe(true);expect(alive[19],'the newest state, saved next').toBe(true);expect(alive.slice(1,19).filter(Boolean).length,'states in between still held').toBe(0);release();await flush();release();await a.idle();});
+ it('marks the season clean once, when the newest state is on disk',async()=>{const disk=slowDisk();let clean=0;const a=autosave<string>(disk.save,{clean:()=>{clean++},failed:()=>{}});a.change('a');a.change('b');await flush();disk.finish();await flush();expect(clean).toBe(0);disk.finish();await a.idle();await flush();expect(clean).toBe(1);expect(disk.saved).toEqual(['"a"','"b"']);});
+ it('reports a failed save',async()=>{const failed:unknown[]=[];const a=autosave<string>(async()=>{throw Error('disk full')},{clean:()=>{},failed:e=>{failed.push(e)}});a.change('a');await a.idle();await flush();expect(failed.length).toBe(1);});
 });
