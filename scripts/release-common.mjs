@@ -31,9 +31,9 @@ export function capture(cmd,args,opts={}){
 export function tauriConf(){return JSON.parse(readFileSync(join(TAURI_DIR,'tauri.conf.json'),'utf8'))}
 
 /** True when apps/desktop/src-tauri/Cargo.toml declares `[features] name = ...`. */
-export function hasCargoFeature(name){
-  const toml=readFileSync(join(TAURI_DIR,'Cargo.toml'),'utf8');
-  const features=/^\[features\]\n([\s\S]*?)(?=^\[|$(?![\s\S]))/m.exec(toml)?.[1]??'';
+export function hasCargoFeature(name,toml=readFileSync(join(TAURI_DIR,'Cargo.toml'),'utf8')){
+  // CRLF too: Windows runners check the file out that way.
+  const features=/^\[features\]\r?\n([\s\S]*?)(?=^\[|$(?![\s\S]))/m.exec(toml)?.[1]??'';
   return new RegExp(`^${name}\\s*=`,'m').test(features);
 }
 

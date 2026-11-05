@@ -3,6 +3,9 @@
 #   push tag vX.Y.Z    tests → notarized DMG + unsigned Windows installer → DRAFT GitHub Release. Publishing the draft is a person's click,
 #                      and it is what makes the updater (latest.json) see the new version.
 #   Run workflow       the same builds as workflow artifacts only, no Release. Tick "testflight" to also upload the Mac App Store build.
+#   main / schedule    the same builds, to keep the Rust caches warm, so a tag only compiles the app itself. No artifacts, no Release.
+#                      A tag run can read main's caches but can't save its own, so main runs when dependencies change, and on a
+#                      schedule, because GitHub evicts caches nobody has read for 7 days.
 #
 # The Mac App Store job runs only when the repository variable MAS_ENABLED is "true" (after the sandboxed build is proven: docs/RELEASE.md § Season files under the sandbox).
 # Unverified until its first run on GitHub. Actions are pinned to commit SHAs; Node and Rust to exact versions.
@@ -10,6 +13,11 @@ name: Release
 on:
   push:
     tags: ['v*.*.*']
+    branches: [main]
+    # GitHub ignores path filters on tag pushes, so every tag still runs.
+    paths: [Cargo.lock, '**/Cargo.toml', package-lock.json, .github/workflows/release.yml, scripts/release-*]
+  schedule:
+    - cron: '23 7 * * 1,4'
   workflow_dispatch:
     inputs:
       testflight:
@@ -32,6 +40,8 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: {node-version: '${{ env.NODE_VERSION }}', cache: npm}
       - run: rustup toolchain install "$RUST_VERSION" --profile minimal && rustup default "$RUST_VERSION"
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with: {shared-key: release-test, save-if: "${{ github.ref == 'refs/heads/main' }}"}
       - name: Tag must match the app version
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
@@ -44,7 +54,7 @@ jobs:
       - run: cargo test --workspace
 
   mac-dmg:
-    needs: test
+    # Builds don't wait for the tests: they run side by side, and the draft Release needs both.
     runs-on: macos-14
     timeout-minutes: 60
     steps:
@@ -52,6 +62,8 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: {node-version: '${{ env.NODE_VERSION }}', cache: npm}
       - run: rustup toolchain install "$RUST_VERSION" --profile minimal --target aarch64-apple-darwin,x86_64-apple-darwin && rustup default "$RUST_VERSION"
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with: {shared-key: release-mac, save-if: "${{ github.ref == 'refs/heads/main' }}"}
       - run: npm ci
       - name: Signing keychain
         env:
@@ -69,6 +81,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: npm run release:mac -- ${{ startsWith(github.ref, 'refs/tags/v') && '--notarize' || '' }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
         with: {name: mac-dmg, path: release/, if-no-files-found: error, retention-days: 30}
 
   mac-app-store:
@@ -81,6 +94,8 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: {node-version: '${{ env.NODE_VERSION }}', cache: npm}
       - run: rustup toolchain install "$RUST_VERSION" --profile minimal --target aarch64-apple-darwin,x86_64-apple-darwin && rustup default "$RUST_VERSION"
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with: {shared-key: release-mas, save-if: "${{ github.ref == 'refs/heads/main' }}"}
       - run: npm ci
       - name: Signing keychain and provisioning profile
         env:
@@ -106,7 +121,6 @@ jobs:
         with: {name: mac-app-store, path: release/, if-no-files-found: error, retention-days: 30}
 
   windows:
-    needs: test
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
@@ -114,6 +128,8 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: {node-version: '${{ env.NODE_VERSION }}', cache: npm}
       - run: rustup toolchain install "$env:RUST_VERSION" --profile minimal; rustup default "$env:RUST_VERSION"
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with: {shared-key: release-windows, save-if: "${{ github.ref == 'refs/heads/main' }}"}
       - run: npm ci
       - name: Build NSIS installer, gate
         env:
@@ -121,11 +137,12 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: npm run release:windows
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
         with: {name: windows, path: release/, if-no-files-found: error, retention-days: 30}
 
   draft-release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [mac-dmg, windows]
+    needs: [test, mac-dmg, windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write

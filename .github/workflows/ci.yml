@@ -1,6 +1,10 @@
 # Unit tests, Rust tests and the real-app E2E suite on macOS and Windows (PRD §14–15).
-# Unverified until the first run on GitHub: this folder had no repository when it was written (problems log A9).
+# Actions are pinned to commit SHAs and Node/Rust to exact versions, as in release.yml: caches written on main feed the
+# signed release builds, so anything that runs here is part of what ships.
 name: CI
+env:
+  NODE_VERSION: 24.14.1
+  RUST_VERSION: 1.97.1
 on:
   push:
     branches: [main]
@@ -17,11 +21,12 @@ jobs:
         os: [macos-14, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: 24, cache: npm}
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: {node-version: '${{ env.NODE_VERSION }}', cache: npm}
+      - run: rustup toolchain install "$RUST_VERSION" --profile minimal && rustup default "$RUST_VERSION"
+        shell: bash
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - run: npm ci
       - run: npx tsc --noEmit -p .
       - run: npm test
@@ -36,16 +41,17 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: 24, cache: npm}
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: {node-version: '${{ env.NODE_VERSION }}', cache: npm}
+      - run: rustup toolchain install "$RUST_VERSION" --profile minimal && rustup default "$RUST_VERSION"
+        shell: bash
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - run: npm ci
       - run: npm run e2e:build
       - run: npm run e2e
       # Synthetic data only: season files, PDFs and screenshots from the fixture families.
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: e2e-evidence-${{ matrix.os }}
