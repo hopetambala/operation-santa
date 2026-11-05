@@ -1,0 +1,63 @@
+# Operation Santa guides: the GitHub Pages site for the operation-santa repo.
+# Built by the Pages workflow proposed in PUBLISHING.md (Pages can't serve a /site folder directly).
+# Nothing here is published until Hope approves it.
+
+title: Operation Santa guides
+description: >-
+  How Pasadena Jaycees volunteers use the Operation Santa app to turn
+  sign-ups into Christmas Eve routes, letters and team packets.
+url: https://hopetambala.github.io
+baseurl: /operation-santa
+lang: en-US
+
+# Just the Docs: left-hand navigation, built-in search, readable defaults.
+# Pinned to a release more than two weeks old (v0.12.0, January 2026).
+remote_theme: just-the-docs/just-the-docs@v0.12.0
+plugins:
+  - jekyll-remote-theme
+  - jekyll-seo-tag
+
+color_scheme: light
+permalink: pretty
+search_enabled: true
+search:
+  heading_level: 2
+  previews: 2
+heading_anchors: true
+back_to_top: true
+back_to_top_text: "Back to top"
+
+aux_links:
+  "Download the app":
+    - "https://github.com/hopetambala/operation-santa/releases/latest"
+aux_links_new_tab: true
+
+footer_content: >-
+  Operation Santa is a Pasadena Jaycees volunteer project. These guides use
+  made-up families only. Never post real family details, screenshots of a real
+  season, or a season passphrase anywhere public.
+
+# Callouts used in the guides: {: .why }, {: .note }, {: .tip }, {: .warning }
+callouts_level: quiet
+callouts:
+  why:
+    title: Why this step exists
+    color: purple
+  note:
+    title: Note
+    color: blue
+  tip:
+    title: Tip
+    color: green
+  warning:
+    title: Careful
+    color: red
+
+# Maintainer files that live here but aren't part of the public site.
+exclude:
+  - FEATURE-INVENTORY.md
+  - PUBLISHING.md
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor

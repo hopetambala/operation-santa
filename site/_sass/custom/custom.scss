@@ -1,0 +1,11 @@
+// Many Santa-team volunteers are older readers: slightly larger body text and roomier lines.
+.main-content {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+.main-content li + li {
+  margin-top: 0.35em;
+}
+
+// Screenshot spots that haven't been filled yet stay invisible: they're HTML comments in the Markdown.
