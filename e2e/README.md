@@ -42,6 +42,11 @@ Each spec file gets a fresh app: `wdio.conf.ts` stops the app after every spec f
   - A volunteer opens the packet: only those families, drawings included.
   - The volunteer approves, edits, flags and holds letters, then saves.
   - The coordinator imports: 10 field changes merge, and 1 clash is resolved in the conflict dialog. Also checked: who cleaned each letter, and the change log.
+- **`specs/airtable-export.e2e.ts`:** the usability test's success criterion at season size. A coordinator takes a 740-family Airtable export (`support/airtable-export.ts`: synthetic, seeded, with the 2025 form's columns and English and Spanish answers) from a fresh install to 45 printed route packets:
+  - import, with expired drawing links, then a fresh re-export that downloads them
+  - geocode, accept the proposed flags (only the real pickup answers become pickups), move the out-of-area families to pickup, and pin the misses
+  - import 45 teams from a sheet, plan 45 routes, approve every letter, and print one PDF
+  - Writes `airtable-export-740.csv`, `teams-45.csv` and `airtable-export-timings.json` to the run folder; the usability study uses the first two. Takes about 15–25 minutes.
 - **`specs/airtable-sync.e2e.ts`:** paged Airtable read, refresh of an expired drawing link, and an idempotent re-sync.
 - **`specs/season-security.e2e.ts`:** keychain "remember passphrase" with fallback, and the purge.
 - **`specs/updates.e2e.ts`:** updates are offered, install only after "Install and restart", and pause Dec 20–26 (the updater plugin is mocked).
