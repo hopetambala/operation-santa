@@ -127,7 +127,9 @@ fn secret_set(name:String,mut value:String)->Result<(),String>{let r=entry(&name
 fn secret_get(name:String)->Result<Option<String>,String>{secret_read(&name)}
 #[tauri::command(async)]
 fn secret_delete(name:String)->Result<(),String>{match entry(&name)?.delete_credential(){Ok(())|Err(keyring::Error::NoEntry)=>Ok(()),Err(e)=>Err(format!("Keychain error: {e}"))}}
+// LR-10: the Census request refuses any field beyond these five, so a name or phone can't ride along.
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct CensusRow{id:String,street:String,city:String,state:String,zip:String}
 #[derive(Serialize,Clone,Debug,PartialEq)]#[serde(rename_all="camelCase")]
 struct CensusHit{id:String,matched:bool,exact:bool,lat:Option<f64>,lon:Option<f64>,matched_address:String}
@@ -255,6 +257,7 @@ fn tmp(ext:&str)->PathBuf{std::env::temp_dir().join(format!("opsanta-{}.{ext}",r
  let rows=[CensusRow{id:"9".into(),street:"12 \"A\" St, Apt 3".into(),city:"Pasadena".into(),state:"CA".into(),zip:"91101".into()}];
  assert_eq!(String::from_utf8(census_csv(&rows).unwrap()).unwrap(),"9,\"12 \"\"A\"\" St, Apt 3\",Pasadena,CA,91101\n");
 }
+#[test]fn census_rows_refuse_extra_fields(){assert!(serde_json::from_str::<CensusRow>(r#"{"id":"1","street":"1 A St","city":"Pasadena","state":"CA","zip":"91101"}"#).is_ok());assert!(serde_json::from_str::<CensusRow>(r#"{"id":"1","street":"1 A St","city":"Pasadena","state":"CA","zip":"91101","name":"Secret Family"}"#).is_err());}
 #[test]fn nominatim_parsing(){
  let p=parse_nominatim(r#"[{"lat":"34.1","lon":"-118.1","class":"place","type":"house","addresstype":"place","display_name":"100, Main Street"}]"#).unwrap().unwrap();assert!(p.house_level&&p.lat==34.1&&p.lon==-118.1);
  assert!(!parse_nominatim(r#"[{"lat":"34.1","lon":"-118.1","class":"highway","type":"residential","addresstype":"road","display_name":"Main Street"}]"#).unwrap().unwrap().house_level);

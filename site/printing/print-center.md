@@ -43,6 +43,7 @@ Each route also has its own card saying "Ready to export", "Ready · 2 warnings"
 
 | Problem | Fix it in |
 |---|---|
+| 36 home deliveries have no route: 30 don’t fit…, 4 need an address, 2 are out of area. (blocks **All routes, one PDF** and **One PDF per route** only) | Route planner: add teams or rebalance; Address review for addresses; move families to pickup, a special route, or cancel them |
 | Assign a team. | Route planner ▸ the route ▸ **Team** |
 | Route has no stops. | Route planner: add stops or **Delete** the route |
 | Route exceeds the delivery limit. | Route planner: move stops off, or add a team and rebalance |

@@ -41,7 +41,7 @@ Change any value under "Season settings", then click **Save settings** at the bo
 | Number of teams | 8 | The same as "Teams" in the Route planner. |
 | Team count | Fixed | The same as "Fleet" in the Route planner: **Fixed** or **Fewest that fit**. |
 
-## Service time model
+## Stop and travel times
 
 How long each stop takes, in minutes. A stop is never counted as less than 5 or more than 25 minutes.
 
@@ -64,7 +64,7 @@ How long each stop takes, in minutes. A stop is never counted as less than 5 or 
 
 | Setting | Default | What it does |
 |---|---|---|
-| Cities served | Pasadena, Altadena, South Pasadena, San Marino, Sierra Madre | Families outside these cities appear on Address review ▸ **Out of area**. |
+| Cities served | Pasadena, Altadena, South Pasadena, San Marino, Sierra Madre | Families outside these cities appear on Address review ▸ **Out of area**. The five default cities are checked by distance; a city you add is matched by the city name on the sign-up. |
 | Buffer beyond city limits (miles) | 1 | How far past each city's edge still counts as inside. |
 
 {: .note }

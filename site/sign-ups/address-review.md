@@ -59,7 +59,7 @@ The **Duplicates** tab groups sign-ups that share the same address and unit. For
 
 - **Merge into #…**: it's the same family twice. The second sign-up's children who aren't already on the first are added to the first, and the second is cancelled.
 - **Cancel this one**: cancel this sign-up without moving anything.
-- **Keep both (different families)**: two households at one address. They're marked "duplicate address ok" and stop appearing here.
+- **Keep both (different families)**: two households at one address. The app asks why, and records it in the change log. They're marked "duplicate address ok" and stop appearing here.
 
 The app always asks for a reason for merges and cancellations here, so the History explains it later.
 

@@ -22,7 +22,7 @@ Red banners at the top of the page explain what went wrong. Find the message bel
 | Season file not found. | The file was moved or renamed. Use **Open encrypted season** and find it again. |
 | A file already exists at this location. Choose a new name. | Pick a different file name when creating a season or saving a packet. |
 | This season was created by a newer version of Operation Santa. | [Update the app]({{ '/start-here/install/' | relative_url }}#updates). |
-| Saving failed. Keep the app open and use Save now in Settings before closing. | Don't close the app. Free some disk space, then use Settings ▸ **Create encrypted backup**. |
+| Saving failed: … Your changes are still in this window. | Don't close the app. Free some disk space, then choose **Try saving again** on the message. |
 | Automatic backup failed. Check free disk space. | Free some disk space. |
 | Season locked after 30 minutes of inactivity. Open it again to continue. | Normal. Open the season again. |
 | Encrypted season files and real imports run in the desktop app. | You're in the developer preview, not the installed app. |

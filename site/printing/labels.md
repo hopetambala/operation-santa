@@ -45,7 +45,7 @@ In **Print center**, under the banner:
 
 ## Start on a part-used sheet
 
-If the first few labels on a sheet are already used, set "Start at slot" to the first free label. Slots count left to right, top to bottom: 1 to 10 on Avery 5163, 1 to 30 on Avery 5160. The setting applies to the first label page of **every** route in the next PDF, so use it for a single route's packet, and set it back to 1 afterwards.
+If the first few labels on a sheet are already used, set "Start at slot" to the first free label. Slots count left to right, top to bottom: 1 to 10 on Avery 5163, 1 to 30 on Avery 5160. When you print several routes at once (**All routes, one PDF** or **One PDF per route**), only the first route's labels start there; every other route starts at slot 1. Set it back to 1 afterwards.
 
 ## Printing the labels
 

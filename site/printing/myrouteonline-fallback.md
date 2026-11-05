@@ -24,15 +24,16 @@ Either:
 - **Print center** ▸ "Other printouts and exports" ▸ **MyRouteOnline CSV**, or
 - **Families** ▸ **Fallback CSV**.
 
-Both save the same file, `MyRouteOnline.csv`, with two columns:
+Both save the same file, `MyRouteOnline.csv`, with three columns:
 
-| Title | Address |
-|---|---|
-| 26001 | 112 Maple Ave, Unit 101, Pasadena, CA, 91101 |
-| 26002 | 124 Oak Ave, Pasadena, CA, 91101 |
+| Title | Address | Service Time |
+|---|---|---|
+| 26001 | 112 Maple Ave, Unit 101, Pasadena, CA, 91101 | 10 |
+| 26002 | 124 Oak Ave, Pasadena, CA, 91101 | 8 |
 
 - "Title" is the Entry ID, so each stop in MyRouteOnline links back to a letter.
-- Only home-delivery families who aren't cancelled are included.
+- It holds the same families the app would route: home deliveries that aren't cancelled, have a checked address, and are in the service area (or marked to include anyway).
+- "Service Time" is the app's planned minutes at the door for that family.
 - No names, phone numbers or letters are in the file.
 
 {: .warning }

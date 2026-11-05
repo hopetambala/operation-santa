@@ -32,7 +32,7 @@ The list shows the first 400 matches; narrow the search to see others. The foote
 | FAMILY | Name and city, plus "missing from latest import" if the last import didn't include them. |
 | KIDS | Number of children. |
 | DELIVERY | home, pickup or special. Pickup families also show their RSVP. |
-| STATUS | new, verified, routed, delivered, missed or cancelled. |
+| STATUS | new, verified, routed or cancelled. |
 | ROUTE | The route they're on, or —. |
 | FLAGS | Short codes: SS Spanish speaker, ET extra toys, AAF adopt-a-family, DNSWV held by coordinator ("do not share with volunteers"). A **?** means proposed flags are waiting. |
 | ADDRESS | verified or manual (good to route), or pending, review or failed (needs a look). |

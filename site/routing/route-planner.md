@@ -46,7 +46,10 @@ The read-outs at the top show:
 
 - "TARGET · LIMIT": your two time limits.
 - "LONGEST · SPREAD": the longest route, and the gap between the longest and shortest. Aim for a spread of 45 minutes or less.
-- "UNROUTED": home-delivery families not on any route, with out-of-area families counted separately.
+- "LATEST BACK": when the last team is expected back at the North Pole.
+- "UNROUTED": home-delivery families not on any route, with out-of-area families counted separately. While this isn't 0, the Print center won't print every route at once.
+
+Each route card reads "N stops · M families": an apartment building with three families is one stop.
 
 ![The Route planner on the demo season: the route list, and Route 01 selected on the map]({{ '/assets/images/route-planner.png' | relative_url }})
 

@@ -23,6 +23,9 @@ The season holds children's names, letters and drawings, and families' addresses
 
 - children's names (they become "Child 1", "Child 2"…), letters, drawings and uploads;
 - families' names (they become "Family 26014"), phone numbers, emails, gate codes, notes, printed notes and the original form data;
+- families' street addresses, apartment units, cities, ZIP codes and map pins, the list of geocoded addresses, and the hardship and Rudolph Route answers;
+- team leads' names, phone numbers and notes;
+- the names of the export files you imported;
 - the change log and the snapshots of what was printed;
 - every backup of this season.
 
@@ -31,9 +34,7 @@ The season holds children's names, letters and drawings, and families' addresses
 - counts of families, children and routes;
 - children's ages;
 - routes as anonymous shapes (the Entry IDs on each route, with no names).
-
-{: .warning }
-**Draft, to fix before publishing:** today's purge also leaves each family's street address and map pin, the form's hardship and Rudolph Route answers, and the list of geocoded addresses in the season file. Until the app removes those too, keep the purged season file somewhere private, or delete it.
+- each family's delivery type (home, pickup, special) and status, and the team names.
 
 ## Before you purge
 

@@ -49,7 +49,7 @@ If a remembered passphrase no longer works (someone changed the file on another 
 There's no Save button. Every change is saved within a moment, and the top right shows "Saving…" and then "Encrypted · saved on this device".
 
 {: .note }
-If you ever see "Saving failed. Keep the app open and use Save now in Settings before closing.", don't close the app. Use Settings ▸ **Create encrypted backup**, check free disk space, and tell the coordinator.
+If you ever see a red "Saving failed" message, don't close the app: your changes are still in the window. Check free disk space, then choose **Try saving again** on that message. If it keeps failing, tell the coordinator.
 
 ## One person at a time
 

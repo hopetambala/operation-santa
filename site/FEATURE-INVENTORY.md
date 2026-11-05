@@ -164,6 +164,6 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 | `travel_matrix_ors` (OpenRouteService road times) and the `ors_key` secret in `main.rs` | No screen calls it. Travel is estimated from straight-line distance × "Road distance multiplier" at "Estimated speed". |
 | Browser preview (`npm run dev`) | Developer tool with synthetic data only. Covered by the repo README. |
 | E2E build (`e2e` Cargo feature) | Must never reach volunteers. Covered by `e2e/README.md`. |
-| Family statuses "delivered" and "missed" | They can be set by hand, but nothing in the app uses them since Dispatch was cut. The guides mention them only as list values. See open questions. |
+| ~~Family statuses "delivered" and "missed"~~ | Removed (Nov 5): older season files turn them back into routed or verified. |
 | Overview funnel (Imported → Verified → Geocoded → Routed) | Described in one line in the tour. The 2026-10-30 audit called it "not grounded"; it's still in the app. See open questions. |
 | `asset_*`, `vacuum_season`, `write_export` and other internal commands | No direct user action; they run behind the features above. |

@@ -52,7 +52,7 @@ Columns **Team**, **Lead**, **Phone**, **Spanish**, **Seats**, **Notes**. See [S
 | `Pickup event - v1.pdf` | Check-in sheet, letters and labels for pickup families | **Pickup event packet (N)** |
 | `Coordinator holds - ….pdf` | Letters held back from the teams | **Coordinator holds (N)** |
 | `Label alignment test 5163.pdf` | Outlines of every label | **Alignment test page** |
-| `MyRouteOnline.csv` | Entry ID and address for every home-delivery family | **MyRouteOnline CSV** or **Fallback CSV** |
+| `MyRouteOnline.csv` | Entry ID, address and planned stop minutes for every home-delivery family the app would route | **MyRouteOnline CSV** or **Fallback CSV** |
 | `Operation Santa teams.csv` | Teams, leads, phones and routes | Teams ▸ **Export CSV** |
 | `Operation Santa change log.csv` | Every recorded change | Change log ▸ **Export CSV** |
 
