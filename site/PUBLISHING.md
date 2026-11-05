@@ -1,6 +1,6 @@
 # Publishing the guides (maintainers)
 
-This folder is the draft GitHub Pages site for `hopetambala/operation-santa`. Nothing here is published until Hope approves it. This file and `FEATURE-INVENTORY.md` are excluded from the site build.
+This folder is the GitHub Pages site for `hopetambala/operation-santa`, live at https://hopetambala.github.io/operation-santa/ since 2026-11-05 (Hope's go). Every push to `main` that changes `site/` republishes it. This file and `FEATURE-INVENTORY.md` are excluded from the site build.
 
 ## What's here
 

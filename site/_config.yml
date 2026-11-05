@@ -1,6 +1,5 @@
 # Operation Santa guides: the GitHub Pages site for the operation-santa repo.
-# Built by the Pages workflow proposed in PUBLISHING.md (Pages can't serve a /site folder directly).
-# Nothing here is published until Hope approves it.
+# Built and published by .github/workflows/pages.yml (Pages can't serve a /site folder directly).
 
 title: Operation Santa guides
 description: >-
