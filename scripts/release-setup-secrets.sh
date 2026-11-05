@@ -13,7 +13,15 @@ notary(){
   P8=$(ls ~/.appstoreconnect/private_keys/AuthKey_*.p8)
   [ "$(printf '%s\n' "$P8" | wc -l)" -eq 1 ] || { echo "Expected exactly one AuthKey_*.p8 in ~/.appstoreconnect/private_keys"; exit 1; }
   KID=$(basename "$P8" .p8); KID=${KID#AuthKey_}
-  read -r -p "Issuer ID (App Store Connect ▸ Users and Access ▸ Integrations ▸ App Store Connect API): " ISSUER
+  echo "The issuer ID is the UUID shown as \"Issuer ID\" above the key list at"
+  echo "App Store Connect ▸ Users and Access ▸ Integrations ▸ App Store Connect API (Team Keys)."
+  ISSUER=""
+  until [[ "$ISSUER" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; do
+    [ -n "$ISSUER" ] && echo "That is not a UUID (8-4-4-4-12 hex digits). Try again."
+    read -r -p "Issuer ID: " ISSUER
+    ISSUER="$(printf '%s' "$ISSUER" | tr -d '[:space:]')"
+    [ -n "$ISSUER" ] || ISSUER=" "
+  done
   xcrun notarytool store-credentials opsanta-notary --key "$P8" --key-id "$KID" --issuer "$ISSUER"
   printf '%s' "$ISSUER" | gh secret set APPLE_API_ISSUER --repo "$REPO"
   echo "Done: keychain profile opsanta-notary, GitHub secret APPLE_API_ISSUER."
