@@ -66,9 +66,10 @@ fn seasons_root(app:&tauri::AppHandle)->Result<PathBuf,String>{use tauri::Manage
 fn create_season(path:String,mut passphrase:String,data:String,app:tauri::AppHandle,store:tauri::State<Store>)->Result<(),String>{let root=seasons_root(&app)?;let r=create_in(Path::new(&path),&passphrase,&data,&root);passphrase.zeroize();*store.0.lock().map_err(|_|"Season is busy.")?=Some(r?);Ok(())}
 #[tauri::command]
 fn open_season(path:String,mut passphrase:String,app:tauri::AppHandle,store:tauri::State<Store>)->Result<String,String>{let root=seasons_root(&app)?;let r=open_in(Path::new(&path),&passphrase,&root);passphrase.zeroize();let (s,data)=r?;*store.0.lock().map_err(|_|"Season is busy.")?=Some(s);Ok(data)}
-#[tauri::command]
+// Off the main thread: a save rewrites and flushes the whole file, which would freeze the window meanwhile.
+#[tauri::command(async)]
 fn save_season(data:String,store:tauri::State<Store>)->Result<(),String>{let mut g=store.0.lock().map_err(|_|"Season is busy.")?;save_to(g.as_mut().ok_or("No encrypted season is open.")?,&data)}
-#[tauri::command]
+#[tauri::command(async)]
 fn backup_season(store:tauri::State<Store>)->Result<String,String>{let g=store.0.lock().map_err(|_|"Season is busy.")?;Ok(backup_of(g.as_ref().ok_or("No season open.")?)?.display().to_string())}
 // After an update installs (only when the coordinator clicked "Install and restart").
 #[tauri::command]
