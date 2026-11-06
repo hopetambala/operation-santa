@@ -2,7 +2,7 @@
 title: Reference
 nav_order: 9
 has_children: true
-description: "Settings, the change log, file formats, privacy, troubleshooting and a glossary."
+description: "Settings, the change log, file formats, privacy, troubleshooting, a glossary and the brand."
 ---
 
 # Reference
@@ -15,3 +15,4 @@ Look things up here when a guide points you to them.
 - [Privacy and what leaves the computer]({{ '/reference/privacy/' | relative_url }})
 - [Troubleshooting]({{ '/reference/troubleshooting/' | relative_url }}): messages and what to do.
 - [Glossary]({{ '/reference/glossary/' | relative_url }})
+- [Brand]({{ '/reference/brand/' | relative_url }}): the logo, colors, type and plain-words rules, for anyone making something for Operation Santa.

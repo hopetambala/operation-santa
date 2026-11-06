@@ -42,3 +42,53 @@ input:focus-visible {
 }
 
 // Screenshot spots that haven't been filled yet stay invisible: they're HTML comments in the Markdown.
+
+// Brand page: color swatches and logo tiles.
+.swatch {
+  display: inline-block;
+  width: 1.4em;
+  height: 1.4em;
+  margin-right: 0.4em;
+  vertical-align: -0.3em;
+  border: 1px solid #8f8a7d;
+  border-radius: 4px;
+}
+.logo-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-end;
+  margin: 1rem 0 1.5rem;
+}
+.logo-row figure {
+  margin: 0;
+  text-align: center;
+}
+.logo-row figcaption {
+  margin-top: 0.4rem;
+  font-size: 14px;
+  color: #5f5c55;
+}
+.lockup-sample {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.06), 0 4px 16px rgba(28, 25, 23, 0.06);
+}
+.lockup-sample strong {
+  display: block;
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 750;
+  color: #1c1917;
+}
+.lockup-sample small {
+  display: block;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  color: #5f5c55;
+}
