@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Operation Santa">
+  <rect width="64" height="64" rx="15" fill="#1f4d38"/>
+  <path d="M15 49c7-1 7-11 14-12s9-6 11-10" fill="none" stroke="#f4f1ea" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="0.01 6.4"/>
+  <circle cx="15" cy="49" r="4" fill="#f4f1ea"/>
+  <path d="M45 7l4.4 10.6L60 22l-10.6 4.4L45 37l-4.4-10.6L30 22l10.6-4.4z" fill="#c4a15a"/>
+</svg>

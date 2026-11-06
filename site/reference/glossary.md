@@ -74,7 +74,7 @@ description: "Words the app and the committee use."
 : The difference between the longest and shortest route. The goal is 45 minutes or less.
 
 **Status**
-: Where a family is in the season: new, verified, routed, delivered, missed or cancelled.
+: Where a family is in the season: new, verified, routed or cancelled.
 
 **Target and hard maximum**
 : How long a route should take, and the longest it may take and still print.

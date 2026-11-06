@@ -1,4 +1,12 @@
 // Many Santa-team volunteers are older readers: slightly larger body text and roomier lines.
+// Colors and the font come from the Operation Santa brand (_sass/color_schemes/opsanta.scss).
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("../fonts/PlusJakartaSans.ttf") format("truetype"); // self-hosted: no request to a font service
+  font-weight: 200 800;
+  font-display: swap;
+}
+
 .main-content {
   font-size: 1.0625rem;
   line-height: 1.6;
@@ -6,6 +14,31 @@
 
 .main-content li + li {
   margin-top: 0.35em;
+}
+
+// The brand lockup in the sidebar: the mark, then the name in live type.
+.site-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 750;
+  color: #1c1917;
+}
+.site-title small {
+  font-weight: 600;
+  color: #5f5c55;
+}
+.site-mark {
+  flex-shrink: 0;
+  border-radius: 7px;
+}
+
+// Keyboard focus: the brand's 3px gold ring.
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid #9a7a2e;
+  outline-offset: 2px;
 }
 
 // Screenshot spots that haven't been filled yet stay invisible: they're HTML comments in the Markdown.
