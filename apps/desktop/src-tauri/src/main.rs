@@ -62,9 +62,11 @@ fn purge_backups_of(s:&OpenSeason)->Result<u32,String>{let dir=s.root.join("back
 // A clean close publishes and deletes the working copy, so app data keeps no extra copy of families' records.
 fn close_out(s:OpenSeason)->Result<(),String>{publish(&s)?;let work=s.work.clone();drop(s);remove_work(&work);Ok(())}
 fn seasons_root(app:&tauri::AppHandle)->Result<PathBuf,String>{use tauri::Manager;let d=app.path().app_data_dir().map_err(|_|"No app data folder.")?.join("seasons");fs::create_dir_all(&d).map_err(|_|"Cannot create the app data folder.")?;Ok(d)}
-#[tauri::command]
+// Argon2id here is m=64MiB, t=3, p=1: 90ms on this machine before the season file is even read.
+// A plain command runs on the UI thread. `async` is Tauri's blocking-pool flag, same as save_season.
+#[tauri::command(async)]
 fn create_season(path:String,mut passphrase:String,data:String,app:tauri::AppHandle,store:tauri::State<Store>)->Result<(),String>{let root=seasons_root(&app)?;let r=create_in(Path::new(&path),&passphrase,&data,&root);passphrase.zeroize();*store.0.lock().map_err(|_|"Season is busy.")?=Some(r?);Ok(())}
-#[tauri::command]
+#[tauri::command(async)]
 fn open_season(path:String,mut passphrase:String,app:tauri::AppHandle,store:tauri::State<Store>)->Result<String,String>{let root=seasons_root(&app)?;let r=open_in(Path::new(&path),&passphrase,&root);passphrase.zeroize();let (s,data)=r?;*store.0.lock().map_err(|_|"Season is busy.")?=Some(s);Ok(data)}
 // Off the main thread: a save rewrites and flushes the whole file, which would freeze the window meanwhile.
 #[tauri::command(async)]
@@ -76,7 +78,8 @@ fn backup_season(store:tauri::State<Store>)->Result<String,String>{let g=store.0
 fn restart_app(app:tauri::AppHandle){app.restart()}
 #[tauri::command]
 fn purge_backups(store:tauri::State<Store>)->Result<u32,String>{let g=store.0.lock().map_err(|_|"Season is busy.")?;purge_backups_of(g.as_ref().ok_or("No encrypted season is open.")?)}
-#[tauri::command]
+// close publishes the whole database back to the user's file, same rewrite save_season keeps off the UI thread.
+#[tauri::command(async)]
 fn close_season(store:tauri::State<Store>)->Result<(),String>{let s=store.0.lock().map_err(|_|"Season is busy.")?.take();match s{Some(s)=>close_out(s),None=>Ok(())}}
 const SERVICE:&str="org.pasadenajaycees.opsanta";
 const UA:&str="OperationSanta/0.1 (Pasadena Jaycees route planner; local desktop app)";
