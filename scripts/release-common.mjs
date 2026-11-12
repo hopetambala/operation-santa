@@ -17,14 +17,39 @@ const win=process.platform==='win32';
 
 export function fail(msg){console.error(`\n✗ ${msg}`);process.exit(1)}
 
+/**
+ * Node's `shell: true` joins argv with spaces and does not escape them (DEP0190).
+ * `cmd /d /s /c` then strips only the first and last quote of that whole line, so an
+ * argument that contains a space or a cmd metacharacter has to arrive already quoted.
+ * The release overlay is an absolute temp path (`C:\Users\First Last\...`), and
+ * without this `--config` is split. GitHub's runner temp path has no spaces, so CI still passed.
+ */
+export function quoteCmdArg(arg){
+  const s=String(arg);
+  if(s==='')return '""';
+  if(!/[\s"&|<>^%]/.test(s))return s;
+  return `"${s.replace(/%/g,'%%').replace(/"/g,'""')}"`;
+}
+
+/** The line `cmd /s /c` will execute after Node wraps it in one pair of quotes and `/s` strips that pair. */
+export function windowsShellCommand(cmd,args){return [cmd,...args].map(quoteCmdArg).join(' ')}
+
+function spawned(cmd,args,useShell){
+  return useShell&&win?[quoteCmdArg(cmd),args.map(quoteCmdArg)]:[cmd,args];
+}
+
 /** `redact` keeps arguments (credential ids, key paths) out of the failure message. */
 export function run(cmd,args,{redact=false,...opts}={}){
-  const r=spawnSync(cmd,args,{stdio:'inherit',cwd:ROOT,shell:win,...opts});
+  const useShell=opts.shell??win;
+  const [file,argv]=spawned(cmd,args,useShell);
+  const r=spawnSync(file,argv,{stdio:'inherit',cwd:ROOT,...opts,shell:useShell});
   if(r.status!==0)fail(`${redact?`${cmd} ${args[0]} ${args[1]??''}`:`${cmd} ${args.join(' ')}`} exited ${r.status??r.signal}`);
 }
 
 export function capture(cmd,args,opts={}){
-  const r=spawnSync(cmd,args,{encoding:'utf8',cwd:ROOT,shell:win,...opts});
+  const useShell=opts.shell??win;
+  const [file,argv]=spawned(cmd,args,useShell);
+  const r=spawnSync(file,argv,{encoding:'utf8',cwd:ROOT,...opts,shell:useShell});
   return {ok:r.status===0,out:`${r.stdout??''}${r.stderr??''}`};
 }
 
