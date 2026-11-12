@@ -375,6 +375,7 @@ tr:last-child td { border-bottom: 0; }
   border-radius: var(--tk-dlite-semantic-border-radius-lg);
   background: var(--tk-dlite-semantic-color-surface-base);
   box-shadow: var(--tk-dlite-semantic-elevation-high);
+  /* Initial focus lands on the dialog so its name is announced. The dialog is not a control, so it does not draw the :focus-visible ring. */
   outline: none;
 }
 .modal.wide { width: min(100%, var(--tk-dlite-semantic-sizing-modal-width-wide)); }
@@ -485,8 +486,8 @@ tr:last-child td { border-bottom: 0; }
 .progress-track { height: var(--tk-dlite-semantic-spacing-200); overflow: hidden; border-radius: var(--tk-dlite-semantic-border-radius-full); background: var(--tk-dlite-semantic-color-surface-sunken); }
 .progress-track i { display: block; height: 100%; border-radius: var(--tk-dlite-semantic-border-radius-full); }
 
-.muted { color: var(--tk-dlite-semantic-color-text-tertiary) !important; }
-.amber-text { color: var(--tk-dlite-semantic-color-feedback-warning-fg) !important; }
+.muted { color: var(--tk-dlite-semantic-color-text-tertiary); }
+.amber-text { color: var(--tk-dlite-semantic-color-feedback-warning-fg); }
 .capitalize { text-transform: capitalize; }
 .pre { white-space: pre-wrap; }
 .mono { font-family: var(--tk-dlite-semantic-typography-font-mono); font-size: var(--tk-dlite-semantic-typography-size-300); }
@@ -511,6 +512,7 @@ button, a, .tabs button, .nav-pills button {
   .btn.danger:hover:not(:disabled) { background: var(--tk-dlite-semantic-color-feedback-danger-active); border-color: var(--tk-dlite-semantic-color-feedback-danger-active); color: var(--tk-dlite-semantic-color-text-on-primary); }
   tbody tr:hover { background: var(--tk-dlite-semantic-color-surface-sunken); }
 }
+/* !important wins over the color transition and the spinner set above. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }

@@ -10,6 +10,8 @@ import {fileURLToPath} from 'node:url';
  * the file that uses the query. This reads the same build's breakpoints.json
  * (copied to src/brand/generated) and applies the dictionary's rule: `-down`
  * is `max-width: <bp - 0.02px>` so `-up` and `-down` never overlap.
+ * Call sites write `@media (--tk-dlite-bp-md-up)`. The replacement is that whole
+ * parenthesized name; replacing the name alone would leave `((min-width: …))`.
  */
 const breakpointsPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'src/brand/generated/breakpoints.json');
 
@@ -27,7 +29,7 @@ export function dliteBreakpoints() {
     query[`${name}-up`] = `(min-width: ${px}px)`;
     query[`${name}-down`] = `(max-width: ${down}px)`;
   }
-  const expand = (params: string) => params.replace(/--tk-dlite-bp-([a-z]+)-(up|down)/g, (full, name: string, dir: string) => {
+  const expand = (params: string) => params.replace(/\(--tk-dlite-bp-([a-z]+)-(up|down)\)/g, (full, name: string, dir: string) => {
     const next = query[`${name}-${dir}`];
     if (!next) throw new Error(`Unknown dLite breakpoint ${full}. Check semantic.breakpoint and run npm run tokens.`);
     return next;

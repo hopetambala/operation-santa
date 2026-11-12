@@ -6,6 +6,8 @@
    xl is only the content max-width. Equal cards use auto-fit so they do not need a private query. */
 
 p { line-height: var(--tk-dlite-semantic-typography-line-height-normal); }
+/* Skip link and in-app navigation move focus onto the landmark, which is not a control. The ring stays on :focus-visible controls. */
+#workspace:focus { outline: none; }
 .app {
   width: 100%;
   max-width: var(--tk-dlite-semantic-breakpoint-xl);
@@ -137,6 +139,7 @@ main { min-width: 0; padding-bottom: var(--tk-dlite-semantic-spacing-300); }
 .schedule-card {
   position: relative;
   display: grid;
+  /* 1.4fr is the route name. The token scale has no column tracks. */
   grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.4fr) auto;
   align-items: center;
   gap: var(--tk-dlite-semantic-spacing-400);
@@ -279,8 +282,9 @@ td.flags .proposed { background: var(--tk-dlite-semantic-color-feedback-warning-
   color: var(--tk-dlite-semantic-color-text-tertiary);
 }
 .search input { width: 100%; min-height: var(--tk-dlite-semantic-sizing-target-comfortable); border: 0; background: transparent; padding: 0; }
+/* The input's own ring is cleared so the field draws one. :focus-visible, not :focus: a mouse click on a button does not light it. A text field usually does, which shows where typing landed. */
 .search input:focus { outline: none; }
-.search:focus-within {
+.search:has(:focus-visible) {
   outline: var(--tk-dlite-semantic-focus-ring-width) solid var(--tk-dlite-semantic-color-focus-ring);
   outline-offset: var(--tk-dlite-semantic-focus-ring-offset);
 }
@@ -305,6 +309,7 @@ td.flags .proposed { background: var(--tk-dlite-semantic-color-feedback-warning-
 }
 .live-dot { display: inline-block; width: var(--tk-dlite-semantic-spacing-200); height: var(--tk-dlite-semantic-spacing-200); border-radius: var(--tk-dlite-semantic-border-radius-full); background: var(--tk-dlite-semantic-color-text-link); }
 
+/* 1.3fr is the map beside the address queue. 2fr is the planner detail beside a route list that is already at least modal-width-narrow. The token scale has no column tracks. */
 .split-view, .planner-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: var(--tk-dlite-semantic-spacing-500); }
 .planner-grid { grid-template-columns: minmax(var(--tk-dlite-semantic-sizing-modal-width-narrow), 1fr) minmax(0, 2fr); }
 .split-view > *, .planner-grid > * { min-width: 0; }
@@ -381,6 +386,7 @@ td.flags .proposed { background: var(--tk-dlite-semantic-color-feedback-warning-
   letter-spacing: var(--tk-dlite-semantic-typography-letter-spacing-wide);
 }
 .planner-controls > div > strong { color: var(--tk-dlite-semantic-color-text-primary); font-size: var(--tk-dlite-semantic-typography-size-500); font-weight: var(--tk-dlite-primitive-fontWeight-semibold); font-variant-numeric: tabular-nums; }
+.planner-controls > div > strong.amber-text { color: var(--tk-dlite-semantic-color-feedback-warning-fg); }
 .planner-controls > .badge { margin-left: auto; align-self: center; }
 .planner-controls > .btn, .planner-controls > .checkbox { align-self: center; }
 /* Four comfortable targets is the sticky bar plus the page title, so the list scrolls inside the panel instead of under the chrome. */
@@ -472,7 +478,7 @@ td.flags .proposed { background: var(--tk-dlite-semantic-color-feedback-warning-
 .issue-list { margin: var(--tk-dlite-semantic-spacing-200) 0; padding-left: var(--tk-dlite-semantic-spacing-500); color: var(--tk-dlite-semantic-color-text-tertiary); font-size: var(--tk-dlite-semantic-typography-size-300); line-height: var(--tk-dlite-semantic-typography-line-height-relaxed); }
 .print-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: var(--tk-dlite-semantic-spacing-200); margin-top: var(--tk-dlite-semantic-spacing-400); }
 .check-list p { margin: var(--tk-dlite-semantic-spacing-100) 0; font-size: var(--tk-dlite-semantic-typography-size-350); }
-.error-line { display: flex; align-items: flex-start; gap: var(--tk-dlite-semantic-spacing-200); color: var(--tk-dlite-semantic-color-feedback-danger-fg) !important; }
+.error-line { display: flex; align-items: flex-start; gap: var(--tk-dlite-semantic-spacing-200); color: var(--tk-dlite-semantic-color-feedback-danger-fg); }
 .danger-panel { margin-top: var(--tk-dlite-semantic-spacing-500); }
 .danger-panel h2 { color: var(--tk-dlite-semantic-color-feedback-danger); }
 .bcc-chunk { margin-bottom: var(--tk-dlite-semantic-spacing-300); overflow-wrap: anywhere; }
