@@ -19,6 +19,14 @@ npm run dev
 
 The development server uses port 1420. If another development server already occupies that port, close that server before starting the desktop development command. Real imports and encrypted season files require the desktop app.
 
+Screen color, type, space, and breakpoints come from the [style-dictionary-dlite](https://github.com/hopetambala/style-dictionary-dlite) `opsanta` brand. Clone that repo into `vendor/style-dictionary-dlite` (local only). After editing `apps/desktop/src/brand/opsanta.tokens.json`, regenerate before `npm run dev`:
+
+```sh
+npm run tokens
+```
+
+The contract, including why dark mode is built and not applied, is in `apps/desktop/src/brand/TOKENS.md`.
+
 ## Build
 
 macOS:

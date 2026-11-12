@@ -4,6 +4,7 @@
   "version": "0.1.1",
   "type": "module",
   "scripts": {
+    "tokens": "node scripts/build-tokens.mjs",
     "dev": "vite --host 127.0.0.1 --port 1420",
     "build": "tsc -b && vite build",
     "test": "vitest run",
