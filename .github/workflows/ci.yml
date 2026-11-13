@@ -43,6 +43,10 @@ jobs:
           "WerSvc:"; Get-Service WerSvc | Format-List Status,StartType
           "WebView2 runtime:"; (Get-ItemProperty 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}' -ErrorAction SilentlyContinue).pv
           "OS:"; [Environment]::OSVersion.VersionString
+          # WerSvc is stopped on these runners, so LocalDumps never fire. procdump attaches to each app as it starts.
+          Invoke-WebRequest https://download.sysinternals.com/files/Procdump.zip -OutFile $env:RUNNER_TEMP\procdump.zip
+          Expand-Archive $env:RUNNER_TEMP\procdump.zip -DestinationPath $env:RUNNER_TEMP\procdump -Force
+          (Get-AuthenticodeSignature $env:RUNNER_TEMP\procdump\procdump64.exe) | Format-List Status,SignerCertificate
       - name: E2E x3 with exit monitor
         shell: pwsh
         env: {A13_ARM: '${{ matrix.arm }}'}
@@ -50,6 +54,8 @@ jobs:
           New-Item -ItemType Directory -Force e2e/.artifacts | Out-Null
           $log="$env:GITHUB_WORKSPACE\e2e\.artifacts\app-exits.log"
           $mon=Start-Process pwsh -ArgumentList '-NoProfile','-File',"$env:GITHUB_WORKSPACE\e2e\watch-app-exits.ps1",'-Log',$log -PassThru -WindowStyle Hidden
+          $dumps="$env:GITHUB_WORKSPACE\e2e\.artifacts\dumps"
+          $pd=Start-Process pwsh -ArgumentList '-NoProfile','-Command',"while(`$true){ & '$env:RUNNER_TEMP\procdump\procdump64.exe' -accepteula -e -w opsanta.exe '$dumps' *>> '$env:GITHUB_WORKSPACE\e2e\.artifacts\procdump.log'; Start-Sleep -Milliseconds 200 }" -PassThru -WindowStyle Hidden
           $results=@()
           foreach($i in 1..3){
             Add-Content $log "$(Get-Date -Format o) suite-start $i"
@@ -57,7 +63,7 @@ jobs:
             $results+="suite $i exit=$LASTEXITCODE"
             Add-Content $log "$(Get-Date -Format o) suite-end $i exit=$LASTEXITCODE"
           }
-          Start-Sleep 2; Stop-Process -Id $mon.Id -Force -ErrorAction SilentlyContinue
+          Start-Sleep 2; Stop-Process -Id $mon.Id,$pd.Id -Force -ErrorAction SilentlyContinue; Get-Process procdump64 -ErrorAction SilentlyContinue | Stop-Process -Force
           "== results ($env:A13_ARM) =="; $results
           "== app exits =="; Get-Content $log
           "== focus-loop warnings per suite =="; foreach($i in 1..3){ "suite $i : " + (Select-String -Path "e2e/.artifacts/suite-$i.log" -Pattern 'Could not find window with title' | Measure-Object).Count }
@@ -73,7 +79,7 @@ jobs:
           "Event log:"; Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName='Application Error','Windows Error Reporting'} -MaxEvents 20 -ErrorAction SilentlyContinue | Format-List TimeCreated,ProviderName,Id,Message
           $cdb=Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe' -ErrorAction SilentlyContinue
           "cdb: $($cdb.FullName)"
-          if($cdb){ foreach($f in Get-ChildItem $d -Filter *.dmp -ErrorAction SilentlyContinue){ "=== $($f.Name) ==="; & $cdb.FullName -z $f.FullName -y "srv*C:\sym*https://msdl.microsoft.com/download/symbols;$env:GITHUB_WORKSPACE\target\debug" -c ".lines -d; .ecxr; kn 60; !analyze -v; q" 2>&1 | Select-Object -Last 160 } }
+          if($cdb){ foreach($f in Get-ChildItem $d -Filter *.dmp -ErrorAction SilentlyContinue){ "=== $($f.Name) ==="; & $cdb.FullName -z $f.FullName -y "srv*C:\sym*https://msdl.microsoft.com/download/symbols;$env:GITHUB_WORKSPACE\target\debug" -c ".ecxr; kn 60; ~*kn 25; !analyze -v; q" 2>&1 | Select-Object -Last 160 } }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -84,5 +90,7 @@ jobs:
             e2e/.artifacts/dumps/
             e2e/.artifacts/webview2-crashpad/
             e2e/.artifacts/app-panics.log
+            e2e/.artifacts/procdump.log
+            target/debug/opsanta.pdb
           include-hidden-files: true
           retention-days: 7

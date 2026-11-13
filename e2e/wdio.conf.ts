@@ -22,7 +22,7 @@ export const config:WebdriverIO.Config={
  // The Tauri service starts the app once and only replaces it if it dies, so spec files would share one app and its
  // state. Stop it after each spec file; the service sees the port closed and starts a fresh app for the next one.
  // A13 experiment arm: an explicit window switch turns off the service's per-command focus recovery.
- async before(){if(process.env.A13_ARM==='nofocus')await browser.tauri.switchWindow('main');},
+ async beforeSuite(){if(process.env.A13_ARM==='nofocus')await browser.tauri.switchWindow('main');},
  async onWorkerEnd(cid:string){try{mkdirSync(path.join(root,'e2e','.artifacts'),{recursive:true});appendFileSync(path.join(root,'e2e','.artifacts','app-exits.log'),`${new Date().toISOString()} harness-stop after worker ${cid}\n`)}catch{};stopApp();for(let i=0;i<60&&await appListening();i++)await sleep(250);},
  waitforTimeout:15000,
 };
