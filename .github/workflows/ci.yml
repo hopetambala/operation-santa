@@ -50,11 +50,21 @@ jobs:
       - run: npm ci
       - run: npm run e2e:build
       - run: npm run e2e
-      # When the app dies mid-test on Windows, the Application event log names the faulting module and exception code.
-      - name: Windows crash report
-        if: failure() && runner.os == 'Windows'
+        if: runner.os != 'Windows'
+      # Windows logs every app start and exit code (e2e/watch-app-exits.ps1): a crash exits with an NTSTATUS such as
+      # 0xC0000374, the harness's own stop with 0xFFFFFFFF. A crash becomes a warning on the run even when a retry passes.
+      # The Application event log can't do this: these runners keep Windows Error Reporting stopped, so it stays empty.
+      - name: npm run e2e (with app exit codes)
+        if: runner.os == 'Windows'
         shell: pwsh
-        run: Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName='Application Error','Windows Error Reporting','.NET Runtime'} -MaxEvents 15 -ErrorAction SilentlyContinue | Format-List TimeCreated,ProviderName,Id,Message
+        run: |
+          $log = "$env:GITHUB_WORKSPACE\e2e\.artifacts\app-exits.log"
+          New-Item -ItemType Directory -Force (Split-Path $log) | Out-Null
+          $watch = Start-Process pwsh -ArgumentList '-NoProfile','-File','e2e/watch-app-exits.ps1','-Log',$log -PassThru -WindowStyle Hidden
+          try { npm run e2e; $code = $LASTEXITCODE } finally { Start-Sleep 1; Stop-Process -Id $watch.Id -Force -ErrorAction SilentlyContinue }
+          Get-Content $log -ErrorAction SilentlyContinue
+          Select-String -Path $log -Pattern 'code=0xC' -ErrorAction SilentlyContinue | ForEach-Object { "::warning title=The app crashed during E2E::$($_.Line)" }
+          exit $code
       # Synthetic data only: season files, PDFs and screenshots from the fixture families.
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()

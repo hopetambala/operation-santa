@@ -25,7 +25,9 @@ describe('A coordinator’s season from an Airtable export',function(){this.time
   await setE2e({census:x.census,expiredUrls:x.uploadUrls({fresh:false}),freshUrls:x.uploadUrls({fresh:true})});await createSeason();});
  it('previews the export: every family, the real pickups, and no guessed ones',async()=>{start();await importCsv(x.csv(),'Op Santa Sign-ups-Grid view.csv');const text=await dialogText('Review your import');stop('import preview');
   assert.ok(text.includes('740 new'),text.slice(0,300));assert.ok(text.includes(`${x.uploadUrls({fresh:false}).length} uploads to download`));assert.ok(!/doesn’t recognize|no column for/.test(text),`unexpected import warning: ${text.slice(0,600)}`);await shot('export-preview');
-  start();await click('Accept import');assert.match(await pageText(),/740 not looked up yet: open Address review and press Geocode/);await $(`//*[contains(text(),"${x.uploadUrls({fresh:false}).length} failed · 0 still downloading")]`).waitForExist({timeout:180000});stop('accept + upload attempts');await noError();
+  start();await click('Accept import');
+  // Accepting backs the season up first, so the families arrive a moment after the click.
+  await browser.waitUntil(async()=>/740 not looked up yet: open Address review and press Geocode/.test(await pageText()),{timeout:60000,timeoutMsg:'the 740 imported families never showed as not looked up'});await $(`//*[contains(text(),"${x.uploadUrls({fresh:false}).length} failed · 0 still downloading")]`).waitForExist({timeout:180000});stop('accept + upload attempts');await noError();
   await nav('Families');const t=await pageText();assert.match(t,/740 families · 2\d{3} children/);await shot('families');});
  // The families table mounts a window of rows. It used to stop at the first 400; every family must still be reachable,
  // and Tab at the edge of the mounted rows must reach the next family rather than leave the list.
@@ -57,7 +59,9 @@ describe('A coordinator’s season from an Airtable export',function(){this.time
   const short=Number((await pageText()).match(/UNROUTED\s*(\d+)/)?.[1]);timings['unrouted with 45 teams']=short;if(short>0){await browser.pause(7000);assert.match(await pageText(),/don’t fit on 45 teams within the 3h 45m limit\. Set Fleet to “Fewest that fit”/,'the note outlives the toast');await nav('Print center');await click('Show details');assert.match(await pageText(),/home deliveries have no route: \d+ don’t fit/,'Check names the unrouted families before anyone prints every route');await nav('Route planner');}await shot('routes-45');
   await choose(field('Fleet'),'auto');start();await click('Rebalance unlocked');await browser.waitUntil(async()=>/UNROUTED\s*0/.test(await pageText()),{timeout:180000,timeoutMsg:'fewest that fit left families unrouted'});stop('plan fewest that fit');const needed=(await $$('.route-card')).length;timings['teams needed']=needed;
   await nav('Teams');await importCsv(sheet(needed),`teams-${needed}.csv`,'input[type=file][hidden]');await $(`//*[contains(text(),"Team ${needed}")]`).waitForExist();
-  await nav('Route planner');await click('Rebalance unlocked');await browser.waitUntil(async()=>/UNROUTED\s*0/.test(await pageText()),{timeout:180000});const t=await pageText();assert.ok(!/No team yet|don’t fit/.test(t),t.slice(0,600));await noError();await shot(`routes-${needed}`);});
+  await nav('Route planner');await click('Rebalance unlocked');
+  // The plan already shows 0 unrouted before this rebalance, so wait for what it does: every route gets a team.
+  await browser.waitUntil(async()=>{const t=await pageText();return /UNROUTED\s*0/.test(t)&&!/No team assigned/.test(t)},{timeout:180000,timeoutMsg:'the rebalance left a route without a team'});const t=await pageText();assert.ok(!/No team (yet|assigned)|don’t fit/.test(t),t.slice(0,600));await noError();await shot(`routes-${needed}`);});
  // About 2,000 letters at season size. The suite's limit sits above the wait's own, so a slow run reports how far it got.
  it('times letter approvals at season size, then clears the queue',async()=>{await nav('Letter cleanup');start();for(let i=0;i<20;i++)await click('Approve');stop('20 approvals by hand');timings['seconds per approval']=Math.round(timings['20 approvals by hand']/20*100)/100;
   // The rest go through the same button in-page; WebDriver round-trips would take most of an hour. Batches of 50
