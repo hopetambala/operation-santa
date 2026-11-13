@@ -10,6 +10,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   e2e:
+    if: ${{ github.run_attempt == 99 }} # soak-only dispatch
     strategy:
       fail-fast: false
       matrix:

@@ -328,8 +328,8 @@ fn decrypt_data(bytes:&[u8])->String{let copy=std::env::temp_dir().join(format!(
 #[test]#[ignore]fn a13_native_soak(){
  let fam=(0..740).map(|i|format!(r#"{{"id":"F{i}","note":"{}"}}"#,"synthetic ".repeat(200))).collect::<Vec<_>>().join(",");
  let season=format!(r#"{{"schema":1,"families":[{fam}],"routes":[]}}"#);let packet=format!(r#"{{"kind":"opsanta-packet","rows":[{fam}]}}"#);
- let hs:Vec<_>=(0..4).map(|t|{let (season,packet)=(season.clone(),packet.clone());std::thread::spawn(move||{for i in 0..15{
-  let (dir,root)=season_dirs();let sp=dir.join("S.opsanta");let mut s=create_in(&sp,"a test passphrase",&season,&root).unwrap();
+ let hs:Vec<_>=(0..4).map(|t|{let (season,packet)=(season.clone(),packet.clone());std::thread::spawn(move||{for i in 0..50{
+  let base=std::env::temp_dir().join(format!("opsanta-soak-{}",rand::random::<u64>()));let (dir,root)=(base.join("chosen"),base.join("appdata"));fs::create_dir_all(&dir).unwrap();fs::create_dir_all(&root).unwrap();let sp=dir.join("S.opsanta");let mut s=create_in(&sp,"a test passphrase",&season,&root).unwrap();
   for _ in 0..3{save_to(&mut s,&season).unwrap();}backup_of(&s).unwrap();drop(s);
   let (_s,d)=open_in(&sp,"a test passphrase",&root).unwrap();assert_eq!(d.len(),season.len());
   let pp=dir.join("P.opsanta-packet");write_packet(&pp,"a test passphrase",&packet,&root).unwrap();assert_eq!(read_packet(&pp,"a test passphrase",&root).unwrap(),packet);
