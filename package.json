@@ -49,6 +49,8 @@
     "@wdio/spec-reporter": "9.32.0",
     "@wdio/tauri-plugin": "1.5.0",
     "@wdio/tauri-service": "1.5.0",
+    "style-dictionary": "5.7.1",
+    "tsx": "4.23.15",
     "typescript": "5.9.2",
     "vite": "6.3.6",
     "vitest": "3.2.4",

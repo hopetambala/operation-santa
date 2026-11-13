@@ -1,6 +1,4 @@
 node_modules
-# Local style-dictionary-dlite clone. Brand source is apps/desktop/src/brand/opsanta.tokens.json.
-vendor/
 target/
 dist/
 *.opsanta*

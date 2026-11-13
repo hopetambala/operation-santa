@@ -19,7 +19,7 @@ npm run dev
 
 The development server uses port 1420. If another development server already occupies that port, close that server before starting the desktop development command. Real imports and encrypted season files require the desktop app.
 
-Screen color, type, space, and breakpoints come from the [style-dictionary-dlite](https://github.com/hopetambala/style-dictionary-dlite) `opsanta` brand. Clone that repo into `vendor/style-dictionary-dlite` (local only). After editing `apps/desktop/src/brand/opsanta.tokens.json`, regenerate before `npm run dev`:
+Screen color, type, space, and breakpoints come from the [style-dictionary-dlite](https://github.com/hopetambala/style-dictionary-dlite) `opsanta` brand. The generated files are committed, so building and running the app needs nothing extra. After editing `apps/desktop/src/brand/opsanta.tokens.json`, regenerate them (this fetches the pinned dLite commit, so it needs git and network access):
 
 ```sh
 npm run tokens

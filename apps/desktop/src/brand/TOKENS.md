@@ -1,6 +1,6 @@
 # Design tokens
 
-Screens read [style-dictionary-dlite](https://github.com/hopetambala/style-dictionary-dlite) (a local clone at `vendor/style-dictionary-dlite`, not committed). The brand source in this repo is `apps/desktop/src/brand/opsanta.tokens.json`. Layout, type, color, space, radius, elevation, and motion use the generated `--tk-dlite-*` custom properties. Do not add a second palette in CSS.
+Screens read tokens built by [style-dictionary-dlite](https://github.com/hopetambala/style-dictionary-dlite). The brand source in this repo is `apps/desktop/src/brand/opsanta.tokens.json`. Layout, type, color, space, radius, elevation, and motion use the generated `--tk-dlite-*` custom properties. Do not add a second palette in CSS.
 
 ## Rebuild
 
@@ -10,7 +10,7 @@ From the repo root, after changing `apps/desktop/src/brand/opsanta.tokens.json`:
 npm run tokens
 ```
 
-That copies the brand file into the local clone, installs the dictionary's build tools if needed, runs its `npm run build`, and copies into `apps/desktop/src/brand/generated/`:
+That fetches style-dictionary-dlite at the commit pinned in `scripts/build-tokens.mjs` (`v0.4.0`, `90def0b`) into `node_modules/.cache/style-dictionary-dlite`, copies the brand file in, runs the dictionary's `build/index.ts` with this repo's exact-pinned `style-dictionary` and `tsx` (dLite's own lockfile and `node_modules` are not used), and copies into `apps/desktop/src/brand/generated/`:
 
 | File | What it is |
 |---|---|
@@ -19,7 +19,9 @@ That copies the brand file into the local clone, installs the dictionary's build
 | `custom-media.css` | `@custom-media --tk-dlite-bp-*` from `semantic.breakpoint`. Reference only. |
 | `breakpoints.json` | The same breakpoints as numbers. `apps/desktop/dlite-breakpoints.ts` reads this during Vite so `@media (--tk-dlite-bp-md-down)` works. Vite processes each CSS file alone, so the `@custom-media` sheet is not in scope otherwise. `-down` stays `breakpoint - 0.02px`, matching the dictionary. |
 
-`generated/` is build output. Edit `opsanta.tokens.json` in this folder, then rerun `npm run tokens`. The dictionary clone and its `node_modules` stay on disk only.
+`generated/` is build output, committed so the app builds without the generator. Edit `opsanta.tokens.json` in this folder, then rerun `npm run tokens` and commit both. CI on macOS runs `npm run tokens` and fails if `generated/` differs from what is committed.
+
+To move to a newer dLite release, change `tag` and `commit` in `scripts/build-tokens.mjs`, run `npm run tokens`, and review the diff in `generated/`.
 
 ## Names the screens use
 
