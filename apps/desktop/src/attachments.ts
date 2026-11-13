@@ -11,7 +11,7 @@ export function imageSize(bytes:Uint8Array):{w:number;h:number}|null{
  if(bytes.length>=24&&bytes[0]===0x89&&bytes[1]===0x50&&bytes[2]===0x4e&&bytes[3]===0x47){const v=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);return {w:v.getUint32(16),h:v.getUint32(20)};}
  if(bytes.length>=10&&bytes[0]===0x47&&bytes[1]===0x49&&bytes[2]===0x46)return {w:bytes[6]|(bytes[7]<<8),h:bytes[8]|(bytes[9]<<8)};
  if(bytes.length<4||bytes[0]!==0xff||bytes[1]!==0xd8)return null;
- let i=2;while(i+8<bytes.length){if(bytes[i]!==0xff){i++;continue;}const marker=bytes[i+1];if(marker===0x00||marker===0x01||(marker>=0xd0&&marker<=0xd9)){i+=2;continue;}const len=(bytes[i+2]<<8)|bytes[i+3];const sof=marker>=0xc0&&marker<=0xcf&&marker!==0xc4&&marker!==0xc8&&marker!==0xcc;if(sof){const h=(bytes[i+5]<<8)|bytes[i+6],w=(bytes[i+7]<<8)|bytes[i+8];return w&&h?{w,h}:null;}if(len<2)return null;i+=2+len;}
+ let i=2;while(i+8<bytes.length){if(bytes[i]!==0xff){i++;continue;}const marker=bytes[i+1];if(marker===0xff){i++;continue;}if(marker===0x00||marker===0x01||(marker>=0xd0&&marker<=0xd9)){i+=2;continue;}const len=(bytes[i+2]<<8)|bytes[i+3];const sof=marker>=0xc0&&marker<=0xcf&&marker!==0xc4&&marker!==0xc8&&marker!==0xcc;if(sof){const h=(bytes[i+5]<<8)|bytes[i+6],w=(bytes[i+7]<<8)|bytes[i+8];return w&&h?{w,h}:null;}if(len<2)return null;i+=2+len;}
  return null;
 }
 async function decode(blob:Blob):Promise<CanvasImageSource&{width:number;height:number}>{
