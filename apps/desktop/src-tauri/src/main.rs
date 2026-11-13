@@ -323,4 +323,17 @@ fn decrypt_data(bytes:&[u8])->String{let copy=std::env::temp_dir().join(format!(
   let text=tauri::async_runtime::block_on(airtable_get(format!("{base}/{table}?maxRecords=3"))).expect("Airtable list failed");let v:serde_json::Value=serde_json::from_str(&text).expect("Airtable returned non-JSON");let records=v["records"].as_array().expect("no records array");assert!(!records.is_empty(),"table has no records");assert!(records[0]["fields"].get("Entry ID").is_some(),"records lack the Entry ID field the 2025 profile expects");
   let url=records.iter().flat_map(|r|r["fields"].as_object().into_iter().flatten()).filter_map(|(_,f)|f.as_array()).flatten().find_map(|a|a["url"].as_str().map(String::from));
   match url{Some(u)=>{let a=tauri::async_runtime::block_on(fetch_attachment(u)).expect("attachment download failed");assert_eq!(a.status,200,"fresh Airtable attachment link did not download");assert!(!a.data.is_empty());eprintln!("airtable attachment: {} ({} base64 chars)",a.content_type,a.data.len());}None=>eprintln!("no attachments in the first {} records; download not checked",records.len())}}
+// A13 EXPERIMENT ONLY: the real app's native season and packet path (SQLCipher, OpenSSL, Argon2), with no WebView or
+// WebDriver, looped on 4 threads at season size. CI runs it in release mode under full page heap on Windows.
+#[test]#[ignore]fn a13_native_soak(){
+ let fam=(0..740).map(|i|format!(r#"{{"id":"F{i}","note":"{}"}}"#,"synthetic ".repeat(200))).collect::<Vec<_>>().join(",");
+ let season=format!(r#"{{"schema":1,"families":[{fam}],"routes":[]}}"#);let packet=format!(r#"{{"kind":"opsanta-packet","rows":[{fam}]}}"#);
+ let hs:Vec<_>=(0..4).map(|t|{let (season,packet)=(season.clone(),packet.clone());std::thread::spawn(move||{for i in 0..15{
+  let (dir,root)=season_dirs();let sp=dir.join("S.opsanta");let mut s=create_in(&sp,"a test passphrase",&season,&root).unwrap();
+  for _ in 0..3{save_to(&mut s,&season).unwrap();}backup_of(&s).unwrap();drop(s);
+  let (_s,d)=open_in(&sp,"a test passphrase",&root).unwrap();assert_eq!(d.len(),season.len());
+  let pp=dir.join("P.opsanta-packet");write_packet(&pp,"a test passphrase",&packet,&root).unwrap();assert_eq!(read_packet(&pp,"a test passphrase",&root).unwrap(),packet);
+  eprintln!("thread {t} round {i} ok");}})}).collect();
+ for h in hs{h.join().unwrap();}
+}
 }
