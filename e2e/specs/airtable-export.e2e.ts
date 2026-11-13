@@ -8,6 +8,7 @@ import {RUN_DIR,field,shot,click,fill,nav,noError,reasonIfAsked,dialogText,pageT
 import {createSeason} from '../support/season';
 import {readPdf} from '../support/pdf';
 import {inArea,defaults,type Family} from '../../apps/desktop/src/model';
+import {WINDOW} from '../../apps/desktop/src/windowed';
 // The usability test's success criterion: a coordinator takes the season's Airtable export, as downloaded,
 // and gets from a fresh install to a printed route packet. A season-sized synthetic export (740 families,
 // the 2025 form's columns and answers) stands in for the real one, which never leaves the club's machines.
@@ -26,6 +27,17 @@ describe('A coordinator’s season from an Airtable export',function(){this.time
   assert.ok(text.includes('740 new'),text.slice(0,300));assert.ok(text.includes(`${x.uploadUrls({fresh:false}).length} uploads to download`));assert.ok(!/doesn’t recognize|no column for/.test(text),`unexpected import warning: ${text.slice(0,600)}`);await shot('export-preview');
   start();await click('Accept import');assert.match(await pageText(),/740 not looked up yet: open Address review and press Geocode/);await $(`//*[contains(text(),"${x.uploadUrls({fresh:false}).length} failed · 0 still downloading")]`).waitForExist({timeout:180000});stop('accept + upload attempts');await noError();
   await nav('Families');const t=await pageText();assert.match(t,/740 families · 2\d{3} children/);await shot('families');});
+ // The families table mounts a window of rows. It used to stop at the first 400; every family must still be reachable,
+ // and Tab from the last mounted row must reach the next family rather than leave the list.
+ it('reaches every family in the table while mounting only a window of rows',async()=>{await nav('Families');const rows=async()=>(await $$('tbody tr')).length;
+  const rowOfFocus=()=>browser.execute(()=>document.activeElement?.closest('tr')?.getAttribute('data-window-index')??null);
+  assert.ok(await rows()>0&&await rows()<=WINDOW,`${await rows()} rows mounted at the top`);
+  await browser.execute(()=>window.scrollTo(0,document.documentElement.scrollHeight));await $('tbody tr[aria-rowindex="741"]').waitForExist({timeout:5000,timeoutMsg:'the 740th family never appeared at the bottom of the list'});assert.ok(await rows()<=WINDOW,`${await rows()} rows mounted at the bottom`);
+  await browser.execute(()=>window.scrollTo(0,0));await $('tbody tr[aria-rowindex="2"]').waitForExist({timeout:5000});
+  const last=Math.max(...await Promise.all(await $$('tbody tr').map(async r=>Number(await r.getAttribute('data-window-index')))));
+  await browser.execute((i:number)=>(document.querySelector(`tbody tr[data-window-index="${i}"] input[type=checkbox]`) as HTMLElement).focus({preventScroll:true}),last);await browser.keys('Tab');
+  await browser.waitUntil(async()=>await rowOfFocus()===String(last+1),{timeout:5000,timeoutMsg:`Tab from row ${last} did not reach row ${last+1}`});
+  await browser.keys(['Shift','Tab']);await browser.waitUntil(async()=>await rowOfFocus()===String(last),{timeout:5000,timeoutMsg:'Shift+Tab did not come back to the row before'});await noError();});
  it('explains the expired upload links, and a fresh export downloads them',async()=>{await nav('Letter cleanup');const t=await pageText();assert.ok(/0\/\d+ ready/.test(t),t.slice(0,300));await shot('uploads-expired');
   start();await importCsv(x.csv({fresh:true}),'Op Santa Sign-ups-Grid view (1).csv');const text=await dialogText('Review your import');assert.ok(text.includes('0 new'),text.slice(0,300));await click('Accept import');await nav('Overview');await $('//*[contains(text(),"0 failed · 0 still downloading")]').waitForExist({timeout:300000});stop('re-import fresh export + downloads');await noError();});
  it('geocodes the whole season in one go and leaves only the real problems for review',async()=>{await nav('Address review');const misses=x.families.filter(f=>!f.geo).length;start();await $('//button[starts-with(normalize-space(.),"Geocode ")]').click();await $(`//strong[normalize-space()="${misses} addresses"]`).waitForExist({timeout:180000}).catch(async()=>{await shot('geocode-timeout');throw Error(`geocoding did not finish: Addresses (${await count(/Addresses/)}), expected ${misses} still waiting. ${(await pageText()).slice(0,1200)}`);});stop('geocode 740');await noError();await shot('address-review');
