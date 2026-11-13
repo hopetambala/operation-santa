@@ -18,18 +18,19 @@ export const config:WebdriverIO.Config={
  mochaOpts:{ui:'bdd',timeout:10*60*1000,bail:true},
  reporters:['spec'],
  logLevel:'warn',
- // The Tauri service starts the app once and only replaces it if it dies, so spec files would share one app and its
- // state. Stop it after each spec file; the service sees the port closed and starts a fresh app for the next one.
  // A13: the service's per-command focus recovery never matches this app (the window is titled "Operation Santa", the page
  // "Operation Santa · Route planner"), so before every element lookup it ran about ten scripts in the app: window states,
  // a sync of each of the nine mocks, and a window switch that fails. On Windows the embedded WebDriver plugin can corrupt
  // the app's heap while it runs scripts (webdriverio/desktop-mobile#1079, #1095), and with that traffic the app crashed
  // mid-spec in most Windows runs: 14 crash dumps in 9 suites, against 0 in 21 suites with this switch. Choosing the one
  // window explicitly turns the recovery off. Mocks still sync after every click, setValue and browser.tauri.execute.
+ // beforeSuite, not before: the config's before runs ahead of the service's, which is what adds browser.tauri.
  async beforeSuite(){await browser.tauri.switchWindow('main');},
  // The plugin bug is upstream and still possible at the lower traffic, so a Windows spec file gets one retry, in a fresh
  // app. CI's exit-code log (e2e/watch-app-exits.ps1) still flags any crash the retry hides.
  specFileRetries:process.platform==='win32'?1:0,
+ // The Tauri service starts the app once and only replaces it if it dies, so spec files would share one app and its
+ // state. Stop it after each spec file; the service sees the port closed and starts a fresh app for the next one.
  async onWorkerEnd(){stopApp();for(let i=0;i<60&&await appListening();i++)await sleep(250);},
  waitforTimeout:15000,
 };
