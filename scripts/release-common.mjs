@@ -17,14 +17,59 @@ const win=process.platform==='win32';
 
 export function fail(msg){console.error(`\n✗ ${msg}`);process.exit(1)}
 
+/**
+ * Node's `shell: true` joins argv with spaces and does not escape them (DEP0190).
+ * `cmd /d /s /c` strips only the first and last quote of that whole line, so an
+ * argument with a space or a cmd metacharacter has to arrive already quoted.
+ * The release overlay is an absolute temp path (`C:\Users\First Last\...`);
+ * without this, `--config` is split. The runner temp path has no spaces, so CI still passed.
+ *
+ * This is `cmd /c` from Node, not a batch file: `%%` does not escape `%`, and `%VAR%`
+ * expands even inside quotes, so each `%` is written `"%"` and the C runtime strips those
+ * quotes. Trailing backslashes are doubled so node.exe does not treat `\"` as an escaped
+ * closer (`npx.cmd` forwards `%*`). `( ) , ; =` are quoted so they stay one argument:
+ * `()` groups commands, and `,` `;` `=` are parameter delimiters.
+ */
+export function quoteCmdArg(arg){
+  const s=String(arg);
+  // A newline ends the cmd line even inside quotes, so quoting it would not make it one argument.
+  if(/[\r\n]/.test(s))throw new Error('quoteCmdArg: a cmd argument cannot contain a newline');
+  if(s==='')return '""';
+  if(!/[\s"&|<>^%(),;=]/.test(s))return s;
+  let body='';let bs=0;
+  // Backslashes are literal unless they sit in front of a quote. `%` inserts quotes, so it counts.
+  const flush=quote=>{body+='\\'.repeat(quote?bs*2:bs);bs=0};
+  for(const c of s){
+    if(c==='\\'){bs++;continue}
+    if(c==='"'||c==='%'){flush(true);body+=c==='%'?'"%"':'""';continue}
+    flush(false);body+=c;
+  }
+  flush(true);
+  return `"${body}"`;
+}
+
+/** The line `cmd /s /c` will execute after Node wraps it in one pair of quotes and `/s` strips that pair. */
+export function windowsShellCommand(cmd,args){return [cmd,...args].map(quoteCmdArg).join(' ')}
+
+/**
+ * spawnSync, through cmd on Windows (so npx.cmd is found) and with no shell elsewhere. On Windows, Node gets
+ * the whole quoted line and no argv: nothing is left for it to join, so the line that runs is the one
+ * windowsShellCommand returns, and Node 24 prints no DEP0190 warning.
+ */
+export function spawnCmd(cmd,args,opts={}){
+  const shell=opts.shell??win;
+  const [file,argv]=shell&&win?[windowsShellCommand(cmd,args),[]]:[cmd,args];
+  return spawnSync(file,argv,{...opts,shell});
+}
+
 /** `redact` keeps arguments (credential ids, key paths) out of the failure message. */
 export function run(cmd,args,{redact=false,...opts}={}){
-  const r=spawnSync(cmd,args,{stdio:'inherit',cwd:ROOT,shell:win,...opts});
+  const r=spawnCmd(cmd,args,{stdio:'inherit',cwd:ROOT,...opts});
   if(r.status!==0)fail(`${redact?`${cmd} ${args[0]} ${args[1]??''}`:`${cmd} ${args.join(' ')}`} exited ${r.status??r.signal}`);
 }
 
 export function capture(cmd,args,opts={}){
-  const r=spawnSync(cmd,args,{encoding:'utf8',cwd:ROOT,shell:win,...opts});
+  const r=spawnCmd(cmd,args,{encoding:'utf8',cwd:ROOT,...opts});
   return {ok:r.status===0,out:`${r.stdout??''}${r.stderr??''}`};
 }
 
