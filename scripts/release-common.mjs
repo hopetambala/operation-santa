@@ -51,22 +51,25 @@ export function quoteCmdArg(arg){
 /** The line `cmd /s /c` will execute after Node wraps it in one pair of quotes and `/s` strips that pair. */
 export function windowsShellCommand(cmd,args){return [cmd,...args].map(quoteCmdArg).join(' ')}
 
-function spawned(cmd,args,useShell){
-  return useShell&&win?[quoteCmdArg(cmd),args.map(quoteCmdArg)]:[cmd,args];
+/**
+ * spawnSync, through cmd on Windows (so npx.cmd is found) and with no shell elsewhere. On Windows, Node gets
+ * the whole quoted line and no argv: nothing is left for it to join, so the line that runs is the one
+ * windowsShellCommand returns, and Node 24 prints no DEP0190 warning.
+ */
+export function spawnCmd(cmd,args,opts={}){
+  const shell=opts.shell??win;
+  const [file,argv]=shell&&win?[windowsShellCommand(cmd,args),[]]:[cmd,args];
+  return spawnSync(file,argv,{...opts,shell});
 }
 
 /** `redact` keeps arguments (credential ids, key paths) out of the failure message. */
 export function run(cmd,args,{redact=false,...opts}={}){
-  const useShell=opts.shell??win;
-  const [file,argv]=spawned(cmd,args,useShell);
-  const r=spawnSync(file,argv,{stdio:'inherit',cwd:ROOT,...opts,shell:useShell});
+  const r=spawnCmd(cmd,args,{stdio:'inherit',cwd:ROOT,...opts});
   if(r.status!==0)fail(`${redact?`${cmd} ${args[0]} ${args[1]??''}`:`${cmd} ${args.join(' ')}`} exited ${r.status??r.signal}`);
 }
 
 export function capture(cmd,args,opts={}){
-  const useShell=opts.shell??win;
-  const [file,argv]=spawned(cmd,args,useShell);
-  const r=spawnSync(file,argv,{encoding:'utf8',cwd:ROOT,...opts,shell:useShell});
+  const r=spawnCmd(cmd,args,{encoding:'utf8',cwd:ROOT,...opts});
   return {ok:r.status===0,out:`${r.stdout??''}${r.stderr??''}`};
 }
 
