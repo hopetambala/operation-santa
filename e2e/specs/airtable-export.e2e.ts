@@ -25,7 +25,9 @@ describe('A coordinator’s season from an Airtable export',function(){this.time
   await setE2e({census:x.census,expiredUrls:x.uploadUrls({fresh:false}),freshUrls:x.uploadUrls({fresh:true})});await createSeason();});
  it('previews the export: every family, the real pickups, and no guessed ones',async()=>{start();await importCsv(x.csv(),'Op Santa Sign-ups-Grid view.csv');const text=await dialogText('Review your import');stop('import preview');
   assert.ok(text.includes('740 new'),text.slice(0,300));assert.ok(text.includes(`${x.uploadUrls({fresh:false}).length} uploads to download`));assert.ok(!/doesn’t recognize|no column for/.test(text),`unexpected import warning: ${text.slice(0,600)}`);await shot('export-preview');
-  start();await click('Accept import');assert.match(await pageText(),/740 not looked up yet: open Address review and press Geocode/);await $(`//*[contains(text(),"${x.uploadUrls({fresh:false}).length} failed · 0 still downloading")]`).waitForExist({timeout:180000});stop('accept + upload attempts');await noError();
+  start();await click('Accept import');
+  // Accepting backs the season up first, so the families arrive a moment after the click.
+  await browser.waitUntil(async()=>/740 not looked up yet: open Address review and press Geocode/.test(await pageText()),{timeout:60000,timeoutMsg:'the 740 imported families never showed as not looked up'});await $(`//*[contains(text(),"${x.uploadUrls({fresh:false}).length} failed · 0 still downloading")]`).waitForExist({timeout:180000});stop('accept + upload attempts');await noError();
   await nav('Families');const t=await pageText();assert.match(t,/740 families · 2\d{3} children/);await shot('families');});
  // The families table mounts a window of rows. It used to stop at the first 400; every family must still be reachable,
  // and Tab at the edge of the mounted rows must reach the next family rather than leave the list.
