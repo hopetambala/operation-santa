@@ -24,6 +24,15 @@ export function slideWindow(start:number,count:number,index:number,size=WINDOW){
  next=Math.max(0,Math.min(count-span,next));
  return {start:next,end:next+span};
 }
+// Tab can move focus one row past the mounted ones. That row stays mounted until the page has scrolled to it: `at` is
+// where that scroll landed, null until it has. Any scroll after that (End, Page Down, the scrollbar) lets go. Before,
+// only a wheel or a click did, so a scroll that beat the next frame left the window on the Tab's row and the bottom of
+// the list blank.
+export type Pin={index:number,at:number|null};
+export function pinnedWindow(next:{start:number,end:number},count:number,intoPx:number,pin:Pin|null){
+ if(pin===null||(pin.at!==null&&Math.abs(intoPx-pin.at)>1)||(pin.index>=next.start&&pin.index<next.end))return {start:next.start,end:next.end,pin:null};
+ return {...slideWindow(next.start,count,pin.index),pin};
+}
 // Null means "keep the previous height". A spacer-sized reading must not become the unit.
 export function clampRow(h:number){return Number.isFinite(h)&&h>20&&h<=MAX_ROW?h:null;}
 // After a filter or a search, ignore the scroll offset left by the previous list.
@@ -34,6 +43,8 @@ export function placedWindow(count:number,intoPx:number,rowH:number,stickTop:boo
  if(stickTop)return {start:0,end:Math.min(n,size)};
  return windowSpan(intoPx,rowH,n,size);
 }
+// How far the page has scrolled into the row box.
+const intoOf=(node:HTMLElement)=>Math.max(0,-node.getBoundingClientRect().top);
 export function useWindow(count:number,resetKey?:string){
  const box=useRef<HTMLElement|null>(null);
  // Guess until the first row is measured. Too high leaves a gap; too low stacks rows.
@@ -41,19 +52,17 @@ export function useWindow(count:number,resetKey?:string){
  const [span,setSpan]=useState({start:0,end:Math.min(count,WINDOW),count});
  const live=useRef({count,rowH});live.current={count,rowH};
  const pending=useRef<number|null>(null);
- const pin=useRef<number|null>(null);
+ const pin=useRef<Pin|null>(null);
  const stick=useRef(span.count!==count);
  const reset=useRef(resetKey);
  if(span.count!==count)stick.current=true;
  const update=()=>{
   const node=box.current;if(!node)return;
   const {count:n,rowH:h}=live.current;
-  const into=Math.max(0,-node.getBoundingClientRect().top);
+  const into=intoOf(node);
   if(stick.current&&into<=h)stick.current=false;
   let next=placedWindow(n,into,h,stick.current);
-  const held=pin.current;
-  if(!stick.current&&held!==null&&(held<next.start||held>=next.end))next=slideWindow(next.start,n,held);
-  else if(!stick.current&&held!==null)pin.current=null;
+  if(!stick.current){const held=pinnedWindow(next,n,into,pin.current);pin.current=held.pin;next={start:held.start,end:held.end};}
   setSpan(cur=>cur.count===n&&cur.start===next.start&&cur.end===next.end?cur:{...next,count:n});
  };
  const updateRef=useRef(update);updateRef.current=update;
@@ -80,10 +89,10 @@ export function useWindow(count:number,resetKey?:string){
   if(index===null||!box.current)return;
   const item=box.current.querySelector<HTMLElement>(`[data-window-index="${index}"]`);
   pending.current=null;
-  if(!item)return;
-  const target=item.matches('a,button,input,select,textarea')?item:item.querySelector<HTMLElement>('a,button,input,select,textarea');
+  const target=item?.matches('a,button,input,select,textarea')?item:item?.querySelector<HTMLElement>('a,button,input,select,textarea');
   target?.focus({preventScroll:true});
   target?.scrollIntoView({block:'nearest'});
+  if(pin.current?.index===index)pin.current={index,at:intoOf(box.current)};
  },[span.start,span.end,count]);
  const boxRef=(node:HTMLElement|null)=>{box.current=node;if(node)requestAnimationFrame(()=>updateRef.current());};
  const measure=(node:HTMLElement|null)=>{if(!node)return;const next=clampRow(node.getBoundingClientRect().height);if(next!==null)setRowH(prev=>Math.abs(prev-next)>1?next:prev);};
@@ -102,7 +111,7 @@ export function useWindow(count:number,resetKey?:string){
   const slid=slideWindow(shown.start,count,next);
   if(slid.start===shown.start&&slid.end===shown.end)return;
   e.preventDefault();
-  pending.current=next;pin.current=next;stick.current=false;
+  pending.current=next;pin.current={index:next,at:null};stick.current=false;
   setSpan({...slid,count});
  };
  return {start:shown.start,end:shown.end,before:shown.start*rowH,after:Math.max(0,count-shown.end)*rowH,boxRef,measure,onKeyDown};
