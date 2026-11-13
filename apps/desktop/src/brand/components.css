@@ -340,7 +340,8 @@ td {
   border-bottom: var(--tk-dlite-semantic-border-weight-thin) solid var(--tk-dlite-semantic-color-border-subtle);
   color: var(--tk-dlite-semantic-color-text-secondary);
   vertical-align: top;
-  overflow-wrap: anywhere;
+  /* break-word, not anywhere: anywhere lets a column shrink to one letter ("Willia / ms") instead of the table scrolling in .table-wrap. */
+  overflow-wrap: break-word;
 }
 td strong { font-weight: var(--tk-dlite-primitive-fontWeight-semibold); color: var(--tk-dlite-semantic-color-text-primary); }
 td small { display: block; margin-top: var(--tk-dlite-semantic-spacing-xxs); color: var(--tk-dlite-semantic-color-text-tertiary); }
