@@ -111,7 +111,7 @@ describe('Windows cmd quoting',()=>{
 // The cases above are judged against a model of the C runtime. This one runs the real chain on the Windows
 // CI runner: Node's `cmd /d /s /c`, then a .cmd shim that forwards `%*` to node.exe, the way npx.cmd does.
 describe.runIf(process.platform==='win32')('Windows cmd quoting through the real cmd.exe',()=>{
- it('delivers every argument unchanged, without the DEP0190 warning',()=>{
+ it('delivers every argument unchanged, without the DEP0190 warning',async()=>{
   const dir=mkdtempSync(join(tmpdir(),'opsanta-quote-'));
   writeFileSync(join(dir,'argv.cjs'),'process.stdout.write(JSON.stringify(process.argv.slice(2)))');
   writeFileSync(join(dir,'echo-args.cmd'),`@"${process.execPath}" "%~dp0argv.cjs" %*\r\n`);
@@ -124,6 +124,8 @@ describe.runIf(process.platform==='win32')('Windows cmd quoting through the real
    const r=capture(join(dir,'echo-args.cmd'),args);
    expect(r.ok,r.out).toBe(true);
    expect(JSON.parse(r.out)).toEqual(args);
+   // Node emits warnings on a later tick, so wait one before stopping listening.
+   await new Promise(resolve=>setImmediate(resolve));
   }finally{process.off('warning',onWarning);rmSync(dir,{recursive:true,force:true})}
   expect(warnings).not.toContain('DEP0190');
  });
