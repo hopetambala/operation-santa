@@ -73,6 +73,9 @@ svg { flex-shrink: 0; }
 .skip-link {
   position: absolute;
   z-index: var(--tk-dlite-semantic-z-index-modal);
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tk-dlite-semantic-sizing-target-comfortable);
   padding: var(--tk-dlite-semantic-spacing-200) var(--tk-dlite-semantic-spacing-400);
   border-radius: var(--tk-dlite-semantic-border-radius-md);
   background: var(--tk-dlite-semantic-color-surface-base);
