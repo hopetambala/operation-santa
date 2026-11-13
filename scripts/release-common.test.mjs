@@ -1,5 +1,8 @@
 import {describe,expect,it} from 'vitest';
-import {hasCargoFeature,quoteCmdArg,windowsShellCommand} from './release-common.mjs';
+import {mkdtempSync,rmSync,writeFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {capture,hasCargoFeature,quoteCmdArg,windowsShellCommand} from './release-common.mjs';
 const toml='[package]\nname = "opsanta"\n\n[features]\ne2e = ["dep:a"]\nupdater = ["dep:tauri-plugin-updater"]\n\n[dependencies]\nserde = "1"\n';
 describe('hasCargoFeature',()=>{
  it('finds a feature',()=>{expect(hasCargoFeature('updater',toml)).toBe(true);expect(hasCargoFeature('nope',toml)).toBe(false);});
@@ -102,5 +105,26 @@ describe('Windows cmd quoting',()=>{
  it('rejects a newline, which would split the cmd line inside quotes',()=>{
   expect(()=>quoteCmdArg('a\nb')).toThrow(/newline/);
   expect(()=>quoteCmdArg('a\rb')).toThrow(/newline/);
+ });
+});
+
+// The cases above are judged against a model of the C runtime. This one runs the real chain on the Windows
+// CI runner: Node's `cmd /d /s /c`, then a .cmd shim that forwards `%*` to node.exe, the way npx.cmd does.
+describe.runIf(process.platform==='win32')('Windows cmd quoting through the real cmd.exe',()=>{
+ it('delivers every argument unchanged, without the DEP0190 warning',()=>{
+  const dir=mkdtempSync(join(tmpdir(),'opsanta-quote-'));
+  writeFileSync(join(dir,'argv.cjs'),'process.stdout.write(JSON.stringify(process.argv.slice(2)))');
+  writeFileSync(join(dir,'echo-args.cmd'),`@"${process.execPath}" "%~dp0argv.cjs" %*\r\n`);
+  const args=['tauri','build','--config','C:\\Users\\First Last\\AppData\\Local\\Temp\\opsanta-release-abc\\tauri.release.conf.json',
+   '','100%','%TEMP%','%%','say "hi"','C:\\Users\\First Last\\','C:\\foo\\"bar','C:\\Users\\First Last%\\',
+   'a&b','a|b','a<b','a>b','a^b','a(b)','a,b','a;b','a=b','a\tb'];
+  const warnings=[];const onWarning=w=>warnings.push(w.code);
+  process.on('warning',onWarning);
+  try{
+   const r=capture(join(dir,'echo-args.cmd'),args);
+   expect(r.ok,r.out).toBe(true);
+   expect(JSON.parse(r.out)).toEqual(args);
+  }finally{process.off('warning',onWarning);rmSync(dir,{recursive:true,force:true})}
+  expect(warnings).not.toContain('DEP0190');
  });
 });
