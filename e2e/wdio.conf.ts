@@ -5,7 +5,8 @@ import {setTimeout as sleep} from 'node:timers/promises';
 // On macOS this is the only WebDriver path into WKWebView; tauri-driver covers Windows/Linux only.
 // Build first with `npm run e2e:build` (bundles the frontend with VITE_E2E=1 and withGlobalTauri on).
 const root=path.resolve(import.meta.dirname,'..');
-const app=path.join(root,'target','debug',process.platform==='win32'?'opsanta.exe':'opsanta');
+// OPSANTA_E2E_APP points at another build of the E2E app: npm run e2e:sandbox uses its sandboxed .app.
+const app=process.env.OPSANTA_E2E_APP??path.join(root,'target','debug',process.platform==='win32'?'opsanta.exe':'opsanta');
 // The app inherits this and writes any panic there (main.rs `record_panics`); CI uploads e2e/.artifacts.
 process.env.OPSANTA_E2E_LOG=path.join(root,'e2e','.artifacts','app-panics.log');
 export const config:WebdriverIO.Config={
