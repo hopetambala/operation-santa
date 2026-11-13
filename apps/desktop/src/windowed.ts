@@ -27,7 +27,7 @@ export function slideWindow(start:number,count:number,index:number,size=WINDOW){
 // Tab can move focus one row past the mounted ones. That row stays mounted until the page has scrolled to it: `at` is
 // where that scroll landed, null until it has. Any scroll after that (End, Page Down, the scrollbar) lets go. Before,
 // only a wheel or a click did, so a scroll that beat the next frame left the window on the Tab's row and the bottom of
-// the list blank.
+// the list blank. Scroll offsets come back fractional on Retina screens, so a move of 1px or less is the same spot.
 export type Pin={index:number,at:number|null};
 export function pinnedWindow(next:{start:number,end:number},count:number,intoPx:number,pin:Pin|null){
  if(pin===null||(pin.at!==null&&Math.abs(intoPx-pin.at)>1)||(pin.index>=next.start&&pin.index<next.end))return {start:next.start,end:next.end,pin:null};

@@ -35,10 +35,14 @@ describe('A coordinator’s season from an Airtable export',function(){this.time
   const indexes=async()=>Promise.all(await $$('tbody tr').map(async r=>Number(await r.getAttribute('data-window-index'))));
   const rowOfFocus=()=>browser.execute(()=>document.activeElement?.closest('tr')?.getAttribute('data-window-index')??null);
   const tabFrom=(i:number,shift:boolean)=>browser.execute((i:number,shift:boolean)=>{const box=document.querySelector(`tbody tr[data-window-index="${i}"] input[type=checkbox]`) as HTMLElement;box.focus({preventScroll:true});box.dispatchEvent(new KeyboardEvent('keydown',{key:'Tab',code:'Tab',shiftKey:shift,bubbles:true,cancelable:true}));},i,shift);
+  // Tab, then End before the page draws again: the scroll lands before the window's next update. Only a slow CI runner
+  // used to hit that order, and the window stayed on the Tab's row with the bottom of the list blank.
+  const tabThenEnd=(i:number)=>browser.execute(async(i:number)=>{const box=document.querySelector(`tbody tr[data-window-index="${i}"] input[type=checkbox]`) as HTMLElement;box.focus({preventScroll:true});box.dispatchEvent(new KeyboardEvent('keydown',{key:'Tab',code:'Tab',bubbles:true,cancelable:true}));
+   // React moves focus in a microtask after the keydown; wait for it without giving the page a frame.
+   for(let n=0;n<20&&document.activeElement?.closest('tr')?.getAttribute('data-window-index')!==String(i+1);n++)await Promise.resolve();
+   const reached=document.activeElement?.closest('tr')?.getAttribute('data-window-index')??null;window.scrollTo(0,document.documentElement.scrollHeight);return reached;},i);
   assert.ok(await rows()>0&&await rows()<=WINDOW,`${await rows()} rows mounted at the top`);
-  const last=Math.max(...await indexes());await tabFrom(last,false);
-  await browser.waitUntil(async()=>await rowOfFocus()===String(last+1),{timeout:5000,timeoutMsg:`Tab from row ${last}, the last one mounted, did not reach row ${last+1}`});
-  await browser.execute(()=>window.scrollTo(0,document.documentElement.scrollHeight));await $('tbody tr[aria-rowindex="741"]').waitForExist({timeout:5000,timeoutMsg:'the 740th family never appeared at the bottom of the list'});assert.ok(await rows()<=WINDOW,`${await rows()} rows mounted at the bottom`);
+  const last=Math.max(...await indexes());assert.equal(await tabThenEnd(last),String(last+1),`Tab from row ${last}, the last one mounted, did not reach row ${last+1}`);await $('tbody tr[aria-rowindex="741"]').waitForExist({timeout:5000,timeoutMsg:'the 740th family never appeared at the bottom of the list'});assert.ok(await rows()<=WINDOW,`${await rows()} rows mounted at the bottom`);
   const first=Math.min(...await indexes());assert.ok(first>0,'the bottom of the list does not mount the first family');await tabFrom(first,true);
   await browser.waitUntil(async()=>await rowOfFocus()===String(first-1),{timeout:5000,timeoutMsg:`Shift+Tab from row ${first}, the first one mounted, did not reach row ${first-1}`});
   await browser.execute(()=>window.scrollTo(0,0));await noError();});
