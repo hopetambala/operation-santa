@@ -1,45 +1,22 @@
-# Unit tests, Rust tests and the real-app E2E suite on macOS and Windows (PRD §14–15).
-# Actions are pinned to commit SHAs and Node/Rust to exact versions, as in release.yml: caches written on main feed the
-# signed release builds, so anything that runs here is part of what ships.
+# A13 EXPERIMENT ONLY (branch exp/a13-probe; never merged). Windows E2E, repeated, with crash capture.
 name: CI
 env:
   NODE_VERSION: 24.14.1
   RUST_VERSION: 1.97.1
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  test:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-15, windows-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with: {node-version: '${{ env.NODE_VERSION }}', cache: npm}
-      - run: rustup toolchain install "$RUST_VERSION" --profile minimal && rustup default "$RUST_VERSION"
-        shell: bash
-      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
-      - run: npm ci
-      - run: npx tsc --noEmit -p .
-      - run: npm test
-      - run: cargo test --workspace
-      - run: npm run build
   e2e:
-    needs: test
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, windows-latest]
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+        arm: [base, nofocus]
+        rep: [1, 2, 3]
+    runs-on: windows-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -47,19 +24,65 @@ jobs:
       - run: rustup toolchain install "$RUST_VERSION" --profile minimal && rustup default "$RUST_VERSION"
         shell: bash
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with: {save-if: false}
       - run: npm ci
       - run: npm run e2e:build
-      - run: npm run e2e
-      # When the app dies mid-test on Windows, the Application event log names the faulting module and exception code.
-      - name: Windows crash report
-        if: failure() && runner.os == 'Windows'
+      - name: Crash capture on
         shell: pwsh
-        run: Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName='Application Error','Windows Error Reporting','.NET Runtime'} -MaxEvents 15 -ErrorAction SilentlyContinue | Format-List TimeCreated,ProviderName,Id,Message
-      # Synthetic data only: season files, PDFs and screenshots from the fixture families.
+        run: |
+          $wer='HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting'
+          "WER before:"; Get-ItemProperty $wer -ErrorAction SilentlyContinue | Format-List Disabled,DontShowUI,LoggingDisabled
+          "AeDebug:"; Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AeDebug' -ErrorAction SilentlyContinue | Format-List Debugger,Auto
+          Set-ItemProperty $wer -Name Disabled -Value 0 -Type DWord
+          Set-ItemProperty $wer -Name DontShowUI -Value 1 -Type DWord
+          $k="$wer\LocalDumps\opsanta.exe"; New-Item -Path $k -Force | Out-Null
+          $dumps="$env:GITHUB_WORKSPACE\e2e\.artifacts\dumps"; New-Item -ItemType Directory -Force $dumps | Out-Null
+          New-ItemProperty $k -Name DumpFolder -PropertyType ExpandString -Value $dumps -Force | Out-Null
+          New-ItemProperty $k -Name DumpType -PropertyType DWord -Value 1 -Force | Out-Null
+          New-ItemProperty $k -Name DumpCount -PropertyType DWord -Value 10 -Force | Out-Null
+          "WerSvc:"; Get-Service WerSvc | Format-List Status,StartType
+          "WebView2 runtime:"; (Get-ItemProperty 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}' -ErrorAction SilentlyContinue).pv
+          "OS:"; [Environment]::OSVersion.VersionString
+      - name: E2E x3 with exit monitor
+        shell: pwsh
+        env: {A13_ARM: '${{ matrix.arm }}'}
+        run: |
+          New-Item -ItemType Directory -Force e2e/.artifacts | Out-Null
+          $log="$env:GITHUB_WORKSPACE\e2e\.artifacts\app-exits.log"
+          $mon=Start-Process pwsh -ArgumentList '-NoProfile','-File',"$env:GITHUB_WORKSPACE\e2e\watch-app-exits.ps1",'-Log',$log -PassThru -WindowStyle Hidden
+          $results=@()
+          foreach($i in 1..3){
+            Add-Content $log "$(Get-Date -Format o) suite-start $i"
+            npm run e2e 2>&1 | Tee-Object -FilePath "e2e/.artifacts/suite-$i.log" | Select-String -Pattern 'PASSED in|FAILED in|Spec Files|ECONNREFUSED when running|ECONNRESET|Error in "' | ForEach-Object { $_.Line }
+            $results+="suite $i exit=$LASTEXITCODE"
+            Add-Content $log "$(Get-Date -Format o) suite-end $i exit=$LASTEXITCODE"
+          }
+          Start-Sleep 2; Stop-Process -Id $mon.Id -Force -ErrorAction SilentlyContinue
+          "== results ($env:A13_ARM) =="; $results
+          "== app exits =="; Get-Content $log
+          "== focus-loop warnings per suite =="; foreach($i in 1..3){ "suite $i : " + (Select-String -Path "e2e/.artifacts/suite-$i.log" -Pattern 'Could not find window with title' | Measure-Object).Count }
+      - name: Dumps, WebView2 crash reports, event log
+        if: always()
+        shell: pwsh
+        run: |
+          $d="$env:GITHUB_WORKSPACE\e2e\.artifacts\dumps"
+          "Dumps:"; Get-ChildItem $d -ErrorAction SilentlyContinue | Format-Table Name,Length
+          $cp="$env:LOCALAPPDATA\org.pasadenajaycees.opsanta\EBWebView\Crashpad"
+          "WebView2 Crashpad:"; Get-ChildItem $cp -Recurse -ErrorAction SilentlyContinue | Format-Table FullName,Length
+          if(Test-Path "$cp\reports"){ Copy-Item "$cp\reports" "$env:GITHUB_WORKSPACE\e2e\.artifacts\webview2-crashpad" -Recurse }
+          "Event log:"; Get-WinEvent -FilterHashtable @{LogName='Application'; ProviderName='Application Error','Windows Error Reporting'} -MaxEvents 20 -ErrorAction SilentlyContinue | Format-List TimeCreated,ProviderName,Id,Message
+          $cdb=Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe' -ErrorAction SilentlyContinue
+          "cdb: $($cdb.FullName)"
+          if($cdb){ foreach($f in Get-ChildItem $d -Filter *.dmp -ErrorAction SilentlyContinue){ "=== $($f.Name) ==="; & $cdb.FullName -z $f.FullName -y "srv*C:\sym*https://msdl.microsoft.com/download/symbols;$env:GITHUB_WORKSPACE\target\debug" -c ".lines -d; .ecxr; kn 60; !analyze -v; q" 2>&1 | Select-Object -Last 160 } }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
-          name: e2e-evidence-${{ matrix.os }}
-          path: e2e/.artifacts/
+          name: a13-${{ matrix.arm }}-${{ matrix.rep }}
+          path: |
+            e2e/.artifacts/app-exits.log
+            e2e/.artifacts/suite-*.log
+            e2e/.artifacts/dumps/
+            e2e/.artifacts/webview2-crashpad/
+            e2e/.artifacts/app-panics.log
           include-hidden-files: true
-          retention-days: 14
+          retention-days: 7

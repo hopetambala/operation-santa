@@ -1,4 +1,5 @@
 import {spawnSync} from 'node:child_process';
+import {appendFileSync,mkdirSync} from 'node:fs';
 import path from 'node:path';
 import {setTimeout as sleep} from 'node:timers/promises';
 // Real-app E2E: drives the debug Tauri binary through WebdriverIO's embedded WebDriver server.
@@ -20,7 +21,9 @@ export const config:WebdriverIO.Config={
  logLevel:'warn',
  // The Tauri service starts the app once and only replaces it if it dies, so spec files would share one app and its
  // state. Stop it after each spec file; the service sees the port closed and starts a fresh app for the next one.
- async onWorkerEnd(){stopApp();for(let i=0;i<60&&await appListening();i++)await sleep(250);},
+ // A13 experiment arm: an explicit window switch turns off the service's per-command focus recovery.
+ async before(){if(process.env.A13_ARM==='nofocus')await browser.tauri.switchWindow('main');},
+ async onWorkerEnd(cid:string){try{mkdirSync(path.join(root,'e2e','.artifacts'),{recursive:true});appendFileSync(path.join(root,'e2e','.artifacts','app-exits.log'),`${new Date().toISOString()} harness-stop after worker ${cid}\n`)}catch{};stopApp();for(let i=0;i<60&&await appListening();i++)await sleep(250);},
  waitforTimeout:15000,
 };
 // Only this build of the app, matched by its full path, so an installed copy of Operation Santa keeps running.
