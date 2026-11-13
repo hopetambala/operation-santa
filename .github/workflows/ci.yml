@@ -113,6 +113,10 @@ jobs:
           "test exe: $exe"
           $gf='C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe'
           & $gf /p /enable (Split-Path $exe -Leaf) /full; & $gf /p
-          & $exe a13_native_soak --ignored --nocapture --test-threads=1
-          "soak exit code: 0x{0:X8}" -f $LASTEXITCODE
-          if($LASTEXITCODE -ne 0){ exit 1 }
+          $p = Start-Process -FilePath $exe -ArgumentList 'a13_native_soak','--ignored','--nocapture','--test-threads=1' -RedirectStandardOutput soak-out.txt -RedirectStandardError soak-err.txt -NoNewWindow -PassThru -Wait
+          $code = $p.ExitCode
+          "stdout:"; Get-Content soak-out.txt
+          "rounds ok: " + (Select-String soak-err.txt -Pattern 'round \d+ ok').Count + " of 200"
+          "stderr tail:"; Get-Content soak-err.txt -Tail 8
+          "soak exit code: 0x{0:X8}" -f $code
+          if($code -ne 0){ exit 1 }
