@@ -103,7 +103,9 @@ describe('Workflow',()=>{
 });
 describe('Route checks scale with the season, not with stops × families',()=>{
  const routed=(n:number,routes:number)=>{const s=demoSeason(n);s.routes=Array.from({length:routes},(_,i)=>({number:i+1,label:`Route ${i+1}`,ids:[] as string[],locked:false,team:s.teams[i%s.teams.length].id,kind:'normal' as const,pinned:[] as string[]}));s.families.forEach((f,i)=>{if(f.mode==='home')s.routes[i%routes].ids.push(f.id)});return s};
- const time=(s:Season)=>{checkRoutes(s,s.routes);const t=performance.now();for(let i=0;i<20;i++)checkRoutes(s,s.routes);return performance.now()-t};
+ // Counts how often a stop id is read, not wall time: a timing ratio failed under load on a busy machine.
+ // The old per-stop scan read every other route's ids for each stop (families × families); one pass reads each a fixed number of times.
+ const reads=(s:Season)=>{let n=0;const counted:Season={...s,routes:s.routes.map(r=>({...r,ids:new Proxy(r.ids,{get(t,k,rc){if(typeof k==='string'&&/^\d+$/.test(k))n++;return Reflect.get(t,k,rc)}})}))};checkRoutes(counted,counted.routes);return n};
  it('flags a building split, then clears it when the address changes',()=>{const s=demoSeason(6);const team=s.teams[0].id;s.routes=[{number:1,label:'Route 01',ids:[s.families[1].id],locked:false,team,kind:'normal',pinned:[]},{number:2,label:'Route 02',ids:[s.families[2].id],locked:false,team,kind:'normal',pinned:[]}];expect(checks(s.routes[0],s).errors.join(' ')).toContain('split across routes');expect(checkRoutes(s,s.routes).get(1)).toEqual(checks(s.routes[0],s));s.families[2].street='9 Only This Lane';expect(checks(s.routes[0],s).errors.join(' ')).not.toContain('split across routes');expect(checkRoutes(s,s.routes).get(1)!.errors.join(' ')).not.toContain('split across routes')});
- it('four times the families is well under sixteen times the cost',()=>{const small=routed(160,10),big=routed(640,40);const samples=(s:Season)=>[time(s),time(s),time(s)].sort((a,b)=>a-b)[1];const ratio=samples(big)/samples(small);expect(ratio).toBeLessThan(8)});
+ it('reads each routed family a fixed number of times, however big the season',()=>{for(const [n,k] of [[160,10],[640,40]] as const){const s=routed(n,k);const ids=s.routes.reduce((sum,r)=>sum+r.ids.length,0);expect(ids).toBeGreaterThan(n/2);expect(reads(s)).toBeLessThanOrEqual(3*ids)}});
 });
