@@ -44,7 +44,8 @@ describe('Season files in the App Sandbox (Mac App Store build)',()=>{
   await click('Choose save location');
   await toast(/Encrypted season created/);await noError();await shot('sandbox-created');
   assert.deepEqual(listing(CHOSEN),[NAME]);
-  // Written during this run, so a container left by an earlier run can't pass for this one.
+  // Written during this run, so a container left by an earlier run can't pass for this one. The 2 s slack covers
+  // file systems that store modification times coarsely.
   const work=path.join(SEASONS,`${sha(SEASON)}.opsanta`);
   assert.ok(existsSync(work)&&statSync(work).mtimeMs>=started-2000,`this run's working copy should be in the sandbox container: ${work}`);
   assert.equal(await call('secret_get',{name:pathKey(SEASON)}),`ok ${JSON.stringify(PASS)}`,'the keychain did not keep the passphrase under the sandbox');
