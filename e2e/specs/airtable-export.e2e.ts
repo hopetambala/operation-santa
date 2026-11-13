@@ -25,7 +25,9 @@ describe('A coordinator’s season from an Airtable export',function(){this.time
   await setE2e({census:x.census,expiredUrls:x.uploadUrls({fresh:false}),freshUrls:x.uploadUrls({fresh:true})});await createSeason();});
  it('previews the export: every family, the real pickups, and no guessed ones',async()=>{start();await importCsv(x.csv(),'Op Santa Sign-ups-Grid view.csv');const text=await dialogText('Review your import');stop('import preview');
   assert.ok(text.includes('740 new'),text.slice(0,300));assert.ok(text.includes(`${x.uploadUrls({fresh:false}).length} uploads to download`));assert.ok(!/doesn’t recognize|no column for/.test(text),`unexpected import warning: ${text.slice(0,600)}`);await shot('export-preview');
-  start();await click('Accept import');assert.match(await pageText(),/740 not looked up yet: open Address review and press Geocode/);await $(`//*[contains(text(),"${x.uploadUrls({fresh:false}).length} failed · 0 still downloading")]`).waitForExist({timeout:180000});stop('accept + upload attempts');await noError();
+  start();await click('Accept import');
+  // Accepting backs the season up first, so the families arrive a moment after the click.
+  await browser.waitUntil(async()=>/740 not looked up yet: open Address review and press Geocode/.test(await pageText()),{timeout:60000,timeoutMsg:'the 740 imported families never showed as not looked up'});await $(`//*[contains(text(),"${x.uploadUrls({fresh:false}).length} failed · 0 still downloading")]`).waitForExist({timeout:180000});stop('accept + upload attempts');await noError();
   await nav('Families');const t=await pageText();assert.match(t,/740 families · 2\d{3} children/);await shot('families');});
  // The families table mounts a window of rows. It used to stop at the first 400; every family must still be reachable,
  // and Tab at the edge of the mounted rows must reach the next family rather than leave the list.
@@ -35,10 +37,14 @@ describe('A coordinator’s season from an Airtable export',function(){this.time
   const indexes=async()=>Promise.all(await $$('tbody tr').map(async r=>Number(await r.getAttribute('data-window-index'))));
   const rowOfFocus=()=>browser.execute(()=>document.activeElement?.closest('tr')?.getAttribute('data-window-index')??null);
   const tabFrom=(i:number,shift:boolean)=>browser.execute((i:number,shift:boolean)=>{const box=document.querySelector(`tbody tr[data-window-index="${i}"] input[type=checkbox]`) as HTMLElement;box.focus({preventScroll:true});box.dispatchEvent(new KeyboardEvent('keydown',{key:'Tab',code:'Tab',shiftKey:shift,bubbles:true,cancelable:true}));},i,shift);
+  // Tab, then End before the page draws again: the scroll lands before the window's next update. Only a slow CI runner
+  // used to hit that order, and the window stayed on the Tab's row with the bottom of the list blank.
+  const tabThenEnd=(i:number)=>browser.execute(async(i:number)=>{const box=document.querySelector(`tbody tr[data-window-index="${i}"] input[type=checkbox]`) as HTMLElement;box.focus({preventScroll:true});box.dispatchEvent(new KeyboardEvent('keydown',{key:'Tab',code:'Tab',bubbles:true,cancelable:true}));
+   // React moves focus in a microtask after the keydown; wait for it without giving the page a frame.
+   for(let n=0;n<20&&document.activeElement?.closest('tr')?.getAttribute('data-window-index')!==String(i+1);n++)await Promise.resolve();
+   const reached=document.activeElement?.closest('tr')?.getAttribute('data-window-index')??null;window.scrollTo(0,document.documentElement.scrollHeight);return reached;},i);
   assert.ok(await rows()>0&&await rows()<=WINDOW,`${await rows()} rows mounted at the top`);
-  const last=Math.max(...await indexes());await tabFrom(last,false);
-  await browser.waitUntil(async()=>await rowOfFocus()===String(last+1),{timeout:5000,timeoutMsg:`Tab from row ${last}, the last one mounted, did not reach row ${last+1}`});
-  await browser.execute(()=>window.scrollTo(0,document.documentElement.scrollHeight));await $('tbody tr[aria-rowindex="741"]').waitForExist({timeout:5000,timeoutMsg:'the 740th family never appeared at the bottom of the list'});assert.ok(await rows()<=WINDOW,`${await rows()} rows mounted at the bottom`);
+  const last=Math.max(...await indexes());assert.equal(await tabThenEnd(last),String(last+1),`Tab from row ${last}, the last one mounted, did not reach row ${last+1}`);await $('tbody tr[aria-rowindex="741"]').waitForExist({timeout:5000,timeoutMsg:'the 740th family never appeared at the bottom of the list'});assert.ok(await rows()<=WINDOW,`${await rows()} rows mounted at the bottom`);
   const first=Math.min(...await indexes());assert.ok(first>0,'the bottom of the list does not mount the first family');await tabFrom(first,true);
   await browser.waitUntil(async()=>await rowOfFocus()===String(first-1),{timeout:5000,timeoutMsg:`Shift+Tab from row ${first}, the first one mounted, did not reach row ${first-1}`});
   await browser.execute(()=>window.scrollTo(0,0));await noError();});
@@ -57,7 +63,9 @@ describe('A coordinator’s season from an Airtable export',function(){this.time
   const short=Number((await pageText()).match(/UNROUTED\s*(\d+)/)?.[1]);timings['unrouted with 45 teams']=short;if(short>0){await browser.pause(7000);assert.match(await pageText(),/don’t fit on 45 teams within the 3h 45m limit\. Set Fleet to “Fewest that fit”/,'the note outlives the toast');await nav('Print center');await click('Show details');assert.match(await pageText(),/home deliveries have no route: \d+ don’t fit/,'Check names the unrouted families before anyone prints every route');await nav('Route planner');}await shot('routes-45');
   await choose(field('Fleet'),'auto');start();await click('Rebalance unlocked');await browser.waitUntil(async()=>/UNROUTED\s*0/.test(await pageText()),{timeout:180000,timeoutMsg:'fewest that fit left families unrouted'});stop('plan fewest that fit');const needed=(await $$('.route-card')).length;timings['teams needed']=needed;
   await nav('Teams');await importCsv(sheet(needed),`teams-${needed}.csv`,'input[type=file][hidden]');await $(`//*[contains(text(),"Team ${needed}")]`).waitForExist();
-  await nav('Route planner');await click('Rebalance unlocked');await browser.waitUntil(async()=>/UNROUTED\s*0/.test(await pageText()),{timeout:180000});const t=await pageText();assert.ok(!/No team yet|don’t fit/.test(t),t.slice(0,600));await noError();await shot(`routes-${needed}`);});
+  await nav('Route planner');await click('Rebalance unlocked');
+  // The plan already shows 0 unrouted before this rebalance, so wait for what it does: every route gets a team.
+  await browser.waitUntil(async()=>{const t=await pageText();return /UNROUTED\s*0/.test(t)&&!/No team assigned/.test(t)},{timeout:180000,timeoutMsg:'the rebalance left a route without a team'});const t=await pageText();assert.ok(!/No team (yet|assigned)|don’t fit/.test(t),t.slice(0,600));await noError();await shot(`routes-${needed}`);});
  // About 2,000 letters at season size. The suite's limit sits above the wait's own, so a slow run reports how far it got.
  it('times letter approvals at season size, then clears the queue',async()=>{await nav('Letter cleanup');start();for(let i=0;i<20;i++)await click('Approve');stop('20 approvals by hand');timings['seconds per approval']=Math.round(timings['20 approvals by hand']/20*100)/100;
   // The rest go through the same button in-page; WebDriver round-trips would take most of an hour. Batches of 50

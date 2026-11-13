@@ -25,7 +25,7 @@ opsanta-solver = { path = "../../../crates/solver" }
 # The server listens on 127.0.0.1:4445 with no auth, so it is registered only in debug builds made with
 # `--features e2e` (npm run e2e:build). Plain `tauri dev` and release builds never start it.
 [features]
-e2e = ["dep:tauri-plugin-wdio-webdriver", "dep:tauri-plugin-wdio"]
+e2e = ["dep:tauri-plugin-wdio-webdriver", "dep:tauri-plugin-wdio", "dep:objc2"]
 # Self-updates for the downloadable DMG and Windows builds only (the release scripts turn it on; the Mac App Store forbids it).
 updater = ["dep:tauri-plugin-updater"]
 [dependencies.tauri-plugin-wdio-webdriver]
@@ -36,4 +36,8 @@ version = "=2.12.0"
 optional = true
 [dependencies.tauri-plugin-wdio]
 version = "=1.5.0"
+optional = true
+# E2E only, macOS: keeps WKWebView drawing when its window is covered (see main.rs). Already in the tree through wry.
+[target.'cfg(target_os = "macos")'.dependencies.objc2]
+version = "=0.6.5"
 optional = true

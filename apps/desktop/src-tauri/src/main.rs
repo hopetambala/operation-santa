@@ -245,6 +245,14 @@ fn record_panics(){let Ok(path)=std::env::var("OPSANTA_E2E_LOG") else {return};l
 fn main(){#[cfg(feature="e2e")]record_panics();let builder=tauri::Builder::default();
  #[cfg(all(debug_assertions,feature="e2e"))]
  let builder=builder.plugin(tauri_plugin_wdio_webdriver::init()).plugin(tauri_plugin_wdio::init());
+ // WebKit stops drawing a window that macOS reports as covered, as on a Mac someone is using during a run. The page
+ // then reads as hidden and gets no animation frames, so the families table never mounts the rows scrolled to and the
+ // E2E fails on a list that works for anyone looking at it. E2E builds keep drawing; every other build keeps WebKit's
+ // power saving. WebKit decides visibility once the view is in its window, before setup runs, and rechecks only when
+ // the window's occlusion changes, so the switch is followed by that notification.
+ // The switch is private WebKit API, so it is skipped if a macOS release drops it.
+ #[cfg(all(debug_assertions,feature="e2e",target_os="macos"))]
+ let builder=builder.setup(|app|{use tauri::Manager;use objc2::{class,msg_send,sel,runtime::AnyObject};if let Some(w)=app.get_webview_window("main"){w.with_webview(|v|unsafe{let wk=v.inner() as *mut AnyObject;let known:bool=msg_send![wk,respondsToSelector:sel!(_setWindowOcclusionDetectionEnabled:)];let win:*mut AnyObject=msg_send![wk,window];if !known||win.is_null(){return}let _:()=msg_send![wk,_setWindowOcclusionDetectionEnabled:false];let center:*mut AnyObject=msg_send![class!(NSNotificationCenter),defaultCenter];let name:*mut AnyObject=msg_send![class!(NSString),stringWithUTF8String:c"NSWindowDidChangeOcclusionStateNotification".as_ptr()];let _:()=msg_send![center,postNotificationName:name,object:win];})?;}Ok(())});
  #[cfg(feature="updater")]
  let builder=builder.plugin(tauri_plugin_updater::Builder::new().build());
  builder.plugin(tauri_plugin_dialog::init()).manage(Store::default()).invoke_handler(tauri::generate_handler![create_season,open_season,save_season,backup_season,close_season,fetch_attachment,airtable_get,secret_set,secret_get,secret_delete,geocode_census,geocode_nominatim,travel_matrix_ors,asset_put,asset_get,asset_prune,vacuum_season,purge_backups,restart_app,updater_built_in,export_packet,open_packet,write_export]).run(tauri::generate_context!()).expect("Unable to launch Operation Santa");}
