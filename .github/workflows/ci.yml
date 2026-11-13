@@ -58,16 +58,16 @@ jobs:
           $dumps="$env:GITHUB_WORKSPACE\e2e\.artifacts\dumps"
           $pd=Start-Process pwsh -ArgumentList '-NoProfile','-Command',"while(`$true){ & '$env:RUNNER_TEMP\procdump\procdump64.exe' -accepteula -e -w opsanta.exe '$dumps' *>> '$env:GITHUB_WORKSPACE\e2e\.artifacts\procdump.log'; Start-Sleep -Milliseconds 200 }" -PassThru -WindowStyle Hidden
           $results=@()
-          foreach($i in 1..3){
+          foreach($i in 1..15){
             Add-Content $log "$(Get-Date -Format o) suite-start $i"
-            npm run e2e 2>&1 | Tee-Object -FilePath "e2e/.artifacts/suite-$i.log" | Select-String -Pattern 'PASSED in|FAILED in|Spec Files|ECONNREFUSED when running|ECONNRESET|Error in "' | ForEach-Object { $_.Line }
+            npx wdio run e2e/wdio.conf.ts --spec e2e/specs/airtable-sync.e2e.ts 2>&1 | Tee-Object -FilePath "e2e/.artifacts/suite-$i.log" | Select-String -Pattern 'PASSED in|FAILED in|Spec Files|ECONNREFUSED when running|ECONNRESET|Error in "' | ForEach-Object { $_.Line }
             $results+="suite $i exit=$LASTEXITCODE"
             Add-Content $log "$(Get-Date -Format o) suite-end $i exit=$LASTEXITCODE"
           }
           Start-Sleep 2; Stop-Process -Id $mon.Id,$pd.Id -Force -ErrorAction SilentlyContinue; Get-Process procdump64 -ErrorAction SilentlyContinue | Stop-Process -Force
           "== results ($env:A13_ARM) =="; $results
           "== app exits =="; Get-Content $log
-          "== focus-loop warnings per suite =="; foreach($i in 1..3){ "suite $i : " + (Select-String -Path "e2e/.artifacts/suite-$i.log" -Pattern 'Could not find window with title' | Measure-Object).Count }
+          "== focus-loop warnings per suite =="; foreach($i in 1..15){ "suite $i : " + (Select-String -Path "e2e/.artifacts/suite-$i.log" -Pattern 'Could not find window with title' | Measure-Object).Count }
       - name: Dumps, WebView2 crash reports, event log
         if: always()
         shell: pwsh
