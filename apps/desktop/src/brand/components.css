@@ -22,11 +22,13 @@ button:disabled { opacity: var(--tk-dlite-semantic-motion-opacity-disabled); cur
 img, svg { max-width: 100%; }
 img { height: auto; }
 
-/* 2.4.11: the sticky step bar can wrap to about three comfortable targets. The margin keeps a focused control out from under it. */
+/* 2.4.11: a focused control never lands under the pinned top bar. Its height changes as the tabs wrap
+   (180px on a desktop window), so main.tsx writes the measured height to --topbar-height, and scroll
+   padding makes the browser scroll a newly focused control below it. */
+html { scroll-padding-top: calc(var(--topbar-height, 0px) + var(--tk-dlite-semantic-spacing-200)); }
 :focus-visible {
   outline: var(--tk-dlite-semantic-focus-ring-width) solid var(--tk-dlite-semantic-color-focus-ring);
   outline-offset: var(--tk-dlite-semantic-focus-ring-offset);
-  scroll-margin-top: calc(var(--tk-dlite-semantic-sizing-target-comfortable) * 3);
   scroll-margin-bottom: var(--tk-dlite-semantic-sizing-target-comfortable);
 }
 a { color: var(--tk-dlite-semantic-color-text-link); text-decoration: underline; text-underline-offset: var(--tk-dlite-semantic-spacing-xxs); }
