@@ -24,7 +24,7 @@ A story: on December 15 the Park family calls the hotline. They missed the form,
 1. Add them: **Families** ▸ **Add family** for a phone call, or import or sync again for late form sign-ups.
 2. Geocode them in **Address review** (**Geocode 1**), and fix the pin if needed.
 3. Go to **Route planner** and click **Insert new families**.
-4. If the plan is frozen or printed, choose a reason, such as **added late**, and click **Record & continue**.
+4. If a route has been printed, choose a reason, such as **added late**, and click **Record & continue**.
 5. Read the message, for example "1 families inserted."
 
 **Insert new families** puts each waiting family into the unlocked ordinary route where it adds the least time, as long as that route stays within the hard maximum. Every other route stays as it is. A family whose building is already on a route joins that route.
@@ -37,7 +37,7 @@ When a family cancels, or switches to the pickup event:
 
 1. Open the family in **Families**.
 2. Set "Status" to **cancelled**, or "Delivery" to **pickup**.
-3. Click **Save family**, then choose a reason, such as **cancelled by family** or **moved to pickup**.
+3. Click **Save family**. If their route has been printed, choose a reason, such as **cancelled by family** or **moved to pickup**.
 
 They come off their route at once. The route's packet shows "Needs reprint" in the Print center, and the team lead goes on the [call list]({{ '/printing/reprints/' | relative_url }}).
 
@@ -51,10 +51,11 @@ Freeze the plan when the routes are final, just before printing (about December 
 While the plan is frozen:
 
 - **Rebalance unlocked** is turned off, so nobody can reshuffle every route by mistake ("Unfreeze the plan before rebalancing.").
-- Changes to families, routes, teams, letters and settings ask for a reason first. (Pinning a stop, importing a team CSV and the Print center's label options don't.)
 - You can still insert late families, move single stops, and edit families.
 
-To unfreeze, click **Unfreeze plan** and give a reason.
+To unfreeze, click **Unfreeze plan**. Once any route has been printed, the app asks for a reason.
+
+Freezing doesn't by itself ask for reasons. A change asks for a reason once it touches a route whose packet has been printed: changes to families, routes, teams, letters and settings. (Pinning a stop, importing a team CSV and the Print center's label options don't.)
 
 ## Reasons
 

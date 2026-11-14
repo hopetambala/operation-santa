@@ -23,7 +23,7 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 | Demo season with fictional families on first launch | Overview banner, **New season** | `main.tsx`, `solver.ts` `demo`, `model.ts` `demoSeason` | everyone | `scope.e2e.ts` (runs on it) | `start-here/tour.md` |
 | Top bar: tab icons, badges, bell (open tasks), save state, **Import families** / **Plan routes** shortcut, avatar menu | every page | `main.tsx` | everyone | `scope.e2e.ts` (tab names) | `start-here/tour.md` |
 | Overview: stat cards, funnel, "Route overview", "Task list" | Overview | `main.tsx` | C | none | `start-here/tour.md` |
-| "Leave a note for the next person" reason prompt (8 reasons, "other" needs text) | appears after freeze or printing | `main.tsx` `withReason`, `model.ts` `needsReason` | C, RP, LC | `planning-and-pickup.e2e.ts`, unit | `routing/late-changes.md`, `start-here/tour.md` |
+| "Leave a note for the next person" reason prompt (8 reasons, "other" needs text) | appears only for a change to a printed route | `main.tsx` `withReason`, `model.ts` `needsReason` | C, RP, LC | `planning-and-pickup.e2e.ts`, unit | `routing/late-changes.md`, `start-here/tour.md` |
 | Error banner and toasts | every page | `main.tsx` | everyone | none | `reference/troubleshooting.md` |
 
 ## 2. Season files and passphrases

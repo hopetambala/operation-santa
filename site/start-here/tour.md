@@ -52,7 +52,7 @@ The Overview answers "what's left to do?"
 
 ## "Leave a note for the next person"
 
-Once the plan is frozen, or once a route's packet has been printed, the app asks why before it accepts a change that touches that route.
+Once a route's packet has been printed, the app asks why before it accepts a change that touches that route. Changes to routes that haven't been printed yet never ask, even when the plan is frozen.
 
 1. Choose a reason: cancelled by family, no response, duplicate, moved to pickup, address fix, added late, rebalanced, or other.
 2. For **other**, describe the change in a few words.

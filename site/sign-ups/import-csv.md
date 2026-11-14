@@ -82,4 +82,4 @@ Families you added by hand with **Add family** (Entry IDs from 90001) are never 
 | Row … has no Entry ID | A row is missing its Entry ID. Fix it in Airtable and download again. |
 | An unclosed quoted CSV field needs correction before importing | The file was edited and saved badly. Download a fresh copy instead of editing it. |
 
-After freezing the plan or printing, the app also asks for a reason before accepting an import.
+If the import changes a family on a route that has been printed, the app also asks for a reason before accepting it.

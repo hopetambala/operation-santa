@@ -16,7 +16,7 @@ description: "Every setting in the Settings page, its default, and what it chang
 {: .why }
 In 2025 the routing settings lived in each MyRouteOnline account and the print layout lived in a Word template on one laptop. Here they're stored in the season file itself, so everyone working on the season uses the same ones.
 
-Change any value under "Season settings", then click **Save settings** at the bottom. After the plan is frozen or printed, the app asks for a reason, and every changed setting is recorded in the [Change log]({{ '/reference/change-log/' | relative_url }}).
+Change any value under "Season settings", then click **Save settings** at the bottom. If the change alters a printed packet (start time, North Pole address, children per bag, street address on labels), the app asks for a reason, and every changed setting is recorded in the [Change log]({{ '/reference/change-log/' | relative_url }}).
 
 ![The Settings page on the demo season]({{ '/assets/images/settings.png' | relative_url }})
 
