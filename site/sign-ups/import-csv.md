@@ -68,7 +68,7 @@ A story: the Bennett family (Entry ID 26014) signs up on November 3. You import 
 - They show under **changed**, with the new gate code.
 - The gate code is updated, because you never edited it in the app.
 - The street name stays as **you** fixed it, because in-app edits win.
-- If a child's letter changed, that letter goes back to "needs review" in Letter cleanup.
+- If a child's letter changed, the new text replaces the old one and is checked again: it goes into Letter cleanup's "to look at" list only if the app flags it.
 - If the address changed (and you hadn't pinned it by hand), the family goes back into the geocoding queue.
 
 Families you added by hand with **Add family** (Entry IDs from 90001) are never marked missing.

@@ -26,7 +26,7 @@ Families are on the pickup list when their "Delivery" is **pickup**: set in [Fam
 
 To print:
 
-1. Approve their letters in [Letter cleanup]({{ '/sign-ups/letter-cleanup/' | relative_url }}). The packet won't print while a pickup family's letter needs approval or an upload is still downloading.
+1. Look at any of their letters the app flags in [Letter cleanup]({{ '/sign-ups/letter-cleanup/' | relative_url }}). The packet won't print while a pickup family's letter needs a look or an upload is still downloading.
 2. Go to **Print center** ▸ "Other printouts and exports".
 3. Click **Pickup event packet (N)**, where N is the number of pickup families. Save the PDF (`Pickup event - v1.pdf`).
 
@@ -40,7 +40,7 @@ Print it again after changes; the version number goes up each time.
 
 ## Coordinator holds
 
-Some letters shouldn't go out with the Santa teams: a single letter held with **Hold from print**, or a whole family flagged **do not share with volunteers**. The team packet only says "Letter held by coordinator. Ask the North Pole before delivering this family's gifts."
+Some letters shouldn't go out with the Santa teams: a single letter marked **Don't print**, or a whole family flagged **do not share with volunteers**. The team packet only says "Letter held by coordinator. Ask the North Pole before delivering this family's gifts."
 
 The coordinator keeps the full letters in a separate PDF:
 
@@ -50,4 +50,4 @@ The coordinator keeps the full letters in a separate PDF:
 It has one letter page per held family, by Entry ID. Keep it with the coordinator at the North Pole.
 
 {: .note }
-For a family flagged **do not share with volunteers**, this PDF has their full letters. A single letter held with **Hold from print** still shows only "Letter held by coordinator." here too; read it on the **Held** tab in Letter cleanup.
+For a family flagged **do not share with volunteers**, this PDF has their full letters. A single letter marked **Don't print** still shows only "Letter held by coordinator." here too; read it on the **Not printing** tab in Letter cleanup.

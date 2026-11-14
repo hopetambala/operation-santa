@@ -27,7 +27,7 @@ Each spec file gets a fresh app: `wdio.conf.ts` stops the app after every spec f
   1. **Sign-ups → routes:**
      - Create an encrypted season and import a synthetic export shaped like 2025.
      - Geocode with mocked services. Fix the miss, move the out-of-area family to pickup, and accept the proposed flags.
-     - Add teams, approve the letters, rebalance into 2 routes.
+     - Add teams, look at the one flagged letter, rebalance into 2 routes.
      - Lock and reopen the file, and check the routes come back.
   2. **Sign-ups + routes → letters and labels:**
      - Check before printing, then export one PDF of all routes.
@@ -40,12 +40,12 @@ Each spec file gets a fresh app: `wdio.conf.ts` stops the app after every spec f
 - **`specs/cleanup-packets.e2e.ts`**
   - Export an encrypted packet for Entry IDs 26001–26005; the coordinator keeps editing one of those letters.
   - A volunteer opens the packet: only those families, drawings included.
-  - The volunteer approves, edits, flags and holds letters, then saves.
+  - The volunteer edits, approves, flags and holds letters ("Don't print"), then saves.
   - The coordinator imports: 10 field changes merge, and 1 clash is resolved in the conflict dialog. Also checked: who cleaned each letter, and the change log.
 - **`specs/airtable-export.e2e.ts`:** the usability test's success criterion at season size. A coordinator takes a 740-family Airtable export (`support/airtable-export.ts`: synthetic, seeded, with the 2025 form's columns and English and Spanish answers) from a fresh install to 45 printed route packets:
   - import, with expired drawing links, then a fresh re-export that downloads them
   - geocode, accept the proposed flags (only the real pickup answers become pickups), move the out-of-area families to pickup, and pin the misses
-  - import 45 teams from a sheet, plan 45 routes, approve every letter, and print one PDF
+  - import 45 teams from a sheet, plan 45 routes, look at the letters the app flags, and print one PDF
   - Writes `airtable-export-740.csv`, `teams-45.csv` and `airtable-export-timings.json` to the run folder; the usability study uses the first two. Takes about 15–25 minutes.
 - **`specs/airtable-sync.e2e.ts`:** paged Airtable read, refresh of an expired drawing link, and an idempotent re-sync.
 - **`specs/season-security.e2e.ts`:** keychain "remember passphrase" with fallback, and the purge.

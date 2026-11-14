@@ -39,7 +39,7 @@ The Overview answers "what's left to do?"
 |---|---|
 | Review addresses | Address review |
 | Confirm proposed flags | Address review |
-| Give letters a final read | Letter cleanup |
+| Look at flagged letters | Letter cleanup |
 | Fix uploads | Letter cleanup |
 | Find a route for everyone | Route planner |
 | Assign every route a team | Route planner |
