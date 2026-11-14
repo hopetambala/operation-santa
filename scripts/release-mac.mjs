@@ -89,6 +89,11 @@ if(!existsSync(app))fail(`${app} was not produced`);
 
 gateOrFail({bins:[app]});
 if(channel==='mas'){const found=checkBinary(app,UPDATER_MARKERS);if(found.length)fail(`The Mac App Store build contains the updater, which App Review rejects:\n  ${found.join('\n  ')}`);console.log('✓ No updater in the Mac App Store build');}
+// App Store Connect rejects a bundle without an .icns holding a 512pt @2x image (error 90236); Tauri adds none unless
+// tauri.conf.json lists bundle.icon. Checked for both channels: the DMG would otherwise show the generic app icon.
+const iconFile=capture('plutil',['-extract','CFBundleIconFile','raw',join(app,'Contents','Info.plist')]).out.trim();
+if(!iconFile||!existsSync(join(app,'Contents','Resources',iconFile.endsWith('.icns')?iconFile:`${iconFile}.icns`)))fail(`${app} has no app icon. List the icons in tauri.conf.json bundle.icon.`);
+console.log(`✓ App icon: ${iconFile}`);
 const exe=join(app,'Contents','MacOS',readdirSync(join(app,'Contents','MacOS'))[0]);
 const archs=capture('lipo',['-archs',exe]).out.trim();
 if(!(archs.includes('arm64')&&archs.includes('x86_64')))fail(`${exe} is not universal (archs: ${archs})`);
