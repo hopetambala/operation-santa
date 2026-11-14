@@ -41,7 +41,7 @@ Only one person can have a season file open at a time. If the planner and the co
 
 ## Letter cleaner
 
-Gives each child's letter a careful final read before it's printed. Usually works from a **cleanup packet**: a small encrypted file with only some families' letters, so cleaners never need the season file.
+Looks at the letters the app flags (contact details, too long, empty, a bad upload) before they're printed; every other letter prints as imported. Works on the coordinator's computer, or from a **cleanup packet** (a small encrypted file with only some families' letters) when Settings ▸ Advanced ▸ "Send letters to helpers" is on.
 
 1. [Install and update]({{ '/start-here/install/' | relative_url }})
 2. [Cleanup packets]({{ '/sign-ups/cleanup-packets/' | relative_url }}): the "For letter cleaners" part

@@ -24,7 +24,7 @@ In 2025 three people planned routes in three separate MyRouteOnline accounts, so
 
 ## How the app times a route
 
-Each stop takes a **base time** (7 minutes), plus time for each extra child, an apartment, a gate code and extra toys, minus a little when the next stop is in the same building. Driving is estimated from the distance at an average speed, plus a minute and a half to park. All of these are in Settings ▸ "Service time model".
+Each stop takes a **base time** (7 minutes), plus time for each extra child, an apartment, a gate code and extra toys, minus a little when the next stop is in the same building. Driving is estimated from the distance at an average speed, plus a minute and a half to park. All of these are in the planner's [Route settings](#route-settings).
 
 Every route leaves the North Pole at the departure time (4:30 PM by default) and comes back there. Two limits matter:
 
@@ -39,7 +39,7 @@ The "Estimated travel" badge is a reminder that times are estimates from straigh
 2. Choose how many teams to plan for, under "Fleet":
    - **Fixed count**: type the number of teams you have in "Teams".
    - **Fewest that fit**: the app works out the smallest number of teams that gets every family home within the hard maximum.
-3. Click **Rebalance unlocked**. It shows "Planning…" for a few seconds.
+3. Click **Rebalance unlocked**. It shows "Planning…" for a few seconds. (Once the plan is frozen, this button is replaced by **Insert new families**; see [Late changes]({{ '/routing/late-changes/' | relative_url }}).)
 4. Read the message: for example "38 routes planned. Longest 3h 12m, spread 41 min."
 
 The read-outs at the top show:
@@ -125,3 +125,24 @@ To make one:
 4. Add families from the unrouted table ("ADD TO ROUTE"), or move them from other routes with each stop's route menu.
 
 Out-of-area families can only go on special routes, unless they're marked **Include anyway** in Address review.
+
+## Route settings
+
+At the bottom of the Route planner, **Route settings** holds the 9 numbers that time every stop and drive, in minutes unless it says otherwise. A stop is never counted as less than 5 or more than 25 minutes. Change a number, then click **Save route settings**; every route's times update at once.
+
+| Setting | Default | What it does |
+|---|---|---|
+| Base stop time | 7 | Every stop. |
+| Per extra child | 1.5 | Added for each child after the first. |
+| Apartment | 3 | Added when the family has a unit number. |
+| Gate code | 2 | Added when the family has gate or access notes. |
+| Extra toys | 3 | Added for families flagged extra toys. |
+| Same-building discount | 3 | Taken off for a second family in the same building. |
+| Estimated speed (mph) | 18 | Average driving speed between stops. |
+| Road distance multiplier | 1.35 | Roads are longer than a straight line; this stretches the straight-line distance. |
+| Parking per stop (min) | 1.5 | Added to every drive. |
+
+{: .why }
+2025 planned a flat 10 minutes for every stop, whether it was a house with one child or an apartment with six behind a gate. That's how twelve routes ran past three and a half hours.
+
+Change these only to match what teams really saw, for example after a dry run. Every change goes into the [Change log]({{ '/reference/change-log/' | relative_url }}).

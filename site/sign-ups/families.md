@@ -51,13 +51,12 @@ The list shows the first 400 matches; narrow the search to see others. The foote
    - Flags: tick spanish speaker, extra toys, adopt a family, do not share with volunteers, duplicate address ok, eaton impacted, paper letter, or include out of area.
    - "Additional information (printed)" and "Special requests (printed)" appear on the family's letter.
    - "Coordinator notes (never printed, never used for routing)" are for the committee only.
-   - "Route" moves the family to another route, or "Not on a route".
 3. Click **Save family**.
 
 The **Children & letters** tab holds each child's name, age, gender, first and second choice and letter, plus their drawings. **Add child** and **Remove child** are at the bottom. The **History** tab lists every recorded change to this family.
 
 {: .note }
-Anything you edit here is kept through later imports, even if the family changes that field in Airtable. If you change the street, city or ZIP, the address goes back into the geocoding queue unless you've ticked "I verified this address and its coordinates".
+Anything you edit here is kept through later imports, even if the family changes that field in Airtable. If you change the street, city or ZIP, the address goes back into the geocoding queue, even if its pin was set by hand. Pins are set in [Address review]({{ '/sign-ups/address-review/' | relative_url }}), not here.
 
 ### Cancelling a family, or moving them to pickup
 
@@ -91,5 +90,4 @@ A story: the committee decides that every family in a named apartment complex ge
 
 ## Other buttons
 
-- **Sync Airtable**: see [Sync from Airtable]({{ '/sign-ups/airtable-sync/' | relative_url }}).
-- **Fallback CSV**: see [MyRouteOnline fallback]({{ '/printing/myrouteonline-fallback/' | relative_url }}).
+- **Sync Airtable** (only with Settings ▸ Advanced ▸ "Airtable Sync" on): see [Sync from Airtable]({{ '/sign-ups/airtable-sync/' | relative_url }}).

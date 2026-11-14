@@ -4,7 +4,7 @@ import {writeFileSync,statSync} from 'node:fs';
 import path from 'node:path';
 import Papa from 'papaparse';
 import {airtableExport} from '../support/airtable-export';
-import {RUN_DIR,field,shot,click,fill,nav,noError,reasonIfAsked,dialogText,pageText,importCsv,installMocks,setE2e,setInput,newestPdf,choose} from '../support/app';
+import {RUN_DIR,field,shot,click,fill,nav,noError,reasonIfAsked,dialogText,pageText,importCsv,installMocks,setE2e,setInput,newestPdf,choose,lookTab} from '../support/app';
 import {createSeason} from '../support/season';
 import {readPdf} from '../support/pdf';
 import {inArea,defaults,type Family} from '../../apps/desktop/src/model';
@@ -66,12 +66,9 @@ describe('A coordinator’s season from an Airtable export',function(){this.time
   await nav('Route planner');await click('Rebalance unlocked');
   // The plan already shows 0 unrouted before this rebalance, so wait for what it does: every route gets a team.
   await browser.waitUntil(async()=>{const t=await pageText();return /UNROUTED\s*0/.test(t)&&!/No team assigned/.test(t)},{timeout:180000,timeoutMsg:'the rebalance left a route without a team'});const t=await pageText();assert.ok(!/No team (yet|assigned)|don’t fit/.test(t),t.slice(0,600));await noError();await shot(`routes-${needed}`);});
- // About 2,000 letters at season size. The suite's limit sits above the wait's own, so a slow run reports how far it got.
- it('times letter approvals at season size, then clears the queue',async()=>{await nav('Letter cleanup');start();for(let i=0;i<20;i++)await click('Approve');stop('20 approvals by hand');timings['seconds per approval']=Math.round(timings['20 approvals by hand']/20*100)/100;
-  // The rest go through the same button in-page; WebDriver round-trips would take most of an hour. Batches of 50
-  // keep each script call well inside WebDriver's script timeout on slow CI runners.
-  // The queue's header reads "… · 1 of N"; N is how many letters are left.
-  let left=NaN;start();try{await browser.waitUntil(async()=>{const r=await browser.execute(async()=>{const done=()=>Array.from(document.querySelectorAll('h2,h3,p,strong')).some(e=>/Every letter has had a little care/.test(e.textContent||''));for(let n=0;n<50&&!done();n++){const b=Array.from(document.querySelectorAll('button')).find(e=>(e.textContent||'').trim()==='Approve') as HTMLButtonElement|undefined;if(!b)break;b.click();await new Promise(r=>setTimeout(r,0));}const m=Array.from(document.querySelectorAll('.panel-head p')).map(e=>/ of (\d+)$/.exec(e.textContent||'')?.[1]).find(Boolean);return {done:done(),left:done()?0:Number(m??NaN)};});if(r.left!==left&&Math.floor(r.left/250)!==Math.floor(left/250))console.log(`[approvals] ${r.left} left after ${Math.round((Date.now()-t0)/1000)} s`);left=r.left;return r.done},{timeout:20*60_000,interval:100});}catch(e){await shot('approvals-timeout');throw Error(`${left} letters still waiting after ${Math.round((Date.now()-t0)/1000)} s: ${(e as Error).message}`)}stop('approve the remaining letters');await noError();});
+ // About 2,000 letters at season size. Phase 3: the import is trusted, so only letters with a warning, a problem upload
+ // or a flag need a look; the rest print as imported. After the fresh re-import this export flags none.
+ it('asks only about the letters it flags, then clears them',async()=>{await nav('Letter cleanup');await lookTab();start();let looked=0;while(!(await $('//*[contains(text(),"Nothing to look at")]').isExisting())){await click('Looks good · next');if(++looked>2100)throw Error('the letters to look at did not drain');}stop('look at the flagged letters');timings['letters to look at']=looked;console.log(`[letters] ${looked} of the export's letters needed a look`);await lookTab(0);await noError();});
  it('passes Check and prints every route packet in one PDF',async()=>{const n=timings['teams needed'];await nav('Print center');const t=await pageText();assert.ok(t.includes('No blocking problems.'),`Check should pass: ${t.slice(0,900)}`);// A season-sized PDF takes minutes, longer than the 6 s toast stays up, so wait for the file and its size to settle.
   const before=newestPdf();start();await click('All routes, one PDF');let size=-1;await browser.waitUntil(async()=>{const p=newestPdf();if(!p||p===before)return false;const s=statSync(p).size;const settled=s>0&&s===size;size=s;return settled;},{timeout:540000,interval:3000,timeoutMsg:'the season PDF was not written'});stop('print every route');await noError();const pages=await readPdf(newestPdf());timings['pages printed']=pages.length;assert.equal(pages.filter(p=>/Route \d+ · Stop 1 of/.test(p.text)).length,n);await shot('printed');});
 });

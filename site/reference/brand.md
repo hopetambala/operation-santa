@@ -95,7 +95,7 @@ A child's own Letter to Santa is set in **Georgia** on warm paper, so it reads a
 - Panels have rounded corners and one soft shadow. Don't put cards inside cards, and don't use gradients or colored side stripes.
 - A screen reads top to bottom: the title, what's left to do, then the work.
 - There is no decorative motion. The only animation is a spinner on an action that's running, and it stops for anyone whose computer is set to reduce motion.
-- A disabled button is faded, and a nearby line says why, for example "Approve every letter first".
+- A disabled button is faded, and a nearby line says why, for example "Look at the flagged letters first".
 
 ## Words
 

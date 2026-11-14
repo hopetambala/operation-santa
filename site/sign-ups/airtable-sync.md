@@ -19,6 +19,9 @@ About 160 children's drawings printed as raw web links in 2025, and cleaners pas
 
 Syncing gives exactly the same "Review your import" preview and the same safe merge as a CSV import. It only ever **reads** from Airtable.
 
+{: .note }
+Sync is off by default: importing the CSV is the normal way in, and a fresh CSV also fixes expired drawing links. To use Sync, go to **Settings** ▸ **Advanced**, tick **Airtable Sync**, and click **Save settings**. Until then, the **Sync Airtable** button and the "Airtable connection" panel don't appear.
+
 ## Set it up once
 
 You need a read-only Airtable token and two IDs.
@@ -33,7 +36,7 @@ You need a read-only Airtable token and two IDs.
 
 ### 2. Save the token in the app
 
-1. Go to **Settings**. Find "Airtable connection" on the right.
+1. Turn on **Settings** ▸ **Advanced** ▸ **Airtable Sync** (see the note above). Then find "Airtable connection" on the right of Settings.
 2. Paste the token into "Personal access token".
 3. Click **Save token**. The badge changes to "Token saved".
 

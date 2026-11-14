@@ -50,7 +50,7 @@ Each route also has its own card saying "Ready to export", "Ready · 2 warnings"
 | #26014: review the address. | Address review |
 | #26014: placeholder text in the address or name. | Families: remove "None", "N/A" or similar |
 | #26014: cancelled family is still routed. / pickup family is still routed. | Route planner: **Remove from route** |
-| #26014: child 2's letter needs approval. | Letter cleanup |
+| #26014: child 2's letter needs a look. | Letter cleanup |
 | #26014: child 1's letter is empty and has no upload. | Letter cleanup, or Families ▸ Children & letters |
 | #26014: child 1's upload is still downloading. / … failed to download | Letter cleanup: **Retry**, or **Skip upload (print placeholder)** |
 | #26014: building is split across routes. | Route planner: move the rest of the building onto one route |
@@ -87,4 +87,4 @@ Each route card has a **Phone links** button. It opens the route as a short text
 
 The links contain addresses only, never names. They work best in the Google Maps app: phone web browsers only show a few stops of a long route. The same links are the QR codes on the packet's cover.
 
-Change how many stops go in each link in Settings ▸ "Stops per Google Maps link (max 9)".
+Change how many stops go in each link in Settings ▸ Advanced ▸ "Stops per Google Maps link (max 9)".
