@@ -87,4 +87,4 @@ Each route card has a **Phone links** button. It opens the route as a short text
 
 The links contain addresses only, never names. They work best in the Google Maps app: phone web browsers only show a few stops of a long route. The same links are the QR codes on the packet's cover.
 
-Change how many stops go in each link in Settings ▸ "Stops per Google Maps link (max 9)".
+Change how many stops go in each link in Settings ▸ Advanced ▸ "Stops per Google Maps link (max 9)".

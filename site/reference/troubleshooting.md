@@ -47,7 +47,7 @@ Red banners at the top of the page explain what went wrong. Find the message bel
 | HEIC photo could not be decoded here. Ask the family for a JPEG. | Ask the family, or **Skip upload (print placeholder)**. |
 | Letter submitted online. Paste the text into the cleaned letter. | Open the link in the original letter, copy the text, and paste it into "Cleaned letter". |
 | Attachment is larger than 30 MB. | Ask the family for a smaller file, or skip it. |
-| A converted drawing is missing. Re-run downloads in Letter cleanup. | Letter cleanup ▸ **Retry failed** or **Download uploads**. |
+| A converted drawing is missing. Re-run downloads in Letter cleanup. | Letter cleanup ▸ **Retry failed**. |
 
 ## Geocoding and routes
 

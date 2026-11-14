@@ -19,11 +19,11 @@ In 2025, after the route sheets were printed, 12 stops were dropped, 2 added and
 
 ## Add late families without starting over
 
-A story: on December 15 the Park family calls the hotline. They missed the form, and the committee agrees to visit them.
+A story: on December 21, after the plan is frozen, the Park family calls the hotline. They missed the form, and the committee agrees to visit them.
 
 1. Add them: **Families** ▸ **Add family** for a phone call, or import or sync again for late form sign-ups.
 2. Geocode them in **Address review** (**Geocode 1**), and fix the pin if needed.
-3. Go to **Route planner** and click **Insert new families**.
+3. Go to **Route planner** and click **Insert new families**. (It's there once the plan is frozen. Before the freeze, use **Rebalance unlocked** instead.)
 4. If a route has been printed, choose a reason, such as **added late**, and click **Record & continue**.
 5. Read the message, for example "1 families inserted."
 
@@ -50,7 +50,7 @@ Freeze the plan when the routes are final, just before printing (about December 
 
 While the plan is frozen:
 
-- **Rebalance unlocked** is turned off, so nobody can reshuffle every route by mistake ("Unfreeze the plan before rebalancing.").
+- **Rebalance unlocked** is replaced by **Insert new families**, so nobody can reshuffle every route by mistake.
 - You can still insert late families, move single stops, and edit families.
 
 To unfreeze, click **Unfreeze plan**. Once any route has been printed, the app asks for a reason.

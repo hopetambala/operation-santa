@@ -2,7 +2,7 @@
 title: Bag labels and the alignment test
 parent: "December 19: printing"
 nav_order: 2
-description: "Choose the Avery label sheet, line it up with a test page, and start on a part-used sheet."
+description: "Choose the Avery label sheet and line it up with a test page."
 ---
 
 # Bag labels and the alignment test
@@ -34,6 +34,8 @@ In **Print center**, under the banner:
 1. "Labels": choose **Avery 5163 · 4×2 in · 10/sheet** (the default, with room for every child) or **Avery 5160 · 1×2⅝ in · 30/sheet** (address-label size, shorter text).
 2. "Street address on labels": tick it to add the address. Leave it off unless the committee wants it: it puts a family's address on a bag that might be left in a car.
 
+Each route's labels start on a fresh sheet, at the first label.
+
 ## Run the alignment test first
 
 1. Click **Alignment test page**. Save the PDF (`Label alignment test 5163.pdf`) and open it.
@@ -42,10 +44,6 @@ In **Print center**, under the banner:
 4. If the boxes are off, check the printer's scale and paper-size settings (US Letter) and try again before using label sheets.
 
 ![The label alignment test page for Avery 5163, with ten numbered slots]({{ '/assets/images/label-alignment-test.png' | relative_url }})
-
-## Start on a part-used sheet
-
-If the first few labels on a sheet are already used, set "Start at slot" to the first free label. Slots count left to right, top to bottom: 1 to 10 on Avery 5163, 1 to 30 on Avery 5160. When you print several routes at once (**All routes, one PDF** or **One PDF per route**), only the first route's labels start there; every other route starts at slot 1. Set it back to 1 afterwards.
 
 ## Printing the labels
 

@@ -48,7 +48,7 @@ The **Addresses** tab lists families the map couldn't place confidently: misses,
 ![The Addresses tab with one demo family selected, the map, and the Pin is right button]({{ '/assets/images/address-review.png' | relative_url }})
 
 {: .tip }
-To get coordinates from Google Maps: right-click the house, then click the two numbers at the top of the menu to copy them. Paste the first number into "Latitude" and the second into "Longitude". **Copy coordinates** does the reverse, so you can paste the app's pin into a map to check it.
+To get coordinates from Google Maps: right-click the house, then click the two numbers at the top of the menu to copy them. Paste the first number into "Latitude" and the second into "Longitude".
 
 ## Duplicates
 

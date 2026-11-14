@@ -90,7 +90,6 @@ const UA:&str="OperationSanta/0.1 (Pasadena Jaycees route planner; local desktop
 const MAX_ATTACHMENT:usize=30*1024*1024;
 static AIRTABLE_SLOT:Mutex<Option<Instant>>=Mutex::new(None);
 static NOMINATIM_SLOT:Mutex<Option<Instant>>=Mutex::new(None);
-static ORS_SLOT:Mutex<Option<Instant>>=Mutex::new(None);
 static ATTACH_CLIENT:OnceLock<reqwest::Client>=OnceLock::new();
 static API_CLIENT:OnceLock<reqwest::Client>=OnceLock::new();
 fn allowed_url(u:&reqwest::Url)->bool{u.scheme()=="https"&&u.username().is_empty()&&u.password().is_none()&&u.port().is_none()&&u.host_str().is_some_and(|h|{let h=h.to_ascii_lowercase();["airtableusercontent.com","dl.airtable.com","airtable.com"].iter().any(|d|h==*d||h.ends_with(&format!(".{d}")))})}
@@ -125,7 +124,7 @@ async fn airtable_get(path:String)->Result<String,String>{
  if !status.is_success(){return Err(format!("Airtable request failed ({}): {}",status.as_u16(),api_reason(&text)))}
  Ok(text)
 }
-fn valid_secret(n:&str)->bool{n=="airtable_token"||n=="ors_key"||n.strip_prefix("passphrase:").is_some_and(|u|u.len()==36&&u.chars().all(|c|c.is_ascii_digit()||('a'..='f').contains(&c)||c=='-'))}
+fn valid_secret(n:&str)->bool{n=="airtable_token"||n.strip_prefix("passphrase:").is_some_and(|u|u.len()==36&&u.chars().all(|c|c.is_ascii_digit()||('a'..='f').contains(&c)||c=='-'))}
 fn entry(n:&str)->Result<keyring::Entry,String>{if !valid_secret(n){return Err("Unknown secret name.".into())}keyring::Entry::new(SERVICE,n).map_err(|e|format!("Keychain unavailable: {e}"))}
 fn secret_read(n:&str)->Result<Option<String>,String>{match entry(n)?.get_password(){Ok(v)=>Ok(Some(v)),Err(keyring::Error::NoEntry)=>Ok(None),Err(e)=>Err(format!("Keychain error: {e}"))}}
 #[tauri::command(async)]
@@ -178,29 +177,6 @@ async fn geocode_nominatim(query:String)->Result<Option<Place>,String>{
  let r=api_client()?.get(url).send().await.map_err(net)?;
  if !r.status().is_success(){return Err(format!("Nominatim returned HTTP {}.",r.status().as_u16()))}
  parse_nominatim(&r.text().await.map_err(net)?)
-}
-#[derive(Serialize)]
-struct Matrix{seconds:Vec<Vec<f64>>,meters:Vec<Vec<f64>>}
-#[tauri::command]
-async fn travel_matrix_ors(points:Vec<[f64;2]>)->Result<Matrix,String>{
- const B:usize=59;let n=points.len();
- if n>3001||points.iter().any(|p|!(-180.0..=180.0).contains(&p[0])||!(-90.0..=90.0).contains(&p[1])){return Err("Invalid points for the travel matrix.".into())}
- let mut seconds=vec![vec![0.0;n];n];let mut meters=vec![vec![0.0;n];n];if n==0{return Ok(Matrix{seconds,meters})}
- let mut key=secret_read("ors_key")?.ok_or("Add an OpenRouteService key in Settings first.")?;
- let result=async{
-  for s0 in (0..n).step_by(B){for d0 in (0..n).step_by(B){
-   let (s1,d1)=((s0+B).min(n),(d0+B).min(n));let ns=s1-s0;let locs:Vec<[f64;2]>=points[s0..s1].iter().chain(&points[d0..d1]).copied().collect();
-   let body=serde_json::json!({"locations":locs,"sources":(0..ns).collect::<Vec<_>>(),"destinations":(ns..locs.len()).collect::<Vec<_>>(),"metrics":["duration","distance"],"units":"m"});
-   throttle(&ORS_SLOT,Duration::from_millis(1600)).await;
-   let r=api_client()?.post("https://api.openrouteservice.org/v2/matrix/driving-car").header(reqwest::header::AUTHORIZATION,key.as_str()).json(&body).timeout(Duration::from_secs(120)).send().await.map_err(net)?;
-   let status=r.status();let text=r.text().await.map_err(net)?;
-   if !status.is_success(){return Err(format!("OpenRouteService request failed ({}): {}",status.as_u16(),api_reason(&text)))}
-   let v:serde_json::Value=serde_json::from_str(&text).map_err(|_|"Unexpected OpenRouteService response.")?;
-   for (field,out) in [("durations",&mut seconds),("distances",&mut meters)]{for i in 0..ns{for j in 0..d1-d0{out[s0+i][d0+j]=v[field][i][j].as_f64().unwrap_or(-1.0);}}}
-  }}
-  Ok(())
- }.await;key.zeroize();result?;
- Ok(Matrix{seconds,meters})
 }
 fn with_season<T>(store:&Store,f:impl FnOnce(&mut Connection)->Result<T,String>)->Result<T,String>{let mut g=store.0.lock().map_err(|_|"Season is busy.")?;let s=g.as_mut().ok_or("No encrypted season is open.")?;f(&mut s.conn)}
 #[derive(Serialize,Debug,PartialEq)]
@@ -255,7 +231,7 @@ fn main(){#[cfg(feature="e2e")]record_panics();let builder=tauri::Builder::defau
  let builder=builder.setup(|app|{use tauri::Manager;use objc2::{class,msg_send,sel,runtime::AnyObject};if let Some(w)=app.get_webview_window("main"){w.with_webview(|v|unsafe{let wk=v.inner() as *mut AnyObject;let known:bool=msg_send![wk,respondsToSelector:sel!(_setWindowOcclusionDetectionEnabled:)];let win:*mut AnyObject=msg_send![wk,window];if !known||win.is_null(){return}let _:()=msg_send![wk,_setWindowOcclusionDetectionEnabled:false];let center:*mut AnyObject=msg_send![class!(NSNotificationCenter),defaultCenter];let name:*mut AnyObject=msg_send![class!(NSString),stringWithUTF8String:c"NSWindowDidChangeOcclusionStateNotification".as_ptr()];let _:()=msg_send![center,postNotificationName:name,object:win];})?;}Ok(())});
  #[cfg(feature="updater")]
  let builder=builder.plugin(tauri_plugin_updater::Builder::new().build());
- builder.plugin(tauri_plugin_dialog::init()).manage(Store::default()).invoke_handler(tauri::generate_handler![create_season,open_season,save_season,backup_season,close_season,fetch_attachment,airtable_get,secret_set,secret_get,secret_delete,geocode_census,geocode_nominatim,travel_matrix_ors,asset_put,asset_get,asset_prune,vacuum_season,purge_backups,restart_app,updater_built_in,export_packet,open_packet,write_export]).run(tauri::generate_context!()).expect("Unable to launch Operation Santa");}
+ builder.plugin(tauri_plugin_dialog::init()).manage(Store::default()).invoke_handler(tauri::generate_handler![create_season,open_season,save_season,backup_season,close_season,fetch_attachment,airtable_get,secret_set,secret_get,secret_delete,geocode_census,geocode_nominatim,asset_put,asset_get,asset_prune,vacuum_season,purge_backups,restart_app,updater_built_in,export_packet,open_packet,write_export]).run(tauri::generate_context!()).expect("Unable to launch Operation Santa");}
 #[cfg(test)] mod tests {use super::*;#[test]fn encrypted_roundtrip(){let p=std::env::temp_dir().join(format!("opsanta-{}.opsanta",rand::random::<u64>()));{let c=connection(&p,"a test passphrase",true).unwrap();c.execute("INSERT INTO season_state VALUES(1,?1)",["private synthetic family"]).unwrap();}let bytes=fs::read(&p).unwrap();assert!(!bytes.windows(7).any(|w|w==b"private"));assert!(!bytes.starts_with(b"SQLite format 3"));assert!(connection(&p,"incorrect password",false).is_err());let c=connection(&p,"a test passphrase",false).unwrap();let text:String=c.query_row("SELECT data FROM season_state",[],|r|r.get(0)).unwrap();assert_eq!(text,"private synthetic family");drop(c);fs::remove_file(p).unwrap();}
 fn tmp(ext:&str)->PathBuf{std::env::temp_dir().join(format!("opsanta-{}.{ext}",rand::random::<u64>()))}
 #[test]fn attachment_allowlist(){
@@ -279,7 +255,7 @@ fn tmp(ext:&str)->PathBuf{std::env::temp_dir().join(format!("opsanta-{}.{ext}",r
  assert!(parse_nominatim("[]").unwrap().is_none());
 }
 #[test]fn secret_names(){
- assert!(valid_secret("airtable_token"));assert!(valid_secret("ors_key"));assert!(valid_secret("passphrase:123e4567-e89b-12d3-a456-426614174000"));
+ assert!(valid_secret("airtable_token"));assert!(!valid_secret("ors_key"),"the OpenRouteService key had no caller and was removed");assert!(valid_secret("passphrase:123e4567-e89b-12d3-a456-426614174000"));
  assert!(!valid_secret("passphrase:123E4567-E89B-12D3-A456-426614174000"));assert!(!valid_secret("passphrase:123e4567"));assert!(!valid_secret("passphrase:../../123e4567-e89b-12d3-a456-4266141740"));assert!(!valid_secret("other"));assert!(!valid_secret(""));
 }
 #[test]fn export_extensions(){assert!(export_ext_ok(Path::new("/x/route.PDF")));assert!(export_ext_ok(Path::new("/x/a.docx")));assert!(!export_ext_ok(Path::new("/x/a.opsanta")));assert!(!export_ext_ok(Path::new("/x/a")));assert!(!export_ext_ok(Path::new("/x/a.sh")));}

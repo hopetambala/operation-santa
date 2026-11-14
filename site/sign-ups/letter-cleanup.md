@@ -35,10 +35,7 @@ What happens to each kind of upload:
 | Word document | Its text is added under the letter as "[from uploaded document]". |
 | Google Docs link | Can't be downloaded. Marked "Letter submitted online. Paste the text into the cleaned letter." |
 
-Buttons:
-
-- **Download uploads** starts any that haven't started. This normally happens by itself after an import.
-- **Retry failed** tries the failed ones again.
+Downloads start by themselves after an import and whenever the season opens. **Retry failed** tries the failed ones again.
 
 The **Uploads to check** tab lists every child with an upload that isn't ready. For each failed upload you can click **Retry**, or **Skip upload (print placeholder)**: the letter then prints "Letter submitted online — ask the coordinator" where the drawing would be.
 
@@ -59,7 +56,7 @@ Every other letter counts as read and prints as imported.
 
 1. Go to **Letter cleanup**. The first tab says how many letters need a look, for example "6 to look at", and shows them one at a time: "Ana's letter · Rivera A · Entry #26001 · 1 of 6".
 2. On the left: the **original letter**, the child's **gift wishes** (first and second choice, age), and any drawings.
-3. On the right, under "A careful final read", is the "Cleaned letter" box, with the warning that flagged it. Edit it if needed.
+3. On the right, under "Clean letter", is the "Cleaned letter" box, with the warning that flagged it. Edit it if needed.
 4. Choose one:
    - **Looks good · next**: the text in the box is what prints. The next letter appears.
    - **Don't print**: this letter won't print. The packet says "Letter held by coordinator." in its place.

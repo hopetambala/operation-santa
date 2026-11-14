@@ -20,7 +20,7 @@ description: "The top bar, the Overview task list, and the reason prompt you'll 
 From left to right:
 
 - **The tree logo** goes back to the Overview.
-- **The tab icons**: Overview, Families, Address review, Route planner, Teams, Letter cleanup, Print center, Change log and Settings. Only the open tab shows its name; rest the pointer on any icon to see its name. A small number on an icon means something there needs attention: addresses to review, letters waiting, or packets to reprint.
+- **The tab icons**: Overview, Families, Address review, Route planner, Teams, Letter cleanup, Print center, Change log and Settings. Only the open tab shows its name; rest the pointer on any icon to see its name. A small number on an icon means something there needs attention: addresses to review, letters to look at, or packets to reprint.
 - **The bell** shows a dot while the Overview task list has open items.
 - **The save state**: "Encrypted · saved on this device" for a real season, "Demo · synthetic data" for the demo, or "Cleanup packet · not a season file" while a letter cleaner has a packet open.
 - **A shortcut button**: **Import families** on the Overview and Families pages, **Plan routes** on most others.

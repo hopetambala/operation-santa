@@ -13,7 +13,7 @@ description: "Every change to the season: who, when, what and why."
 {: .why }
 In 2025, changes made after printing were tracked in a spreadsheet with no reasons, so nobody could later say why a family had been dropped or moved. The app records every change as it happens.
 
-The **Change log** page lists every recorded change, newest first: "Every change has a story".
+The **Change log** page lists every recorded change, newest first.
 
 | Column | Shows |
 |---|---|
