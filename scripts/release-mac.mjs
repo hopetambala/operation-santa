@@ -10,6 +10,8 @@ import {cpSync,existsSync,mkdirSync,mkdtempSync,readdirSync,rmSync,symlinkSync} 
 import {tmpdir} from 'node:os';
 import {basename,join} from 'node:path';
 import {ROOT,TAURI_DIR,TARGET,OUT,fail,run,capture,tauriConf,buildFrontend,gateOrFail,updaterSetup,tauriBuild} from './release-common.mjs';
+import {checkBinary,UPDATER_MARKERS} from './release-gate.mjs';
+import {checkProfile} from './release-profile.mjs';
 
 const BUNDLE_ID='org.pasadenajaycees.opsanta';
 const args=process.argv.slice(2);
@@ -42,21 +44,6 @@ function notarizeRoute(env=process.env){
   return {ok:false,why:set.length?`only ${set.join(', ')} set. Set APPLE_API_KEY (path to .p8) + APPLE_API_KEY_ID + APPLE_API_ISSUER, or APPLE_KEYCHAIN_PROFILE.`:'no credentials. Set APPLE_KEYCHAIN_PROFILE (notarytool store-credentials) or APPLE_API_KEY + APPLE_API_KEY_ID + APPLE_API_ISSUER.'};
 }
 
-/** Decodes a provisioning profile and checks it is a Mac App Store profile for this app and team. */
-function checkProfile(path,team){
-  const decoded=capture('security',['cms','-D','-i',path]);
-  if(!decoded.ok)return [`${path} is not a readable provisioning profile`];
-  const json=capture('plutil',['-convert','json','-o','-','-'],{input:decoded.out.slice(decoded.out.indexOf('<?xml'))});
-  if(!json.ok)return [`${path} could not be decoded`];
-  const p=JSON.parse(json.out);const problems=[];
-  const appId=p.Entitlements?.['com.apple.application-identifier'];
-  if(appId!==`${team}.${BUNDLE_ID}`)problems.push(`profile is for ${appId}, not ${team}.${BUNDLE_ID}`);
-  if(p.ProvisionedDevices)problems.push('profile lists devices, so it is a development profile, not "Mac App Store Connect"');
-  if(new Date(p.ExpirationDate)<=new Date())problems.push(`profile expired ${p.ExpirationDate}`);
-  if(!(p.Platform??[]).includes('OSX'))problems.push('profile is not a macOS profile');
-  return problems;
-}
-
 const problems=[];
 const installed=capture('rustup',['target','list','--installed']).out;
 for(const t of ['aarch64-apple-darwin','x86_64-apple-darwin'])if(!installed.includes(t))problems.push(`Rust target ${t} is missing: rustup target add ${t}`);
@@ -73,7 +60,7 @@ if(channel==='dmg'){
   if(!installer)problems.push('no "Mac Installer Distribution" certificate in the keychain (it signs the .pkg App Store Connect accepts). Xcode ▸ Settings ▸ Accounts ▸ Manage Certificates ▸ + ▸ Mac Installer Distribution');
   profile=process.env.OPSANTA_MAS_PROFILE??join(TAURI_DIR,'profiles','Operation_Santa_Mac_App_Store.provisionprofile');
   if(!existsSync(profile))problems.push(`no provisioning profile at ${profile} (docs/RELEASE.md § Mac App Store)`);
-  else if(signer)problems.push(...checkProfile(profile,teamOf(signer)));
+  else if(signer)problems.push(...checkProfile(profile,{team:teamOf(signer),bundleId:BUNDLE_ID}));
   // CFBundleVersion must go up with every upload, from any machine; a UTC timestamp always does.
   buildNumber=process.env.OPSANTA_BUILD_NUMBER??new Date().toISOString().replace(/\D/g,'').slice(2,12);
   if(upload){
@@ -101,6 +88,7 @@ if(!existsSync(app))fail(`${app} was not produced`);
 // ---------- verify the .app ----------
 
 gateOrFail({bins:[app]});
+if(channel==='mas'){const found=checkBinary(app,UPDATER_MARKERS);if(found.length)fail(`The Mac App Store build contains the updater, which App Review rejects:\n  ${found.join('\n  ')}`);console.log('✓ No updater in the Mac App Store build');}
 const exe=join(app,'Contents','MacOS',readdirSync(join(app,'Contents','MacOS'))[0]);
 const archs=capture('lipo',['-archs',exe]).out.trim();
 if(!(archs.includes('arm64')&&archs.includes('x86_64')))fail(`${exe} is not universal (archs: ${archs})`);

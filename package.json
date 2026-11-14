@@ -12,6 +12,7 @@
     "desktop:build": "cd apps/desktop && tauri build",
     "e2e:build": "node e2e/build.mjs",
     "e2e": "wdio run e2e/wdio.conf.ts",
+    "e2e:sandbox": "node e2e/sandbox/run.mjs",
     "live-check": "cargo test -p opsanta -- --ignored live_ --nocapture --test-threads=1",
     "release:gate": "node scripts/release-gate.mjs",
     "release:mac": "node scripts/release-mac.mjs --channel dmg",

@@ -9,6 +9,9 @@ import {pathToFileURL} from 'node:url';
 
 export const BINARY_MARKERS=['WDIO WebDriver plugin initialized','WebdriverIO E2E harness','wdio-webdriver:default'];
 export const DIST_MARKERS=['WDIO Tauri Plugin','__wdio_mocks__'];
+// tauri-plugin-updater's own error text, and the `updater` capability's permission. The Mac App Store build must carry
+// neither: Apple updates store copies and rejects apps that update themselves.
+export const UPDATER_MARKERS=['Updater does not have any endpoints set.','updater:default'];
 
 function walk(dir){return readdirSync(dir,{withFileTypes:true}).flatMap(e=>{const p=join(dir,e.name);return e.isDirectory()?walk(p):[p]})}
 
@@ -18,10 +21,10 @@ export function binariesOf(path){
   return existsSync(path)&&statSync(path).isFile()?[path]:[];
 }
 
-export function checkBinary(path){
+export function checkBinary(path,markers=BINARY_MARKERS){
   const bins=binariesOf(path);
   if(bins.length===0)return [`${path}: no executable found to check`];
-  return bins.flatMap(b=>{const buf=readFileSync(b);return BINARY_MARKERS.filter(m=>buf.includes(m)).map(m=>`${b}: contains "${m}"`)});
+  return bins.flatMap(b=>{const buf=readFileSync(b);return markers.filter(m=>buf.includes(m)).map(m=>`${b}: contains "${m}"`)});
 }
 
 export function checkDist(dir){

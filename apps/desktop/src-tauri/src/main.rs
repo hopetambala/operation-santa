@@ -76,6 +76,10 @@ fn backup_season(store:tauri::State<Store>)->Result<String,String>{let g=store.0
 // After an update installs (only when the coordinator clicked "Install and restart").
 #[tauri::command]
 fn restart_app(app:tauri::AppHandle){app.restart()}
+// Whether this build updates itself. Only the DMG and Windows builds do; the Mac App Store build must not even offer to
+// (App Review guideline 2.4.5), so Settings hides "Check for updates" when this is false.
+#[tauri::command]
+fn updater_built_in()->bool{cfg!(feature="updater")}
 #[tauri::command]
 fn purge_backups(store:tauri::State<Store>)->Result<u32,String>{let g=store.0.lock().map_err(|_|"Season is busy.")?;purge_backups_of(g.as_ref().ok_or("No encrypted season is open.")?)}
 // close publishes the whole database back to the user's file, same rewrite save_season keeps off the UI thread.
@@ -251,7 +255,7 @@ fn main(){#[cfg(feature="e2e")]record_panics();let builder=tauri::Builder::defau
  let builder=builder.setup(|app|{use tauri::Manager;use objc2::{class,msg_send,sel,runtime::AnyObject};if let Some(w)=app.get_webview_window("main"){w.with_webview(|v|unsafe{let wk=v.inner() as *mut AnyObject;let known:bool=msg_send![wk,respondsToSelector:sel!(_setWindowOcclusionDetectionEnabled:)];let win:*mut AnyObject=msg_send![wk,window];if !known||win.is_null(){return}let _:()=msg_send![wk,_setWindowOcclusionDetectionEnabled:false];let center:*mut AnyObject=msg_send![class!(NSNotificationCenter),defaultCenter];let name:*mut AnyObject=msg_send![class!(NSString),stringWithUTF8String:c"NSWindowDidChangeOcclusionStateNotification".as_ptr()];let _:()=msg_send![center,postNotificationName:name,object:win];})?;}Ok(())});
  #[cfg(feature="updater")]
  let builder=builder.plugin(tauri_plugin_updater::Builder::new().build());
- builder.plugin(tauri_plugin_dialog::init()).manage(Store::default()).invoke_handler(tauri::generate_handler![create_season,open_season,save_season,backup_season,close_season,fetch_attachment,airtable_get,secret_set,secret_get,secret_delete,geocode_census,geocode_nominatim,travel_matrix_ors,asset_put,asset_get,asset_prune,vacuum_season,purge_backups,restart_app,export_packet,open_packet,write_export]).run(tauri::generate_context!()).expect("Unable to launch Operation Santa");}
+ builder.plugin(tauri_plugin_dialog::init()).manage(Store::default()).invoke_handler(tauri::generate_handler![create_season,open_season,save_season,backup_season,close_season,fetch_attachment,airtable_get,secret_set,secret_get,secret_delete,geocode_census,geocode_nominatim,travel_matrix_ors,asset_put,asset_get,asset_prune,vacuum_season,purge_backups,restart_app,updater_built_in,export_packet,open_packet,write_export]).run(tauri::generate_context!()).expect("Unable to launch Operation Santa");}
 #[cfg(test)] mod tests {use super::*;#[test]fn encrypted_roundtrip(){let p=std::env::temp_dir().join(format!("opsanta-{}.opsanta",rand::random::<u64>()));{let c=connection(&p,"a test passphrase",true).unwrap();c.execute("INSERT INTO season_state VALUES(1,?1)",["private synthetic family"]).unwrap();}let bytes=fs::read(&p).unwrap();assert!(!bytes.windows(7).any(|w|w==b"private"));assert!(!bytes.starts_with(b"SQLite format 3"));assert!(connection(&p,"incorrect password",false).is_err());let c=connection(&p,"a test passphrase",false).unwrap();let text:String=c.query_row("SELECT data FROM season_state",[],|r|r.get(0)).unwrap();assert_eq!(text,"private synthetic family");drop(c);fs::remove_file(p).unwrap();}
 fn tmp(ext:&str)->PathBuf{std::env::temp_dir().join(format!("opsanta-{}.{ext}",rand::random::<u64>()))}
 #[test]fn attachment_allowlist(){
