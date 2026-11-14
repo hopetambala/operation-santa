@@ -52,10 +52,10 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 | Re-import is safe: in-app edits win, missing families flagged not deleted, changed addresses re-geocoded | Accept import | `importer.ts` `mergeImport` | C | `airtable-sync.e2e.ts`, unit | `sign-ups/import-csv.md` |
 | Uploads (drawings, PDFs, Word files) download right after import; Google Docs links marked "by hand" | automatic | `attachments.ts`, `main.rs` `fetch_attachment` | C | `airtable-export.e2e.ts` | `sign-ups/import-csv.md`, `sign-ups/letter-cleanup.md` |
 | Expired upload links (HTTP 410): message says to download a fresh CSV and import again | Letter cleanup | `attachments.ts` | C | `airtable-export.e2e.ts` | `sign-ups/import-csv.md`, `reference/troubleshooting.md` |
-| Airtable connection: personal access token, **Save token**, **Remove** (keychain only) | Settings ▸ "Airtable connection" | `more.tsx` | C | `airtable-sync.e2e.ts` (mocked keychain) | `sign-ups/airtable-sync.md` |
+| Airtable connection: personal access token, **Save token**, **Remove** (keychain only) | Settings ▸ "Airtable connection" (Advanced ▸ Airtable Sync on) | `more.tsx` | C | `airtable-sync.e2e.ts` (mocked keychain) | `sign-ups/airtable-sync.md` |
 | Airtable base ID and table | Settings ▸ "Airtable (read-only)" | `more.tsx` | C | `airtable-sync.e2e.ts` | `sign-ups/airtable-sync.md` |
-| **Sync Airtable**: paged read, same preview and merge as a CSV | Families toolbar | `main.tsx` `syncAirtable`, `importer.ts` `airtableImport`, `main.rs` `airtable_get` | C | `airtable-sync.e2e.ts` | `sign-ups/airtable-sync.md` |
-| Expired drawing link refreshed through the Airtable record | automatic during downloads | `attachments.ts` `freshUrl` | C | `airtable-sync.e2e.ts` | `sign-ups/airtable-sync.md` |
+| **Sync Airtable**: paged read, same preview and merge as a CSV | Families toolbar (Advanced ▸ Airtable Sync on) | `main.tsx` `syncAirtable`, `importer.ts` `airtableImport`, `main.rs` `airtable_get` | C | `airtable-sync.e2e.ts` | `sign-ups/airtable-sync.md` |
+| Expired drawing link refreshed through the Airtable record | automatic during downloads (Advanced ▸ Airtable Sync on) | `attachments.ts` `freshUrl` | C | `airtable-sync.e2e.ts` | `sign-ups/airtable-sync.md` |
 
 ## 4. Families
 
@@ -123,10 +123,10 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 | Per-upload **Retry** and **Skip upload (print placeholder)** | letter view | `cleanup.tsx` | C, LC | none | `sign-ups/letter-cleanup.md` |
 | Tabs: Needs review, Uploads to check, Approved, Held, All letters | Letter cleanup | `cleanup.tsx` | LC | `cleanup-packets.e2e.ts` | `sign-ups/letter-cleanup.md` |
 | Letter view: original, gift wishes, uploads; "Cleaned letter" box; warnings (contact details, too long, empty); **Previous**, **Next letter**, **Flag**, **Hold from print**, **Approve** | Letter cleanup | `cleanup.tsx`, `model.ts` `letterChecks` | LC | `journey.e2e.ts`, `cleanup-packets.e2e.ts`, `airtable-export.e2e.ts` | `sign-ups/letter-cleanup.md` |
-| **Cleanup packet** export: From/To Entry ID, Only route, passphrase, **Choose where to save** (`.opsanta-packet`) | Letter cleanup | `cleanup.tsx`, `workflow.ts` `buildPacket`, `main.rs` `export_packet` | C | `cleanup-packets.e2e.ts` | `sign-ups/cleanup-packets.md` |
+| **Cleanup packet** export: From/To Entry ID, Only route, passphrase, **Choose where to save** (`.opsanta-packet`) | Letter cleanup (Advanced ▸ Send letters to helpers on) | `cleanup.tsx`, `workflow.ts` `buildPacket`, `main.rs` `export_packet` | C | `cleanup-packets.e2e.ts` | `sign-ups/cleanup-packets.md` |
 | **Open a cleanup packet** (packet mode, only those families) | avatar menu or Settings | `main.tsx` `openPacket`, `main.rs` `open_packet` | LC | `cleanup-packets.e2e.ts` | `sign-ups/cleanup-packets.md` |
 | **Save edited packet** (`Cleaned by <name>.opsanta-packet`) | Letter cleanup in packet mode | `cleanup.tsx` | LC | `cleanup-packets.e2e.ts` | `sign-ups/cleanup-packets.md` |
-| **Import returned packet**: field-by-field merge; conflicts dialog **Keep mine** / **Take theirs** | Letter cleanup | `cleanup.tsx`, `workflow.ts` `mergePacket` | C | `cleanup-packets.e2e.ts`, unit | `sign-ups/cleanup-packets.md` |
+| **Import returned packet**: field-by-field merge; conflicts dialog **Keep mine** / **Take theirs** | Letter cleanup (Advanced ▸ Send letters to helpers on) | `cleanup.tsx`, `workflow.ts` `mergePacket` | C | `cleanup-packets.e2e.ts`, unit | `sign-ups/cleanup-packets.md` |
 | Display name used on cleaned letters and packets | Settings ▸ "Your display name" | `more.tsx` | LC, C | `cleanup-packets.e2e.ts` | `sign-ups/cleanup-packets.md`, `reference/settings.md` |
 
 ## 9. Print center
@@ -155,6 +155,7 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 | Change log: search, newest 500, before/after, reason ("Before printing" when none) | Change log | `more.tsx` `ChangeLog`, `model.ts` `audit` | C | none | `reference/change-log.md` |
 | Change log **Export CSV** | Change log | `more.tsx` | C | none | `reference/change-log.md` |
 | Settings: Season, North Pole and delivery window, Service time model, Service area, Printing, Airtable; **Save settings** with validation | Settings | `more.tsx` | C | `airtable-sync.e2e.ts`, `cleanup-packets.e2e.ts` | `reference/settings.md` |
+| Settings ▸ Advanced switches, off by default: **Airtable Sync**, **Send letters to helpers**. With a switch off, its buttons aren't rendered | Settings | `model.ts` `features`, `more.tsx` | C | `scope.e2e.ts`, `airtable-sync.e2e.ts`, `cleanup-packets.e2e.ts`, unit | `reference/settings.md` |
 | **Purge sensitive records**: type PURGE CHILD DATA, **Purge now**; deletes backups; Jan 31 reminder | Settings ▸ "After the season" | `main.tsx`, `workflow.ts` `purge`, `main.rs` `vacuum_season`/`purge_backups` | C | `season-security.e2e.ts`, unit | `after-the-season/purge.md` |
 
 ## 11. In the code but with no guide

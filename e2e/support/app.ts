@@ -58,3 +58,5 @@ export async function installMocks(){const census=Object.fromEntries(families.fi
  return {save,open,census:census_,nominatim:nom,fetch:fetch_,secretSet,secretGet,airtable};}
 export const queueOpen=(p:string)=>browser.execute((file:string)=>{(window as unknown as {__e2e:{openQueue:string[]}}).__e2e.openQueue.push(file)},p);
 export const setE2e=(patch:Record<string,unknown>)=>browser.execute((p:Record<string,unknown>)=>{Object.assign((window as unknown as {__e2e:Record<string,unknown>}).__e2e,p)},patch);
+// Settings ▸ Advanced: unproven features are off by default (Hope, 2026-11-05). Specs that cover them turn their switch on first.
+export async function turnOn(label:'Airtable Sync'|'Send letters to helpers'){await nav('Settings');const box=await $(`//label[contains(@class,"checkbox") and normalize-space()="${label}"]/input`);if(!(await box.isSelected()))await box.click();await browser.waitUntil(()=>box.isSelected(),{timeoutMsg:`${label} did not switch on`});await click('Save settings');await toast(/Settings saved/);}

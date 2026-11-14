@@ -81,7 +81,18 @@ The app knows the shape of these five cities only. Adding another city's name to
 | Stops per Google Maps link (max 9) | 9 | How many stops each phone link and QR code covers. |
 | Flag letters longer than (characters) | 1500 | Letters longer than this get a warning in Letter cleanup. |
 
+## Advanced
+
+Two switches for features that could be useful but haven't been tried in a real season yet. Both start **off**, and while a switch is off its buttons don't appear anywhere. Tick one and click **Save settings** to turn it on.
+
+| Switch | Default | What it adds |
+|---|---|---|
+| Airtable Sync | off | **Sync Airtable** on Families, the "Airtable (read-only)" settings below, the "Airtable connection" token panel, and fresh links for expired drawings. See [Sync from Airtable]({{ '/sign-ups/airtable-sync/' | relative_url }}). |
+| Send letters to helpers | off | **Cleanup packet** and **Import returned packet** on Letter cleanup. See [Cleanup packets]({{ '/sign-ups/cleanup-packets/' | relative_url }}). |
+
 ## Airtable (read-only)
+
+Shown only with Advanced ▸ "Airtable Sync" on.
 
 | Setting | What it is |
 |---|---|
@@ -93,7 +104,7 @@ The Airtable token isn't a season setting; it's saved on the right under "Airtab
 ## Other panels on the Settings page
 
 - **Your season, on your device**: **New encrypted season**, **Open season file**, **Create encrypted backup**, **Open a cleanup packet**, **Check for updates**. See [Season files and passphrases]({{ '/start-here/season-file/' | relative_url }}) and [Install and update]({{ '/start-here/install/' | relative_url }}).
-- **Airtable connection**: the read-only token.
+- **Airtable connection** (with Advanced ▸ "Airtable Sync" on): the read-only token.
 - **After the season**: **Purge sensitive records**. See [Purge at season end]({{ '/after-the-season/purge/' | relative_url }}).
 
 ## If Save settings is refused

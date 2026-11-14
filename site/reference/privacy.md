@@ -28,7 +28,7 @@ The season holds children's names, letters and drawings, and families' addresses
 |---|---|---|
 | US Census geocoder | Street, city, state and ZIP. No names, units, phones or letters. | **Geocode** in Address review |
 | OpenStreetMap (Nominatim) | Street, city, state and ZIP of addresses the Census couldn't find | **Geocode** |
-| Airtable | Requests to read the sign-ups table, with the read-only token | **Sync Airtable**, and refreshing expired drawing links |
+| Airtable | Requests to read the sign-ups table, with the read-only token | **Sync Airtable**, and refreshing expired drawing links. Both only with Settings ▸ Advanced ▸ "Airtable Sync" on |
 | Airtable's file links | Requests to download each upload | After each import |
 | GitHub | A check for a new version | When the app opens, and **Check for updates** (downloaded copies only) |
 

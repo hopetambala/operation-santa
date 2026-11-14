@@ -91,5 +91,5 @@ A story: the committee decides that every family in a named apartment complex ge
 
 ## Other buttons
 
-- **Sync Airtable**: see [Sync from Airtable]({{ '/sign-ups/airtable-sync/' | relative_url }}).
+- **Sync Airtable** (only with Settings ▸ Advanced ▸ "Airtable Sync" on): see [Sync from Airtable]({{ '/sign-ups/airtable-sync/' | relative_url }}).
 - **Fallback CSV**: see [MyRouteOnline fallback]({{ '/printing/myrouteonline-fallback/' | relative_url }}).

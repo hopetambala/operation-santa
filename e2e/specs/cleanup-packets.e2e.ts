@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {existsSync,readFileSync} from 'node:fs';
 import path from 'node:path';
 import {families} from '../support/fixture';
-import {RUN_DIR,click,fill,nav,toast,noError,dialogText,pageText,queueOpen,setInput,field,shot} from '../support/app';
+import {RUN_DIR,click,fill,nav,toast,noError,dialogText,pageText,queueOpen,setInput,field,shot,turnOn} from '../support/app';
 import {routedSeason,openSeason} from '../support/season';
 // R-CLN-2 / §12: several people clean letters in parallel through encrypted packets, and the coordinator merges them back field by field.
 const PACKET_PASS='packet passphrase for brady';
@@ -16,7 +16,7 @@ const COORDINATOR_TEXT='Dear Santa, I would really like a paint set. Thank you! 
 const heading=async()=>(await $('.cleanup-grid h2').getText()).replace(/’s letter$/,'');
 async function showLetter(name:string){for(let i=0;i<30;i++){if(await heading()===name)return;await click('Next letter');}throw Error(`${name} never came up in the cleanup queue`);}
 describe('Cleanup packets: parallel letter cleanup without sharing the season file',()=>{
- before(async()=>{await routedSeason({approveLetters:false});});
+ before(async()=>{await routedSeason({approveLetters:false});await turnOn('Send letters to helpers');});
  it('exports an encrypted packet with only the chosen Entry ID range',async()=>{await nav('Letter cleanup');await click('Cleanup packet');await dialogText('Export a cleanup packet');await fill('From Entry ID','26001');await fill('To Entry ID','26005');await setInput(field('Packet passphrase'),PACKET_PASS);await click('Choose where to save');await toast(new RegExp(`Packet with ${RANGE.length} families saved`));assert.ok(existsSync(EXPORTED),`packet missing at ${EXPORTED}`);const bytes=readFileSync(EXPORTED);assert.ok(!bytes.subarray(0,16).toString().startsWith('SQLite format 3'),'packet is encrypted, not plain SQLite');for(const f of families)assert.equal(bytes.indexOf(Buffer.from(f.name)),-1,`${f.name} readable in the packet file`);assert.equal(bytes.indexOf(Buffer.from('Dear Santa')),-1,'letter text readable in the packet file');});
  it('lets the coordinator keep working on a letter that is also in the packet',async()=>{await showLetter('Ava Alder');await setInput(field('Cleaned letter'),COORDINATOR_TEXT);await click('Approve');await noError();});
  it('opens the packet in packet mode with only its families and their drawings',async()=>{await queueOpen(EXPORTED);await $('button.avatar').click();await click('Open a cleanup packet');await dialogText('Open a cleanup packet');await setInput(field('Packet passphrase'),PACKET_PASS);await click('Choose packet file');await toast(new RegExp(`with ${RANGE.length} families opened`));assert.match(await pageText(),/Packet mode: you are editing 5 families/);assert.match(await $('.save-state').getText(),/Cleanup packet/);await nav('Families');const t=await pageText();for(const f of families)assert.equal(t.includes(f.name),RANGE.includes(f),`${f.name} ${RANGE.includes(f)?'missing from':'leaked into'} the packet`);assert.ok(!t.includes('family26001@'),'packets carry no contact details');await nav('Letter cleanup');await showLetter('Ava Alder');const img=await $('img.letter-image');await img.waitForExist({timeoutMsg:'the drawing did not travel with the packet'});assert.ok(await browser.execute((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0,img as unknown as HTMLImageElement),'drawing loads in packet mode');await shot('packet-mode');});

@@ -19,6 +19,9 @@ In 2025 several people cleaned letters at once by splitting a Word file by Entry
 
 A packet contains each family's name, route and children's letters, wishes and drawings. It doesn't contain addresses, phone numbers or emails.
 
+{: .note }
+Sending letters to helpers is off by default. To turn it on, go to **Settings** ▸ **Advanced**, tick **Send letters to helpers**, and click **Save settings**. Until then, **Cleanup packet** and **Import returned packet** don't appear on Letter cleanup. Letter cleaners don't need the switch: they open a packet from the avatar menu.
+
 ## For the coordinator: send a packet
 
 1. Go to **Letter cleanup** and click **Cleanup packet**.
