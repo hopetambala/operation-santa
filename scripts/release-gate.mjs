@@ -40,7 +40,7 @@ export function checkDist(dir){
 
 /** Returns the list of problems; empty means the gate passes. */
 export function gate({dist,bins=[]}){
-  return [...(dist?checkDist(dist):[]),...bins.flatMap(checkBinary)];
+  return [...(dist?checkDist(dist):[]),...bins.flatMap(b=>checkBinary(b))];
 }
 
 if(process.argv[1]&&pathToFileURL(process.argv[1]).href===import.meta.url){
