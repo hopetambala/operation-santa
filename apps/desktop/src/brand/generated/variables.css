@@ -1,0 +1,439 @@
+/**
+ * Do not edit directly, this file was auto-generated.
+ */
+
+:root {
+  --tk-dlite-primitive-color-white: #ffffff;
+  --tk-dlite-primitive-color-black: #000000;
+  --tk-dlite-primitive-color-neutral-100: #f7f7f7;
+  --tk-dlite-primitive-color-neutral-200: #e9e9e9;
+  --tk-dlite-primitive-color-neutral-300: #d4d4d4;
+  --tk-dlite-primitive-color-neutral-400: #c4c4c4;
+  --tk-dlite-primitive-color-neutral-500: #a5a5a5;
+  --tk-dlite-primitive-color-neutral-600: #6e6e6e;
+  --tk-dlite-primitive-color-neutral-700: #464646;
+  --tk-dlite-primitive-color-neutral-800: #202020;
+  --tk-dlite-primitive-color-neutral-900: #161616;
+  --tk-dlite-primitive-color-neutral-1000: #101010;
+  --tk-dlite-primitive-color-blue-100: #ebf2ff;
+  --tk-dlite-primitive-color-blue-200: #d1e2fe;
+  --tk-dlite-primitive-color-blue-300: #a3c3fd;
+  --tk-dlite-primitive-color-blue-400: #70a1fc;
+  --tk-dlite-primitive-color-blue-500: #3d80fc;
+  --tk-dlite-primitive-color-blue-600: #1b5fdb;
+  --tk-dlite-primitive-color-blue-700: #0a46b6;
+  --tk-dlite-primitive-color-blue-800: #043393;
+  --tk-dlite-primitive-color-blue-900: #012371;
+  --tk-dlite-primitive-color-blue-1000: #001653;
+  --tk-dlite-primitive-color-green-100: #e7f1cb;
+  --tk-dlite-primitive-color-green-200: #dce8c5;
+  --tk-dlite-primitive-color-green-300: #c5d8a7;
+  --tk-dlite-primitive-color-green-400: #8fb064;
+  --tk-dlite-primitive-color-green-500: #528d36;
+  --tk-dlite-primitive-color-green-600: #15701f;
+  --tk-dlite-primitive-color-green-700: #006210;
+  --tk-dlite-primitive-color-green-800: #0b5223;
+  --tk-dlite-primitive-color-green-900: #073922;
+  --tk-dlite-primitive-color-green-1000: #052b1a;
+  --tk-dlite-primitive-color-yellow-100: #faefc5;
+  --tk-dlite-primitive-color-yellow-200: #ffe680;
+  --tk-dlite-primitive-color-yellow-300: #f7dd68;
+  --tk-dlite-primitive-color-yellow-400: #f7d24d;
+  --tk-dlite-primitive-color-yellow-500: #f3c409;
+  --tk-dlite-primitive-color-yellow-600: #eeb90b;
+  --tk-dlite-primitive-color-yellow-700: #da9d04;
+  --tk-dlite-primitive-color-yellow-800: #976500;
+  --tk-dlite-primitive-color-yellow-900: #623e00;
+  --tk-dlite-primitive-color-yellow-1000: #492e00;
+  --tk-dlite-primitive-color-orange-100: #f7e9da;
+  --tk-dlite-primitive-color-orange-200: #f2d7bb;
+  --tk-dlite-primitive-color-orange-300: #f2c7d9;
+  --tk-dlite-primitive-color-orange-400: #f0b373;
+  --tk-dlite-primitive-color-orange-500: #eb974d;
+  --tk-dlite-primitive-color-orange-600: #de6f1b;
+  --tk-dlite-primitive-color-orange-700: #b2530a;
+  --tk-dlite-primitive-color-orange-800: #8f4008;
+  --tk-dlite-primitive-color-orange-900: #692d05;
+  --tk-dlite-primitive-color-orange-1000: #4f2204;
+  --tk-dlite-primitive-color-red-100: #fbe8e1;
+  --tk-dlite-primitive-color-red-200: #f7dace;
+  --tk-dlite-primitive-color-red-300: #f1b198;
+  --tk-dlite-primitive-color-red-400: #ec9471;
+  --tk-dlite-primitive-color-red-500: #e9541e;
+  --tk-dlite-primitive-color-red-600: #d84215;
+  --tk-dlite-primitive-color-red-700: #bf3813;
+  --tk-dlite-primitive-color-red-800: #8e280e;
+  --tk-dlite-primitive-color-red-900: #6b1c0b;
+  --tk-dlite-primitive-color-red-1000: #501508;
+  --tk-dlite-primitive-color-mint-100: #dff5ea;
+  --tk-dlite-primitive-color-mint-200: #cceddd;
+  --tk-dlite-primitive-color-mint-300: #b8e5d2;
+  --tk-dlite-primitive-color-mint-400: #9fd7c3;
+  --tk-dlite-primitive-color-mint-500: #81c7b0;
+  --tk-dlite-primitive-color-mint-600: #64b59a;
+  --tk-dlite-primitive-color-mint-700: #42a383;
+  --tk-dlite-primitive-color-mint-800: #278166;
+  --tk-dlite-primitive-color-mint-900: #165f4c;
+  --tk-dlite-primitive-color-mint-1000: #104739;
+  --tk-dlite-primitive-color-teal-100: #dcf3f3;
+  --tk-dlite-primitive-color-teal-200: #c6eded;
+  --tk-dlite-primitive-color-teal-300: #a2e2e2;
+  --tk-dlite-primitive-color-teal-400: #90d9d9;
+  --tk-dlite-primitive-color-teal-500: #74c9c9;
+  --tk-dlite-primitive-color-teal-600: #60c3c3;
+  --tk-dlite-primitive-color-teal-700: #4bb2b2;
+  --tk-dlite-primitive-color-teal-800: #2b9595;
+  --tk-dlite-primitive-color-teal-900: #136565;
+  --tk-dlite-primitive-color-teal-1000: #0e4c4c;
+  --tk-dlite-primitive-color-purple-100: #f3e7f2;
+  --tk-dlite-primitive-color-purple-200: #ead4e8;
+  --tk-dlite-primitive-color-purple-300: #e2badf;
+  --tk-dlite-primitive-color-purple-400: #d49ed0;
+  --tk-dlite-primitive-color-purple-500: #c585c0;
+  --tk-dlite-primitive-color-purple-600: #b56faf;
+  --tk-dlite-primitive-color-purple-700: #9d5897;
+  --tk-dlite-primitive-color-purple-800: #8a4885;
+  --tk-dlite-primitive-color-purple-900: #682061;
+  --tk-dlite-primitive-color-purple-1000: #4e1849;
+  --tk-dlite-primitive-color-pink-100: #f5e7ea;
+  --tk-dlite-primitive-color-pink-200: #f2d5dd;
+  --tk-dlite-primitive-color-pink-300: #eebfce;
+  --tk-dlite-primitive-color-pink-400: #e59eb7;
+  --tk-dlite-primitive-color-pink-500: #e281a3;
+  --tk-dlite-primitive-color-pink-600: #d66b96;
+  --tk-dlite-primitive-color-pink-700: #c15381;
+  --tk-dlite-primitive-color-pink-800: #a83b67;
+  --tk-dlite-primitive-color-pink-900: #831540;
+  --tk-dlite-primitive-color-pink-1000: #621030;
+  --tk-dlite-primitive-color-sand-100: #faf6f0;
+  --tk-dlite-primitive-color-sand-200: #f0e8dc;
+  --tk-dlite-primitive-color-sand-300: #e0d4c0;
+  --tk-dlite-primitive-color-sand-400: #d0c4a8;
+  --tk-dlite-primitive-color-sand-500: #b8a888;
+  --tk-dlite-primitive-color-sand-600: #8c7a5c;
+  --tk-dlite-primitive-color-sand-700: #6b5c42;
+  --tk-dlite-primitive-color-sand-800: #4d4230;
+  --tk-dlite-primitive-color-sand-900: #362e22;
+  --tk-dlite-primitive-color-sand-1000: #28221a;
+  --tk-dlite-primitive-color-saturated-blue-100: #fafcff;
+  --tk-dlite-primitive-color-saturated-blue-200: #f0f7ff;
+  --tk-dlite-primitive-color-saturated-blue-300: #dcefff;
+  --tk-dlite-primitive-color-saturated-blue-400: #c8e7ff;
+  --tk-dlite-primitive-color-saturated-blue-500: #8fc8ff;
+  --tk-dlite-primitive-color-saturated-blue-600: #4ca2ff;
+  --tk-dlite-primitive-color-saturated-blue-700: #0078ff;
+  --tk-dlite-primitive-color-saturated-blue-800: #0063f5;
+  --tk-dlite-primitive-color-saturated-blue-900: #0041e6;
+  --tk-dlite-primitive-color-saturated-blue-1000: #001dd7;
+  --tk-dlite-primitive-color-saturated-teal-100: #f7fdfd;
+  --tk-dlite-primitive-color-saturated-teal-200: #e6fafa;
+  --tk-dlite-primitive-color-saturated-teal-300: #cdf5f5;
+  --tk-dlite-primitive-color-saturated-teal-400: #b4eff0;
+  --tk-dlite-primitive-color-saturated-teal-500: #80e0e0;
+  --tk-dlite-primitive-color-saturated-teal-600: #32cde0;
+  --tk-dlite-primitive-color-saturated-teal-700: #00abad;
+  --tk-dlite-primitive-color-saturated-teal-800: #0085b1;
+  --tk-dlite-primitive-color-saturated-teal-900: #005f9a;
+  --tk-dlite-primitive-color-saturated-teal-1000: #003a84;
+  --tk-dlite-primitive-color-saturated-green-100: #f7fdeb;
+  --tk-dlite-primitive-color-saturated-green-200: #e6fce0;
+  --tk-dlite-primitive-color-saturated-green-300: #cdf5b9;
+  --tk-dlite-primitive-color-saturated-green-400: #b4ef96;
+  --tk-dlite-primitive-color-saturated-green-500: #80e041;
+  --tk-dlite-primitive-color-saturated-green-600: #56d400;
+  --tk-dlite-primitive-color-saturated-green-700: #33bb00;
+  --tk-dlite-primitive-color-saturated-green-800: #009900;
+  --tk-dlite-primitive-color-saturated-green-900: #008000;
+  --tk-dlite-primitive-color-saturated-green-1000: #006600;
+  --tk-dlite-primitive-color-saturated-yellow-100: #fffde6;
+  --tk-dlite-primitive-color-saturated-yellow-200: #fffcc8;
+  --tk-dlite-primitive-color-saturated-yellow-300: #fffb96;
+  --tk-dlite-primitive-color-saturated-yellow-400: #ffe864;
+  --tk-dlite-primitive-color-saturated-yellow-500: #ffef00;
+  --tk-dlite-primitive-color-saturated-yellow-600: #ffe600;
+  --tk-dlite-primitive-color-saturated-yellow-700: #ffdd00;
+  --tk-dlite-primitive-color-saturated-yellow-800: #ffca00;
+  --tk-dlite-primitive-color-saturated-yellow-900: #fdaa00;
+  --tk-dlite-primitive-color-saturated-yellow-1000: #ef8800;
+  --tk-dlite-primitive-color-saturated-orange-100: #fff7e6;
+  --tk-dlite-primitive-color-saturated-orange-200: #ffefb9;
+  --tk-dlite-primitive-color-saturated-orange-300: #ffe096;
+  --tk-dlite-primitive-color-saturated-orange-400: #ffd164;
+  --tk-dlite-primitive-color-saturated-orange-500: #ffc100;
+  --tk-dlite-primitive-color-saturated-orange-600: #ffaa00;
+  --tk-dlite-primitive-color-saturated-orange-700: #ff8800;
+  --tk-dlite-primitive-color-saturated-orange-800: #fd6400;
+  --tk-dlite-primitive-color-saturated-orange-900: #f54600;
+  --tk-dlite-primitive-color-saturated-orange-1000: #e62900;
+  --tk-dlite-primitive-color-saturated-pink-100: #fffaf9;
+  --tk-dlite-primitive-color-saturated-pink-200: #ffeef9;
+  --tk-dlite-primitive-color-saturated-pink-300: #ffe0ef;
+  --tk-dlite-primitive-color-saturated-pink-400: #ffd1e6;
+  --tk-dlite-primitive-color-saturated-pink-500: #ff99c8;
+  --tk-dlite-primitive-color-saturated-pink-600: #ff64aa;
+  --tk-dlite-primitive-color-saturated-pink-700: #ff0088;
+  --tk-dlite-primitive-color-saturated-pink-800: #ef006b;
+  --tk-dlite-primitive-color-saturated-pink-900: #d40053;
+  --tk-dlite-primitive-color-saturated-pink-1000: #b9003c;
+  --tk-dlite-primitive-color-saturated-purple-100: #faf7fc;
+  --tk-dlite-primitive-color-saturated-purple-200: #f7effd;
+  --tk-dlite-primitive-color-saturated-purple-300: #efdefc;
+  --tk-dlite-primitive-color-saturated-purple-400: #e8d1f9;
+  --tk-dlite-primitive-color-saturated-purple-500: #cd99f3;
+  --tk-dlite-primitive-color-saturated-purple-600: #b264ec;
+  --tk-dlite-primitive-color-saturated-purple-700: #9900e6;
+  --tk-dlite-primitive-color-saturated-purple-800: #8500cd;
+  --tk-dlite-primitive-color-saturated-purple-900: #7000b3;
+  --tk-dlite-primitive-color-saturated-purple-1000: #5b0099;
+  --tk-dlite-primitive-color-saturated-red-100: #fff7f5;
+  --tk-dlite-primitive-color-saturated-red-200: #ffeee6;
+  --tk-dlite-primitive-color-saturated-red-300: #ffe0d1;
+  --tk-dlite-primitive-color-saturated-red-400: #ffd1bc;
+  --tk-dlite-primitive-color-saturated-red-500: #ff9a88;
+  --tk-dlite-primitive-color-saturated-red-600: #ff6453;
+  --tk-dlite-primitive-color-saturated-red-700: #ff0000;
+  --tk-dlite-primitive-color-saturated-red-800: #ef0000;
+  --tk-dlite-primitive-color-saturated-red-900: #d40000;
+  --tk-dlite-primitive-color-saturated-red-1000: #b90000;
+  --tk-dlite-primitive-dimension-letter-spacing-widest: 0.1em;
+  --tk-dlite-primitive-dimension-font-size-100: 0.625rem;
+  --tk-dlite-primitive-dimension-font-size-200: 0.75rem;
+  --tk-dlite-primitive-dimension-font-size-300: 0.875rem;
+  --tk-dlite-primitive-dimension-font-size-350: 0.9375rem;
+  --tk-dlite-primitive-dimension-font-size-400: 1rem;
+  --tk-dlite-primitive-dimension-font-size-500: 1.125rem;
+  --tk-dlite-primitive-dimension-font-size-600: 1.25rem;
+  --tk-dlite-primitive-dimension-font-size-700: 1.5rem;
+  --tk-dlite-primitive-dimension-font-size-800: 1.875rem;
+  --tk-dlite-primitive-dimension-font-size-900: 2.25rem;
+  --tk-dlite-primitive-dimension-font-size-1000: 3rem;
+  --tk-dlite-primitive-dimension-font-size-1100: 3.75rem;
+  --tk-dlite-primitive-dimension-letter-spacing-tight: -0.02em;
+  --tk-dlite-primitive-dimension-letter-spacing-normal: 0em;
+  --tk-dlite-primitive-dimension-letter-spacing-wide: 0.025em;
+  --tk-dlite-primitive-dimension-letter-spacing-wider: 0.05em;
+  --tk-dlite-primitive-dimension-radius-0: 0px;
+  --tk-dlite-primitive-dimension-radius-100: 2px;
+  --tk-dlite-primitive-dimension-radius-200: 4px;
+  --tk-dlite-primitive-dimension-radius-300: 8px;
+  --tk-dlite-primitive-dimension-radius-400: 12px;
+  --tk-dlite-primitive-dimension-radius-full: 9999px;
+  --tk-dlite-primitive-fontWeight-regular: 400;
+  --tk-dlite-primitive-fontWeight-medium: 500;
+  --tk-dlite-primitive-fontWeight-semibold: 600;
+  --tk-dlite-primitive-fontWeight-bold: 700;
+  --tk-dlite-primitive-number-opacity-0: 0;
+  --tk-dlite-primitive-number-opacity-5: 0.05;
+  --tk-dlite-primitive-number-opacity-10: 0.1;
+  --tk-dlite-primitive-number-opacity-20: 0.2;
+  --tk-dlite-primitive-number-opacity-40: 0.4;
+  --tk-dlite-primitive-number-opacity-60: 0.6;
+  --tk-dlite-primitive-number-opacity-80: 0.8;
+  --tk-dlite-primitive-number-opacity-100: 1;
+  --tk-dlite-primitive-number-line-height-tight: 1.1;
+  --tk-dlite-primitive-number-line-height-snug: 1.25;
+  --tk-dlite-primitive-number-line-height-normal: 1.5;
+  --tk-dlite-primitive-number-line-height-relaxed: 1.625;
+  --tk-dlite-primitive-shadow-100: 0px 1px 2px 0px #0000000d;
+  --tk-dlite-primitive-shadow-200: 0px 2px 4px -1px #0000001a;
+  --tk-dlite-primitive-shadow-300: 0px 4px 8px -2px #00000026;
+  --tk-dlite-primitive-shadow-400: 0px 8px 24px -4px #00000033;
+  --tk-dlite-semantic-color-primary: #1f4d38;
+  --tk-dlite-semantic-color-secondary: #7a5d1d;
+  --tk-dlite-semantic-color-brand: #c4a15a; /** Star gold. The North Star in the mark. Never text. */
+  --tk-dlite-semantic-color-background: #f7f6f2; /** Paper. The page behind every screen. */
+  --tk-dlite-semantic-color-foreground: #1c1917;
+  --tk-dlite-semantic-color-muted: #5f5c55; /** Same role as text-tertiary. Kept because dLite utilities read color.muted. */
+  --tk-dlite-semantic-color-border: #ebe8e0; /** Decorative divider. Not a control boundary; border-control is the 3:1 edge. */
+  --tk-dlite-semantic-color-success: #1f4d38;
+  --tk-dlite-semantic-color-warning: #7a5d1d;
+  --tk-dlite-semantic-color-error: #8b1c22;
+  --tk-dlite-semantic-color-surface-base: #ffffff; /** Surface. Panels, inputs and cards. */
+  --tk-dlite-semantic-color-surface-sunken: #f4f1ea; /** Sunken. Hover and neutral fills. Not a second card. */
+  --tk-dlite-semantic-color-surface-raised: #ffffff;
+  --tk-dlite-semantic-color-surface-overlay: #000000;
+  --tk-dlite-semantic-color-text-primary: #1c1917; /** Ink. Names and headings. */
+  --tk-dlite-semantic-color-text-secondary: #2b2a27; /** Body text. */
+  --tk-dlite-semantic-color-text-tertiary: #5f5c55; /** Muted secondary lines. Never lighter than this on paper. */
+  --tk-dlite-semantic-color-text-on-brand: #1c1917;
+  --tk-dlite-semantic-color-text-on-primary: #ffffff;
+  --tk-dlite-semantic-color-action-primary: #1f4d38; /** Forest. One primary button per screen. */
+  --tk-dlite-semantic-color-action-primary-hover: #173d2c; /** Forest pressed/hover. One step darker than the primary fill. */
+  --tk-dlite-semantic-color-action-primary-active: #123024; /** Forest pressed. Darker than hover so the keyboard and coarse-pointer press is visible. */
+  --tk-dlite-semantic-color-action-secondary: #ffffff;
+  --tk-dlite-semantic-color-action-secondary-active: #f4f1ea;
+  --tk-dlite-semantic-color-feedback-info: #1f4d38;
+  --tk-dlite-semantic-color-feedback-success: #1f4d38;
+  --tk-dlite-semantic-color-feedback-success-active: #173d2c;
+  --tk-dlite-semantic-color-feedback-warning: #7a5d1d; /** Gold dark. Needs a look, does not block. */
+  --tk-dlite-semantic-color-feedback-danger: #8b1c22; /** Crimson. Things that stop work. */
+  --tk-dlite-semantic-color-feedback-danger-active: #6e151b;
+  --tk-dlite-semantic-color-text-on-dark: #ffffffeb;
+  --tk-dlite-semantic-color-text-on-dark-muted: #ffffff99;
+  --tk-dlite-semantic-color-text-on-dark-subtle: #ffffff66;
+  --tk-dlite-semantic-color-border-on-dark: #ffffff26;
+  --tk-dlite-semantic-color-surface-on-dark: #ffffff14;
+  --tk-dlite-semantic-color-surface-scrim: #1c191752; /** Modal scrim. Ink at 32% (0x52), the product's overlay, not the shared 50% black. */
+  --tk-dlite-semantic-color-feedback-success-bg: #e7f0ea;
+  --tk-dlite-semantic-color-feedback-success-fg: #173d2c;
+  --tk-dlite-semantic-color-feedback-danger-bg: #fbe9ea;
+  --tk-dlite-semantic-color-feedback-danger-fg: #8b1c22;
+  --tk-dlite-semantic-color-feedback-warning-bg: #f8f0dc;
+  --tk-dlite-semantic-color-feedback-warning-fg: #7a5d1d;
+  --tk-dlite-semantic-color-feedback-info-bg: #e7f0ea;
+  --tk-dlite-semantic-color-feedback-info-fg: #173d2c;
+  --tk-dlite-semantic-color-border-subtle: #ebe8e0;
+  --tk-dlite-semantic-color-border-emphasis: #8f8a7d;
+  --tk-dlite-semantic-color-border-control: #8f8a7d; /** Input, checkbox and radio boundary. 3:1 on paper and white. */
+  --tk-dlite-semantic-color-text-link: #2c6a4f; /** Forest light. Links and ready states. Passes 4.5:1 on paper. */
+  --tk-dlite-semantic-color-focus-ring: #9a7a2e; /** Gold. Focus only. 3:1 on paper and white; not used for text (it is under 4.5:1). */
+  --tk-dlite-semantic-color-map-ground: #edf0e9; /** Offline map field. Not a page surface. */
+  --tk-dlite-semantic-color-map-street: #dce2d8; /** Offline map hatch. */
+  --tk-dlite-semantic-color-map-pin: #5f5c55; /** Unrouted pin. Same ink as muted text so it stays 4.5:1 on the map field. */
+  --tk-dlite-semantic-color-letter-paper: #fbf8f0; /** Warm paper behind a child's letter. */
+  --tk-dlite-semantic-color-letter-ink: #5d5541; /** The letter's ink. 4.5:1 on letter-paper. */
+  --tk-dlite-semantic-color-route-1: #1f6b5c; /** Route 1 swatch. White route numbers sit on it at 4.5:1. The number, not the color, identifies the route. */
+  --tk-dlite-semantic-color-route-2: #a64f1d; /** Route 2 swatch. White route numbers sit on it at 4.5:1. The number, not the color, identifies the route. */
+  --tk-dlite-semantic-color-route-3: #3a5aa0; /** Route 3 swatch. White route numbers sit on it at 4.5:1. The number, not the color, identifies the route. */
+  --tk-dlite-semantic-color-route-4: #8f3f6e; /** Route 4 swatch. White route numbers sit on it at 4.5:1. The number, not the color, identifies the route. */
+  --tk-dlite-semantic-color-route-5: #6b6118; /** Route 5 swatch. White route numbers sit on it at 4.5:1. The number, not the color, identifies the route. */
+  --tk-dlite-semantic-color-route-6: #24697a; /** Route 6 swatch. White route numbers sit on it at 4.5:1. The number, not the color, identifies the route. */
+  --tk-dlite-semantic-color-route-7: #6a4a99; /** Route 7 swatch. White route numbers sit on it at 4.5:1. The number, not the color, identifies the route. */
+  --tk-dlite-semantic-color-route-8: #a23a33; /** Route 8 swatch. White route numbers sit on it at 4.5:1. The number, not the color, identifies the route. */
+  --tk-dlite-semantic-color-route-9: #4a6b25; /** Route 9 swatch. White route numbers sit on it at 4.5:1. The number, not the color, identifies the route. */
+  --tk-dlite-semantic-color-route-10: #4d5a66; /** Route 10 swatch. White route numbers sit on it at 4.5:1. The number, not the color, identifies the route. */
+  --tk-dlite-semantic-focus-ring-width: 3px; /** The product brand guide specifies a 3px ring, one step thicker than the shared 2px default, so gold focus stays obvious on warm paper for volunteers. */
+  --tk-dlite-semantic-focus-ring-offset: 2px;
+  --tk-dlite-semantic-z-index-default: 0;
+  --tk-dlite-semantic-z-index-sticky: 50;
+  --tk-dlite-semantic-z-index-dropdown: 100;
+  --tk-dlite-semantic-z-index-overlay: 999;
+  --tk-dlite-semantic-z-index-modal: 1000;
+  --tk-dlite-semantic-typography-font-heading: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; /** Product brand: Plus Jakarta Sans for every UI string, including body. The shared font-body is Source Serif 4; this brand overrides both faces. */
+  --tk-dlite-semantic-typography-font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --tk-dlite-semantic-typography-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; /** Season IDs and packet text use the system mono so the desktop app does not download Source Code Pro. */
+  --tk-dlite-semantic-typography-size-100: 0.625rem;
+  --tk-dlite-semantic-typography-size-200: 0.75rem;
+  --tk-dlite-semantic-typography-size-300: 0.875rem;
+  --tk-dlite-semantic-typography-size-350: 0.9375rem;
+  --tk-dlite-semantic-typography-size-400: 1rem;
+  --tk-dlite-semantic-typography-size-500: 1.125rem;
+  --tk-dlite-semantic-typography-size-600: 1.1875rem; /** Brand book letter (19px): a child's Letter to Santa. Shared step is 1.25rem. */
+  --tk-dlite-semantic-typography-size-700: 1.375rem; /** Brand book title (22px): dialog and section titles. Shared step is 1.5rem. */
+  --tk-dlite-semantic-typography-size-800: 2rem; /** Brand book stat (32px): big read-outs such as times and counts. Shared step is 1.875rem. */
+  --tk-dlite-semantic-typography-size-900: 2.125rem; /** Brand book page-title (34px): one per screen. Shared step is 2.25rem. */
+  --tk-dlite-semantic-typography-size-1000: 3rem;
+  --tk-dlite-semantic-typography-size-1100: 3.75rem;
+  --tk-dlite-semantic-typography-letter-spacing-tight: -0.32px;
+  --tk-dlite-semantic-typography-letter-spacing-normal: 0px;
+  --tk-dlite-semantic-typography-letter-spacing-wide: 0.4px;
+  --tk-dlite-semantic-typography-letter-spacing-wider: 0.8px;
+  --tk-dlite-semantic-typography-letter-spacing-widest: 1.6px;
+  --tk-dlite-semantic-typography-letter-spacing-code: 8px;
+  --tk-dlite-semantic-typography-line-height-tight: 1.1;
+  --tk-dlite-semantic-typography-line-height-snug: 1.25;
+  --tk-dlite-semantic-typography-line-height-normal: 1.5;
+  --tk-dlite-semantic-typography-line-height-relaxed: 1.625;
+  --tk-dlite-semantic-typography-type-display-l-size: 3.75rem;
+  --tk-dlite-semantic-typography-type-display-l-weight: 700;
+  --tk-dlite-semantic-typography-type-display-l-line-height: 1.1;
+  --tk-dlite-semantic-typography-type-display-l-letter-spacing: -0.02em;
+  --tk-dlite-semantic-typography-type-heading-m-size: 1.5rem;
+  --tk-dlite-semantic-typography-type-heading-m-weight: 600;
+  --tk-dlite-semantic-typography-type-heading-m-line-height: 1.25;
+  --tk-dlite-semantic-typography-type-heading-m-letter-spacing: -0.02em;
+  --tk-dlite-semantic-typography-type-body-default-size: 1rem;
+  --tk-dlite-semantic-typography-type-body-default-weight: 400;
+  --tk-dlite-semantic-typography-type-body-default-line-height: 1.5;
+  --tk-dlite-semantic-typography-type-body-default-letter-spacing: 0em;
+  --tk-dlite-semantic-typography-type-label-s-size: 0.75rem;
+  --tk-dlite-semantic-typography-type-label-s-weight: 500;
+  --tk-dlite-semantic-typography-type-label-s-line-height: 1.5;
+  --tk-dlite-semantic-typography-type-label-s-letter-spacing: 0.025em;
+  --tk-dlite-semantic-typography-type-mono-m-size: 0.875rem;
+  --tk-dlite-semantic-typography-type-mono-m-weight: 400;
+  --tk-dlite-semantic-typography-type-mono-m-line-height: 1.5;
+  --tk-dlite-semantic-typography-type-mono-m-letter-spacing: 0em;
+  --tk-dlite-semantic-typography-font-letter: Georgia, "Times New Roman", serif; /** A child's letter is set in Georgia so it reads as their words, not the app's. The shared faces have no letter slot. */
+  --tk-dlite-semantic-spacing-100: 0.25rem;
+  --tk-dlite-semantic-spacing-200: 0.5rem;
+  --tk-dlite-semantic-spacing-300: 0.75rem;
+  --tk-dlite-semantic-spacing-400: 1rem;
+  --tk-dlite-semantic-spacing-500: 1.25rem;
+  --tk-dlite-semantic-spacing-600: 1.5rem;
+  --tk-dlite-semantic-spacing-700: 1.75rem;
+  --tk-dlite-semantic-spacing-800: 2rem;
+  --tk-dlite-semantic-spacing-900: 2.25rem;
+  --tk-dlite-semantic-spacing-1000: 2.5rem;
+  --tk-dlite-semantic-spacing-xxxs: 0.0625rem;
+  --tk-dlite-semantic-spacing-xxs: 0.125rem;
+  --tk-dlite-semantic-spacing-xs: 0.25rem;
+  --tk-dlite-semantic-spacing-sm: 0.5rem;
+  --tk-dlite-semantic-spacing-md: 1rem;
+  --tk-dlite-semantic-spacing-lg: 1.5rem;
+  --tk-dlite-semantic-spacing-xl: 2rem;
+  --tk-dlite-semantic-spacing-xxl: 3rem;
+  --tk-dlite-semantic-spacing-xxxl: 4rem;
+  --tk-dlite-semantic-breakpoint-sm: 640px;
+  --tk-dlite-semantic-breakpoint-md: 768px;
+  --tk-dlite-semantic-breakpoint-lg: 1024px;
+  --tk-dlite-semantic-breakpoint-xl: 1280px;
+  --tk-dlite-semantic-border-radius-none: 0px;
+  --tk-dlite-semantic-border-radius-sm: 8px; /** Brand book radius-sm: flag chips, small icon buttons, route-number tiles. */
+  --tk-dlite-semantic-border-radius-md: 12px; /** Brand book radius-md: buttons, inputs, selects, banners, tabs. */
+  --tk-dlite-semantic-border-radius-lg: 16px; /** Brand book radius-lg: panels and cards. */
+  --tk-dlite-semantic-border-radius-full: 9999px;
+  --tk-dlite-semantic-border-weight-thin: 1px;
+  --tk-dlite-semantic-border-weight-medium: 2px;
+  --tk-dlite-semantic-border-weight-thick: 3px;
+  --tk-dlite-semantic-border-radius-xl: 24px; /** Brand book radius-xl: dialogs. The shared scale stops at lg. */
+  --tk-dlite-semantic-sizing-icon-sm: 1rem;
+  --tk-dlite-semantic-sizing-icon-md: 1.5rem;
+  --tk-dlite-semantic-sizing-icon-lg: 2rem;
+  --tk-dlite-semantic-sizing-target-min: 24px; /** Minimum pointer target (WCAG 2.5.8, AA). */
+  --tk-dlite-semantic-sizing-target-comfortable: 44px; /** Comfortable touch target (WCAG 2.5.5, AAA / platform guidance). */
+  --tk-dlite-semantic-sizing-modal-width-narrow: 20rem;
+  --tk-dlite-semantic-sizing-modal-width-normal: 40rem;
+  --tk-dlite-semantic-sizing-modal-width-wide: 60rem;
+  --tk-dlite-semantic-sizing-content-width: 1440px; /** Brand book content-width: the app's widest content area. Separate from breakpoint-xl, which stays a breakpoint. */
+  --tk-dlite-semantic-motion-duration-instant: 0s;
+  --tk-dlite-semantic-motion-duration-micro: 0.08s;
+  --tk-dlite-semantic-motion-duration-quick: 0.15s;
+  --tk-dlite-semantic-motion-duration-snappy: 0.2s;
+  --tk-dlite-semantic-motion-duration-base: 0.3s;
+  --tk-dlite-semantic-motion-duration-substantial: 0.4s;
+  --tk-dlite-semantic-motion-duration-slow: 0.5s;
+  --tk-dlite-semantic-motion-duration-xslow: 0.7s;
+  --tk-dlite-semantic-motion-duration-pulse: 1s;
+  --tk-dlite-semantic-motion-duration-toast: 3s;
+  --tk-dlite-semantic-motion-duration-dismiss: 4s;
+  --tk-dlite-semantic-motion-spring-tight-damping: 20;
+  --tk-dlite-semantic-motion-spring-tight-stiffness: 250;
+  --tk-dlite-semantic-motion-spring-tight-mass: 0.6;
+  --tk-dlite-semantic-motion-spring-snappy-damping: 14;
+  --tk-dlite-semantic-motion-spring-snappy-stiffness: 180;
+  --tk-dlite-semantic-motion-spring-snappy-mass: 0.8;
+  --tk-dlite-semantic-motion-spring-smooth-damping: 18;
+  --tk-dlite-semantic-motion-spring-smooth-stiffness: 120;
+  --tk-dlite-semantic-motion-spring-smooth-mass: 1;
+  --tk-dlite-semantic-motion-spring-playful-damping: 8;
+  --tk-dlite-semantic-motion-spring-playful-stiffness: 60;
+  --tk-dlite-semantic-motion-spring-playful-mass: 1;
+  --tk-dlite-semantic-motion-easing-standard: cubic-bezier(0.42, 0, 0.58, 1);
+  --tk-dlite-semantic-motion-easing-entrance: cubic-bezier(0, 0, 0.58, 1);
+  --tk-dlite-semantic-motion-easing-exit: cubic-bezier(0.42, 0, 1, 1);
+  --tk-dlite-semantic-motion-easing-linear: cubic-bezier(0, 0, 1, 1);
+  --tk-dlite-semantic-motion-scale-press: 0.95;
+  --tk-dlite-semantic-motion-scale-micro: 0.98;
+  --tk-dlite-semantic-motion-scale-entrance: 0.98;
+  --tk-dlite-semantic-motion-scale-celebrate: 1.2;
+  --tk-dlite-semantic-motion-scale-hover: 1.05;
+  --tk-dlite-semantic-motion-scale-active: 0.95;
+  --tk-dlite-semantic-motion-opacity-interactive: 0.8;
+  --tk-dlite-semantic-motion-opacity-disabled: 0.5;
+  --tk-dlite-semantic-motion-opacity-backdrop: 0.5;
+  --tk-dlite-semantic-motion-opacity-entrance: 0;
+  --tk-dlite-semantic-elevation-low: 0 1px 2px #1c19170f, 0 4px 16px #1c19170f; /** Brand book shadow-card: ink at 6%, two layers, on panels and the step bar. */
+  --tk-dlite-semantic-elevation-medium: 0px 4px 8px -2px #00000026;
+  --tk-dlite-semantic-elevation-high: 0 18px 50px #1c19172e; /** Brand book shadow-overlay: ink at 18%, on dialogs and toasts. */
+}

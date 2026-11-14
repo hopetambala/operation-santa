@@ -30,6 +30,11 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit -p .
       - run: npm test
+      # The committed brand tokens must be exactly what the pinned generator writes (apps/desktop/src/brand/TOKENS.md).
+      # macOS only: a Windows checkout may convert line endings in the committed copies.
+      - name: Brand tokens match the generator
+        if: runner.os == 'macOS'
+        run: npm run tokens && git diff --exit-code -- apps/desktop/src/brand/generated
       - run: cargo test --workspace
       - run: npm run build
   e2e:
