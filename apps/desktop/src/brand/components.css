@@ -378,7 +378,7 @@ tr:last-child td { border-bottom: 0; }
   max-height: calc(100dvh - var(--tk-dlite-semantic-spacing-800));
   overflow: auto;
   padding: var(--tk-dlite-semantic-spacing-600);
-  border-radius: var(--tk-dlite-semantic-border-radius-lg);
+  border-radius: var(--tk-dlite-semantic-border-radius-xl);
   background: var(--tk-dlite-semantic-color-surface-base);
   box-shadow: var(--tk-dlite-semantic-elevation-high);
   /* Initial focus lands on the dialog so its name is announced. The dialog is not a control, so it does not draw the :focus-visible ring. */

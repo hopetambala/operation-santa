@@ -10,7 +10,7 @@ p { line-height: var(--tk-dlite-semantic-typography-line-height-normal); }
 #workspace:focus { outline: none; }
 .app {
   width: 100%;
-  max-width: var(--tk-dlite-semantic-breakpoint-xl);
+  max-width: var(--tk-dlite-semantic-sizing-content-width);
   margin: 0 auto;
   padding: var(--tk-dlite-semantic-spacing-500) var(--tk-dlite-semantic-spacing-800) 0;
 }
@@ -89,7 +89,7 @@ main { min-width: 0; padding-bottom: var(--tk-dlite-semantic-spacing-300); }
   grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--tk-dlite-semantic-sizing-modal-width-narrow)), 1fr));
   gap: var(--tk-dlite-semantic-spacing-400);
 }
-/* Four summary numbers. 20rem only fits three across the xl content width, so the floor is four comfortable targets (176px): one column on a phone, four on the desktop row. */
+/* Four summary numbers. The floor is four comfortable targets (176px): one column on a phone, four on the desktop row. */
 .stats-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--tk-dlite-semantic-sizing-target-comfortable) * 4)), 1fr)); }
 .stats-grid { margin-bottom: var(--tk-dlite-semantic-spacing-500); }
 .team-grid, .print-grid, .cleanup-grid, .settings-grid { gap: var(--tk-dlite-semantic-spacing-500); }

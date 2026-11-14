@@ -19,6 +19,26 @@
         "$type": "fontFamily",
         "$value": "Georgia, \"Times New Roman\", serif",
         "$description": "A child's letter is set in Georgia so it reads as their words, not the app's. The shared faces have no letter slot."
+      },
+      "size-600": {
+        "$type": "dimension",
+        "$value": "1.1875rem",
+        "$description": "Brand book letter (19px): a child's Letter to Santa. Shared step is 1.25rem."
+      },
+      "size-700": {
+        "$type": "dimension",
+        "$value": "1.375rem",
+        "$description": "Brand book title (22px): dialog and section titles. Shared step is 1.5rem."
+      },
+      "size-800": {
+        "$type": "dimension",
+        "$value": "2rem",
+        "$description": "Brand book stat (32px): big read-outs such as times and counts. Shared step is 1.875rem."
+      },
+      "size-900": {
+        "$type": "dimension",
+        "$value": "2.125rem",
+        "$description": "Brand book page-title (34px): one per screen. Shared step is 2.25rem."
       }
     },
     "focus-ring": {
@@ -26,6 +46,48 @@
         "$type": "dimension",
         "$value": "3px",
         "$description": "The product brand guide specifies a 3px ring, one step thicker than the shared 2px default, so gold focus stays obvious on warm paper for volunteers."
+      }
+    },
+    "border": {
+      "$type": "dimension",
+      "radius-sm": {
+        "$type": "dimension",
+        "$value": "8px",
+        "$description": "Brand book radius-sm: flag chips, small icon buttons, route-number tiles."
+      },
+      "radius-md": {
+        "$type": "dimension",
+        "$value": "12px",
+        "$description": "Brand book radius-md: buttons, inputs, selects, banners, tabs."
+      },
+      "radius-lg": {
+        "$type": "dimension",
+        "$value": "16px",
+        "$description": "Brand book radius-lg: panels and cards."
+      },
+      "radius-xl": {
+        "$type": "dimension",
+        "$value": "24px",
+        "$description": "Brand book radius-xl: dialogs. The shared scale stops at lg."
+      }
+    },
+    "elevation": {
+      "low": {
+        "$type": "shadow",
+        "$value": "0 1px 2px #1c19170f, 0 4px 16px #1c19170f",
+        "$description": "Brand book shadow-card: ink at 6%, two layers, on panels and the step bar."
+      },
+      "high": {
+        "$type": "shadow",
+        "$value": "0 18px 50px #1c19172e",
+        "$description": "Brand book shadow-overlay: ink at 18%, on dialogs and toasts."
+      }
+    },
+    "sizing": {
+      "content-width": {
+        "$type": "dimension",
+        "$value": "1440px",
+        "$description": "Brand book content-width: the app's widest content area. Separate from breakpoint-xl, which stays a breakpoint."
       }
     },
     "themes": {

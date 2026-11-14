@@ -49,13 +49,15 @@ Route swatches are `--tk-dlite-semantic-color-route-1` through `-route-10`. `mod
 | regular | `--tk-dlite-bp-md-up` and `--tk-dlite-bp-lg-down` | tablet, 768–1023 |
 | expanded | base styles, which match `--tk-dlite-bp-lg-up` | desktop, 1024 and up |
 
-xl is the content max-width (`--tk-dlite-semantic-breakpoint-xl`), not a fourth layout. Equal card grids use `repeat(auto-fit, minmax(min(100%, …), 1fr))` so they reflow without a private query.
+xl is not a fourth layout. The content max-width is the brand's own `--tk-dlite-semantic-sizing-content-width` (1440px), not a breakpoint. Equal card grids use `repeat(auto-fit, minmax(min(100%, …), 1fr))` so they reflow without a private query.
 
 ## What this brand overrides, and why
 
 - **Color** is the Operation Santa guide (paper, forest, crimson, gold, the ten route colors), stored as DTCG colors on the `opsanta` brand. The shared semantic layer is Puente blue. Putting the hexes in the brand file is the dictionary's extension point, not a parallel system.
 - **font-body** is Plus Jakarta Sans. The shared token is Source Serif 4. The product brand uses Plus Jakarta for every UI string. `font-letter` is Georgia for a child's letter; the shared faces have no letter slot. The app still serves `public/fonts/PlusJakartaSans.ttf`.
 - **Focus ring width** is 3px. The shared token is 2px. The brand guide asks for 3px so the gold ring stays obvious on warm paper.
+- **Sizes** follow the brand book, not dLite's shared scale: `typography.size-600/700/800/900` are 19/22/32/34px (letter, title, stat, page-title), `border.radius-sm/md/lg` are 8/12/16px and a brand `radius-xl` (24px) rounds dialogs, `elevation.low/high` are the brand's ink-tinted shadow-card and shadow-overlay, and `sizing.content-width` is 1440px. The scale stays in increasing order. `model.test.ts` checks the generated values.
+- **Unrouted map pin** is `#5f5c55` and **danger** is crimson-800 `#8b1c22`, darker than the brand book's `#77756e` and crimson-700. Both read better (the pin is 5.8:1 on the map ground instead of 4.0:1); the brand book is to be updated to match.
 - **color-scheme** is `light` on `:root`, and `variables.dark.css` is not imported. The brand guide says the app is light only this season. Declaring `light` stops the webview from painting dark form controls when the Mac is in Dark Mode. `theme-color` in `index.html` is `#1f4d38` (action-primary) because a meta tag cannot read a custom property.
 - **Motion** tokens time color changes and the busy spinner only. The brand guide forbids decorative motion, so buttons do not scale on hover.
 

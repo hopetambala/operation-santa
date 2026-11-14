@@ -318,10 +318,10 @@
   --tk-dlite-semantic-typography-size-350: 0.9375rem;
   --tk-dlite-semantic-typography-size-400: 1rem;
   --tk-dlite-semantic-typography-size-500: 1.125rem;
-  --tk-dlite-semantic-typography-size-600: 1.25rem;
-  --tk-dlite-semantic-typography-size-700: 1.5rem;
-  --tk-dlite-semantic-typography-size-800: 1.875rem;
-  --tk-dlite-semantic-typography-size-900: 2.25rem;
+  --tk-dlite-semantic-typography-size-600: 1.1875rem; /** Brand book letter (19px): a child's Letter to Santa. Shared step is 1.25rem. */
+  --tk-dlite-semantic-typography-size-700: 1.375rem; /** Brand book title (22px): dialog and section titles. Shared step is 1.5rem. */
+  --tk-dlite-semantic-typography-size-800: 2rem; /** Brand book stat (32px): big read-outs such as times and counts. Shared step is 1.875rem. */
+  --tk-dlite-semantic-typography-size-900: 2.125rem; /** Brand book page-title (34px): one per screen. Shared step is 2.25rem. */
   --tk-dlite-semantic-typography-size-1000: 3rem;
   --tk-dlite-semantic-typography-size-1100: 3.75rem;
   --tk-dlite-semantic-typography-letter-spacing-tight: -0.32px;
@@ -379,13 +379,14 @@
   --tk-dlite-semantic-breakpoint-lg: 1024px;
   --tk-dlite-semantic-breakpoint-xl: 1280px;
   --tk-dlite-semantic-border-radius-none: 0px;
-  --tk-dlite-semantic-border-radius-sm: 4px;
-  --tk-dlite-semantic-border-radius-md: 8px;
-  --tk-dlite-semantic-border-radius-lg: 0.75rem;
+  --tk-dlite-semantic-border-radius-sm: 8px; /** Brand book radius-sm: flag chips, small icon buttons, route-number tiles. */
+  --tk-dlite-semantic-border-radius-md: 12px; /** Brand book radius-md: buttons, inputs, selects, banners, tabs. */
+  --tk-dlite-semantic-border-radius-lg: 16px; /** Brand book radius-lg: panels and cards. */
   --tk-dlite-semantic-border-radius-full: 9999px;
   --tk-dlite-semantic-border-weight-thin: 1px;
   --tk-dlite-semantic-border-weight-medium: 2px;
   --tk-dlite-semantic-border-weight-thick: 3px;
+  --tk-dlite-semantic-border-radius-xl: 24px; /** Brand book radius-xl: dialogs. The shared scale stops at lg. */
   --tk-dlite-semantic-sizing-icon-sm: 1rem;
   --tk-dlite-semantic-sizing-icon-md: 1.5rem;
   --tk-dlite-semantic-sizing-icon-lg: 2rem;
@@ -394,6 +395,7 @@
   --tk-dlite-semantic-sizing-modal-width-narrow: 20rem;
   --tk-dlite-semantic-sizing-modal-width-normal: 40rem;
   --tk-dlite-semantic-sizing-modal-width-wide: 60rem;
+  --tk-dlite-semantic-sizing-content-width: 1440px; /** Brand book content-width: the app's widest content area. Separate from breakpoint-xl, which stays a breakpoint. */
   --tk-dlite-semantic-motion-duration-instant: 0s;
   --tk-dlite-semantic-motion-duration-micro: 0.08s;
   --tk-dlite-semantic-motion-duration-quick: 0.15s;
@@ -431,7 +433,7 @@
   --tk-dlite-semantic-motion-opacity-disabled: 0.5;
   --tk-dlite-semantic-motion-opacity-backdrop: 0.5;
   --tk-dlite-semantic-motion-opacity-entrance: 0;
-  --tk-dlite-semantic-elevation-low: 0px 2px 4px -1px #0000001a;
+  --tk-dlite-semantic-elevation-low: 0 1px 2px #1c19170f, 0 4px 16px #1c19170f; /** Brand book shadow-card: ink at 6%, two layers, on panels and the step bar. */
   --tk-dlite-semantic-elevation-medium: 0px 4px 8px -2px #00000026;
-  --tk-dlite-semantic-elevation-high: 0px 8px 24px -4px #00000033;
+  --tk-dlite-semantic-elevation-high: 0 18px 50px #1c19172e; /** Brand book shadow-overlay: ink at 18%, on dialogs and toasts. */
 }
