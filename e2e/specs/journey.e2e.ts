@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {existsSync,readFileSync,writeFileSync} from 'node:fs';
 import path from 'node:path';
 import {families,homeFamilies,OUT_OF_AREA,GEOCODER_MISS,UPLOAD_URL,GDOC_URL,csv} from '../support/fixture';
-import {RUN_DIR,SEASON_PATH,PASSPHRASE,shot,click,fill,nav,toast,noError,reasonIfAsked,reasonAsked,dialogText,pageText,importCsv,newestPdf,installMocks,queueOpen,setInput,lookTab} from '../support/app';
+import {RUN_DIR,SEASON_PATH,PASSPHRASE,shot,click,fill,nav,field,choose,toast,noError,reasonIfAsked,reasonAsked,dialogText,pageText,importCsv,newestPdf,installMocks,queueOpen,setInput,lookTab} from '../support/app';
 import {readPdf,pagesWith,type Page} from '../support/pdf';
 // One season, three features, in the order the committee works: sign-ups → routes, routes + sign-ups → letters and labels, → team packets.
 const byName=Object.fromEntries(families.map(f=>[f.name,f]));
@@ -61,5 +61,18 @@ describe('Feature 3: a team packet a Santa team can use',()=>{
  it('runs cover → route sheet → packing manifest → letters → labels, stamped on every page',async()=>{const at=(re:RegExp)=>pages.findIndex(p=>re.test(p.text));const idx=[0,at(/Route 01 · Route sheet/),at(/Packing manifest/),at(/Route 01 · Stop 1a? of/),at(/Route 1 – Stop 1/)];assert.ok(idx.every(i=>i>=0),`a section is missing: ${idx}`);assert.deepEqual([...idx].sort((a,b)=>a-b),idx,'sections out of order');pages.forEach((p,i)=>{assert.ok(p.text.includes('Route 01 · v2'),`page ${i+1} lacks the version stamp`);assert.ok(p.text.includes(`Page ${i+1} of ${pages.length}`));});});
  it('lists every stop’s address, unit and gate code on the route sheet, and loads the truck last-stop-first',async()=>{const sheet=pagesWith(pages,'Route 01 · Route sheet')[0].text;const names=routes[route];for(const n of names){const f=familyOf(n);assert.ok(sheet.includes(n)&&sheet.includes(`#${f.id}`));assert.ok(sheet.includes(`${f.house} ${f.ordinal?f.ordinal+' ':''}${f.street}`),`${n}: street missing on sheet`);if(f.unit)assert.ok(sheet.includes(`Unit ${f.unit}`));if(f.gate)assert.ok(sheet.includes(f.gate));}const manifest=pagesWith(pages,'Packing manifest')[0].text;const order=names.map(n=>manifest.indexOf(`#${familyOf(n).id}`));assert.deepEqual([...order].sort((a,b)=>b-a),order,'manifest is in reverse stop order');});
  it('flags the packet after a late change and reprints only the changed pages',async()=>{assert.match(await (await card()).getText(),/Up to date/);const first=familyOf(routes[route][0]);await nav('Families');await $(`//tr[.//strong[normalize-space()="${first.name}"]]`).click();await dialogText(`${first.name} · #${first.id}`);await fill('Gate code / access notes','New gate code 4455');await click('Save family');assert.ok(await reasonIfAsked('address_fix'),'a change after printing requires a reason');await nav('Print center');assert.match(await (await card()).getText(),/Needs reprint/);const call=await pageText();assert.ok(call.includes('Call these teams')&&call.includes(`#${first.id} ${first.name}: access changed`),'call list names the change');await (await card()).$('.//button[contains(.,"Replacement pages")]').click();await toast(/Replacement pages for Route 01 saved/,60000);const rep=await readPdf(newestPdf());const letters=rep.filter(p=>/Route 01 · Stop \d+[a-z]* of/.test(p.text));assert.equal(letters.length,1,'only the changed family’s letter is reprinted');assert.ok(letters[0].text.includes(`Family Name: ${first.name}`)&&letters[0].text.includes('New gate code 4455'));assert.ok(rep[0].text.includes('replacement pages')||rep.some(p=>p.text.includes('replacement pages')));assert.match(await (await card()).getText(),/Up to date/);await nav('Change log');assert.ok((await pageText()).includes('address fix'));await shot('packet-reprinted');});
+});
+it('keeps street addresses on compact Avery 5160 labels',async()=>{
+ await nav('Print center');
+ await choose(field('Labels'),'5160');
+ assert.ok(await reasonIfAsked('other:Use the compact label sheet'));
+ await click('All routes, one PDF');
+ await toast(/2 route packets saved in one PDF/,60000);
+ const pages=await readPdf(newestPdf());
+ const labels=pages.filter(p=>p.lines.some(l=>/^Route \d+ – Stop \d+[a-z]*$/.test(l.str)));
+ const text=labels.map(p=>p.text).join(' ');
+ assert.match(text,/Address: 200 E Colorado Blvd, Unit 4B/);
+ assert.match(text,/Address: 1200 Mission St/);
+ for(const l of labels.flatMap(p=>p.lines.filter(l=>l.str.startsWith('Address:'))))assert.ok(l.y>30);
 });
 after(async()=>{console.log(`\nE2E evidence: ${RUN_DIR}\n`);});
