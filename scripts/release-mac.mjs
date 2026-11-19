@@ -6,7 +6,7 @@
 //   npm run release:mas -- --upload        ...then altool validate + upload to App Store Connect (TestFlight).
 //
 // Credentials come from the keychain and the environment only (docs/RELEASE.md § Secrets). Values are never printed.
-import {cpSync,existsSync,mkdirSync,mkdtempSync,readdirSync,rmSync,symlinkSync} from 'node:fs';
+import {chmodSync,cpSync,existsSync,mkdirSync,mkdtempSync,readdirSync,rmSync,symlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {basename,join} from 'node:path';
 import {ROOT,TAURI_DIR,TARGET,OUT,fail,run,capture,tauriConf,buildFrontend,gateOrFail,updaterSetup,tauriBuild} from './release-common.mjs';
@@ -84,6 +84,15 @@ tauriBuild({args:['--target','universal-apple-darwin','--bundles','app'],config:
 const bundleDir=join(TARGET,'universal-apple-darwin','release','bundle','macos');
 const app=join(bundleDir,`${product}.app`);
 if(!existsSync(app))fail(`${app} was not produced`);
+
+if(channel==='mas'){
+  // Tauri preserves the input profile's mode. This copy is shipped inside the signed app,
+  // so every tester must be able to read it even if the local signing profile is mode 0600.
+  chmodSync(join(app,'Contents','embedded.provisionprofile'),0o644);
+  const unreadable=capture('find',[app,'(','-type','f','!','-perm','-004','-o','-type','d','!','-perm','-005',')','-print']);
+  if(!unreadable.ok||unreadable.out.trim())fail(`App Store packages must be readable by every user:\n${unreadable.out.trim()}`);
+}
+
 
 // ---------- verify the .app ----------
 
