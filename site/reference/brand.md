@@ -101,7 +101,7 @@ A child's own Letter to Santa is set in **Georgia** on warm paper, so it reads a
 
 - **Plain words from the volunteer's side.** Say *family*, *route*, *stop*, *team*, *team lead*, *North Pole* (the place every route starts and ends), *letter*, *packet*, *sticker*. Never a system word like *geocode cache*, *entity* or *payload*, or a planning-document ID.
 - **Say what happens.** A button names its action: "Plan routes", "Print all 45 routes (one PDF)", "Try saving again". The confirmation uses the same words: "45 routes planned. Longest 3h 41m."
-- **A problem says what's wrong and what to do.** For example: "36 home deliveries have no route: 30 don't fit within the 3h 45m limit, 4 need an address, 2 are out of area. Route them, move them to pickup or cancel them in Route planner before printing every route." No apologies, no "Oops".
+- **A problem says what's wrong and what to do.** For example: "36 home deliveries have no route: 30 don't fit within the 3h 45m limit, 4 need an address, 2 are out of area. Route them or record cancellations before printing every route. Add teams if the routes are full." No apologies, no "Oops".
 - **Count things.** Lead with what's left: "21 to check", "6 letters to look at", "1 needs a reprint".
 - **Sentence case** for buttons, headings and tabs. Uppercase only for small labels.
 - **Real formats:** "4:30 PM", "3h 45m", "Route 07", "#26014" for an Entry ID, "Unit 4B".

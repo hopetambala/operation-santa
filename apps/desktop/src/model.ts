@@ -7,13 +7,15 @@ export type Child = {id:string;name:string;age:string;ageGroup:string;gender:str
 export type Family = {id:string;name:string;phone:string;email:string;street:string;unit:string;city:string;zip:string;access:string;mode:Mode;status:Status;rsvp:Rsvp;flags:string[];proposals:string[];notes:string;sourceNotes:string;rudolph:string;hardship:string;language:'en'|'es';previous:string;heard:string;additional:string;requests:string;created:string;recordId:string;children:Child[];lat:number|null;lon:number|null;geo:'pending'|'review'|'ok'|'manual'|'failed';geoSource:string;geoConfidence:number;suggestion:{lat:number;lon:number;label:string;confidence:number}|null;missing:boolean;raw:Record<string,string>;overrides:string[]};
 export type Route = {number:number;label:string;ids:string[];locked:boolean;team:string;kind:'normal'|'special';pinned:string[];start?:string};
 export type Team = {id:string;name:string;lead:string;phone:string;spanish:boolean;notes:string};
-export type Settings = {year:number;actor:string;depot:string;depotPhone:string;lat:number;lon:number;start:string;end:string;target:number;max:number;fleet:number;fleetMode:'fixed'|'auto';base:number;extra:number;apartment:number;gate:number;toys:number;discount:number;speed:number;circuity:number;parking:number;kidsPerBag:number;serviceCities:string;serviceBuffer:number;labelFormat:'5163'|'5160';labelAddress:boolean;legSize:number;letterLimit:number;airtableBase:string;airtableTable:string;airtableSync:boolean;helperPackets:boolean};
+export type Settings = {year:number;actor:string;depot:string;depotPhone:string;lat:number;lon:number;start:string;end:string;target:number;max:number;fleet:number;fleetMode:'fixed'|'auto';base:number;extra:number;apartment:number;gate:number;toys:number;discount:number;speed:number;circuity:number;parking:number;kidsPerBag:number;serviceZips:string;labelFormat:'5163'|'5160';labelAddress:boolean;legSize:number;letterLimit:number;airtableBase:string;airtableTable:string;airtableSync:boolean;helperPackets:boolean};
 export type Change = {id:string;at:string;actor:string;entity:string;field:string;before:string;after:string;reason:string};
 export type PrintJob = {id:string;route:number;version:number;at:string;snapshot:string};
 export type Batch = {id:string;name:string;hash:string;at:string;added:number;updated:number;missing:number};
 export type GeoHit = {lat:number;lon:number;confidence:number;source:string;label:string};
 export type Season = {schema:1;id:string;name:string;demo:boolean;settings:Settings;families:Family[];routes:Route[];teams:Team[];changes:Change[];prints:PrintJob[];imports:Batch[];frozen:boolean;geocache:Record<string,GeoHit>;packet?:{type:'cleanup';path:string;base:Record<string,{clean:string;state:string}>};purgedAt?:string};
-export const defaults:Settings = {year:2026,actor:'Coordinator',depot:'150 N Madison Ave, Pasadena, CA 91101',depotPhone:'',lat:34.1478,lon:-118.1445,start:'16:30',end:'20:30',target:195,max:225,fleet:8,fleetMode:'fixed',base:7,extra:1.5,apartment:3,gate:2,toys:3,discount:3,speed:18,circuity:1.35,parking:1.5,kidsPerBag:3,serviceCities:'Pasadena, Altadena, South Pasadena, San Marino, Sierra Madre',serviceBuffer:1,labelFormat:'5163',labelAddress:false,legSize:9,letterLimit:1500,airtableBase:'',airtableTable:'',airtableSync:false,helperPackets:false};
+// Pasadena Jaycees’ Operation Santa FAQ, “Where is Santa’s delivery range?”
+const defaultServiceZips = '91001, 91006, 91007, 91011, 91012, 91020, 91021, 91024, 91025, 91030, 91066, 91077, 91101, 91103, 91104, 91105, 91106, 91107, 91108, 91775, 91776, 91778';
+export const defaults:Settings = {year:2026,actor:'Coordinator',depot:'150 N Madison Ave, Pasadena, CA 91101',depotPhone:'',lat:34.1478,lon:-118.1445,start:'16:30',end:'20:30',target:195,max:225,fleet:8,fleetMode:'fixed',base:12,extra:0,apartment:0,gate:0,toys:0,discount:0,speed:18,circuity:1.35,parking:4,kidsPerBag:3,serviceZips:defaultServiceZips,labelFormat:'5163',labelAddress:true,legSize:9,letterLimit:1500,airtableBase:'',airtableTable:'',airtableSync:false,helperPackets:false};
 // Settings ▸ Advanced (Hope, 2026-11-05): features that could be useful but are unproven stay in the app, off by default. With a switch off, its buttons aren't rendered.
 export const features=(s:Season)=>({airtableSync:!!s.settings.airtableSync,helperPackets:!!s.settings.helperPackets});
 export const flagList = ['spanish_speaker','extra_toys','adopt_a_family','do_not_share_with_volunteers','duplicate_address_ok','eaton_impacted','paper_letter','include_out_of_area'];
@@ -24,7 +26,9 @@ export const blankFamily=(id:string):Family=>({id,name:'',phone:'',email:'',stre
 export const blankChild=(id:string):Child=>({id,name:'',age:'',ageGroup:'',gender:'',first:'',second:'',letter:'',clean:'',state:'pending',files:[],cleanedBy:'',cleanedAt:''});
 // Fills fields added after a season file was first written, so older files keep opening.
 export function migrate(s:Season):Season{const legacy=s as Season&{scenarios?:unknown;dispatch?:unknown;sweep?:unknown;contacts?:unknown;outreach?:unknown};for(const k of ['scenarios','dispatch','sweep','contacts','outreach'] as const)delete legacy[k];const base=emptySeason();for(const k of Object.keys(base) as (keyof Season)[])if(s[k]===undefined&&k!=='packet'&&k!=='purgedAt')(s as unknown as Record<string,unknown>)[k]=base[k];// A season saved before the Advanced switches existed, with an Airtable base already set up, was using Sync: keep it on.
-if(s.settings&&s.settings.airtableSync===undefined&&s.settings.airtableBase)s.settings.airtableSync=true;s.settings={...defaults,...s.settings};delete (s.settings as Settings&{labelStart?:number}).labelStart;s.teams=s.teams.map(t=>{const {seats:_,...rest}=t as Team&{seats?:number};return {...rest,notes:t.notes??''}});s.routes=s.routes.map(r=>({...r,pinned:r.pinned||[],kind:r.kind==='normal'?'normal':r.kind?'special':'normal'}));s.families=s.families.map(f=>{const legacy=f as Family&{uploads?:string[]};const next={...blankFamily(f.id),...f};next.children=f.children.map(c=>{const old=c as Child&{uploads?:string[]};const child={...blankChild(c.id),...c};if(old.uploads){child.files=old.uploads.map((u,i)=>attachmentFrom(`${c.id}-legacy${i}`,u,u,''));delete (child as Child&{uploads?:string[]}).uploads}return child});delete legacy.uploads;const st=next.status as string;if(st==='delivered'||st==='missed')next.status=s.routes.some(r=>r.ids.includes(next.id))?'routed':'verified';return next});return s;}
+if(s.settings&&s.settings.airtableSync===undefined&&s.settings.airtableBase)s.settings.airtableSync=true;const {labelStart: _labelStart, serviceCities: _serviceCities, serviceBuffer: _serviceBuffer, ...saved} =
+  (s.settings ?? {}) as Partial<Settings> & {labelStart?:number;serviceCities?:string;serviceBuffer?:number};
+s.settings={...defaults,...saved};s.teams=s.teams.map(t=>{const {seats:_,...rest}=t as Team&{seats?:number};return {...rest,notes:t.notes??''}});s.routes=s.routes.map(r=>({...r,pinned:r.pinned||[],kind:r.kind==='normal'?'normal':r.kind?'special':'normal'}));s.families=s.families.map(f=>{const legacy=f as Family&{uploads?:string[]};const next={...blankFamily(f.id),...f};next.children=f.children.map(c=>{const old=c as Child&{uploads?:string[]};const child={...blankChild(c.id),...c};if(old.uploads){child.files=old.uploads.map((u,i)=>attachmentFrom(`${c.id}-legacy${i}`,u,u,''));delete (child as Child&{uploads?:string[]}).uploads}return child});delete legacy.uploads;const st=next.status as string;if(st==='delivered'||st==='missed')next.status=s.routes.some(r=>r.ids.includes(next.id))?'routed':'verified';return next});return s;}
 // Route swatches. Hex stays for canvas and PDF fills, which cannot resolve a CSS variable.
 // Screens use routeColor(), which points at --tk-dlite-semantic-color-route-N. model.test.ts locks the two together.
 export const colors=['#1f6b5c','#a64f1d','#3a5aa0','#8f3f6e','#6b6118','#24697a','#6a4a99','#a23a33','#4a6b25','#4d5a66'];
@@ -36,7 +40,10 @@ export function kindOf(name:string,url:string):Attachment['kind']{const n=`${nam
 export function addressLines(f:Pick<Family,'street'|'unit'|'city'|'zip'>){const unit=clean(f.unit);return [clean(f.street).replace(/\s+/g,' '),unit&&(/^(apt|unit|ste|suite|#|spc|space|bldg)/i.test(unit)?unit:`Unit ${unit}`),[clean(f.city),clean(f.zip)].filter(Boolean).join(' ')].filter(Boolean);}
 export const address=(f:Pick<Family,'street'|'unit'|'city'|'zip'>)=>addressLines(f).join(', ');
 export const navAddress=(f:Pick<Family,'street'|'city'|'zip'>)=>[clean(f.street),clean(f.city),clean(f.zip)].filter(Boolean).join(', ');
-export const building=(f:Pick<Family,'street'|'city'|'zip'>)=>`${f.street} ${f.city.split(',')[0]} ${f.zip}`.toLowerCase().replace(/\b(avenue|ave|street|st|boulevard|blvd|drive|dr|road|rd|place|pl|court|ct|lane|ln)\b/g,m=>m.slice(0,2)).replace(/[^a-z0-9]/g,'');
+export function zip5(zip:string) {
+  return /^(\d{5})(?:-\d{4})?$/.exec(String(zip??'').trim())?.[1];
+}
+export const building=(f:Pick<Family,'street'|'city'|'zip'>)=>`${f.street} ${f.city.split(',')[0]} ${zip5(f.zip) ?? f.zip}`.toLowerCase().replace(/\b(avenue|ave|street|st|boulevard|blvd|drive|dr|road|rd|place|pl|court|ct|lane|ln)\b/g,m=>m.slice(0,2)).replace(/[^a-z0-9]/g,'');
 export const phoneDisplay=(p:string)=>{const d=p.replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'');return d.length===10?`(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`:clean(p);};
 export const letterOf=(c:Child)=>c.state==='approved'?c.clean:c.letter;
 export const bags=(f:Family,s:Settings)=>Math.max(1,Math.ceil(f.children.length/Math.max(1,s.kidsPerBag)));
@@ -47,7 +54,10 @@ export const family=(s:Season,id:string)=>byId(s).get(id);
 export const routeOf=(s:Season,id:string)=>s.routes.find(r=>r.ids.includes(id));
 export const eligible=(f:Family)=>f.mode==='home'&&f.status!=='cancelled';
 export function distance(a:{lat:number;lon:number},b:{lat:number;lon:number}){const rad=Math.PI/180;const x=Math.sin((b.lat-a.lat)*rad/2)**2+Math.cos(a.lat*rad)*Math.cos(b.lat*rad)*Math.sin((b.lon-a.lon)*rad/2)**2;return 3958.8*2*Math.atan2(Math.sqrt(x),Math.sqrt(Math.max(0,1-x)));}
-export function leg(a:{lat:number;lon:number},b:{lat:number;lon:number},s:Settings){const miles=distance(a,b)*s.circuity;return {miles,min:miles/s.speed*60+s.parking};}
+export function leg(a:{lat:number;lon:number},b:{lat:number;lon:number},s:Settings,park=true){
+  const miles=distance(a,b)*s.circuity;
+  return {miles,min:miles/s.speed*60+(park?s.parking:0)};
+}
 // D2: the planned minutes per family at the door, averaged over home deliveries, so the committee can compare it with 2025's flat 10.
 export function averageStop(s:Season){const homes=s.families.filter(eligible);return homes.length?homes.reduce((a,f)=>a+service(f,s.settings),0)/homes.length:0;}
 export function service(f:Family,s:Settings,repeat=false){return Math.max(5,Math.min(25,s.base+s.extra*Math.max(0,f.children.length-1)+(f.unit?s.apartment:0)+(f.access?s.gate:0)+(f.flags.includes('extra_toys')?s.toys:0)-(repeat?s.discount:0)));}
@@ -55,24 +65,81 @@ export const mins=(t:string)=>{const [h,m]=t.split(':').map(Number);return h*60+
 export const clock=(m:number)=>new Date(2026,11,24,0,Math.round(m)).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
 export const duration=(n:number)=>`${Math.floor(n/60)}h ${Math.round(n%60)}m`;
 export const startOf=(r:Route,s:Season)=>r.start||s.settings.start;
-export function routeStats(r:Route,season:Season){const st=season.settings;let prev={lat:st.lat,lon:st.lon},drive=0,work=0,miles=0,longLeg=0;let previousBuilding='';const seen=new Set<string>();const start=mins(startOf(r,season));const stops=r.ids.map(id=>family(season,id)).filter((f):f is Family=>!!f).map(f=>{const p={lat:f.lat??prev.lat,lon:f.lon??prev.lon};const b=building(f);const same=seen.has(b);const l=previousBuilding===b?{min:.5,miles:0}:leg(prev,p,st);drive+=l.min;miles+=l.miles;longLeg=Math.max(longLeg,l.miles);const eta=start+drive+work;const svc=service(f,st,same);work+=svc;seen.add(b);previousBuilding=b;prev=p;return {f,eta,svc,legMiles:l.miles}});if(stops.length){const back=leg(prev,st,st);drive+=back.min;miles+=back.miles;}return {stops,places:seen.size,drive,work,miles,longLeg,total:drive+work,finish:start+drive+work,kids:stops.reduce((a,x)=>a+x.f.children.length,0),bags:stops.reduce((a,x)=>a+bags(x.f,st),0)};}
+function stopSuffix(index:number):string {
+  let suffix = '';
+  for (let n = index + 1; n > 0; n = Math.floor((n - 1) / 26)) {
+    suffix = String.fromCharCode(97 + (n - 1) % 26) + suffix;
+  }
+  return suffix;
+}
+
+export function routeStats(r:Route,season:Season) {
+  const st = season.settings;
+  const families = r.ids.map(id => family(season,id)).filter((f):f is Family => !!f);
+  const buildings = new Map<string,{number:number;count:number;visited:number}>();
+  for (const f of families) {
+    const key = building(f);
+    const stop = buildings.get(key);
+    if (stop) stop.count++;
+    else buildings.set(key,{number:buildings.size+1,count:1,visited:0});
+  }
+
+  let prev = {lat:st.lat,lon:st.lon};
+  let previousBuilding = '';
+  let drive = 0, work = 0, miles = 0, longLeg = 0;
+  const start = mins(startOf(r,season));
+  const stops = families.map(f => {
+    const key = building(f);
+    const stop = buildings.get(key)!;
+    const points = {lat:f.lat ?? prev.lat,lon:f.lon ?? prev.lon};
+    const trip = previousBuilding===key ? {min:.5,miles:0} : leg(prev,points,st);
+    drive += trip.min;
+    miles += trip.miles;
+    longLeg = Math.max(longLeg,trip.miles);
+    const eta = start+drive+work;
+    const firstAtBuilding = stop.visited===0;
+    const svc = service(f,st,!firstAtBuilding);
+    const stopLabel = String(stop.number)+(stop.count>1 ? stopSuffix(stop.visited) : '');
+    stop.visited++;
+    work += svc;
+    previousBuilding = key;
+    prev = points;
+    return {f,eta,svc,legMiles:trip.miles,stopLabel,firstAtBuilding};
+  });
+  if (stops.length) {
+    const back = leg(prev,st,st,false);
+    drive += back.min;
+    miles += back.miles;
+  }
+  return {
+    stops,places:buildings.size,drive,work,miles,longLeg,total:drive+work,finish:start+drive+work,
+    kids:families.reduce((n,f)=>n+f.children.length,0),
+    bags:families.reduce((n,f)=>n+bags(f,st),0),
+  };
+}
 // Only the fields that appear on paper. A change to any of them makes the route's packet stale.
 export function printed(f:Family){return {id:f.id,name:f.name,phone:f.phone,address:addressLines(f),access:f.access,flags:f.flags,rudolph:f.rudolph,hardship:f.hardship,additional:f.additional,requests:f.requests,held:held(f),children:f.children.map(c=>({name:c.name,age:c.age,gender:c.gender,first:c.first,second:c.second,held:c.state==='do_not_print',text:letterOf(c),renders:c.files.flatMap(a=>a.renders)}))};}
 // Every setting that reaches a packet: the stop and travel times behind each ETA, the North Pole on the cover and map, the phone links and the labels. A change to one makes every printed route stale and, after printing, asks for a reason.
 export const paperSettings:(keyof Settings)[]=['base','extra','apartment','gate','toys','discount','speed','circuity','parking','depot','depotPhone','lat','lon','legSize','labelFormat','labelAddress','kidsPerBag'];
-export function snapshot(r:Route,s:Season){const t=s.teams.find(t=>t.id===r.team);return JSON.stringify({route:{number:r.number,label:r.label,ids:r.ids,start:startOf(r,s)},team:t?{name:t.name,lead:t.lead,phone:t.phone}:null,settings:Object.fromEntries(paperSettings.map(k=>[k,s.settings[k]])),families:r.ids.map(id=>family(s,id)).filter((f):f is Family=>!!f).map(printed)});}
+function printedStops(r:Route,s:Season) {
+  const {stops,places}=routeStats(r,s);
+  return stops.map(({f,stopLabel})=>({...printed(f),stop:`${stopLabel} of ${places}`}));
+}
+export function snapshot(r:Route,s:Season){const t=s.teams.find(t=>t.id===r.team);return JSON.stringify({route:{number:r.number,label:r.label,ids:r.ids,start:startOf(r,s)},team:t?{name:t.name,lead:t.lead,phone:t.phone}:null,settings:Object.fromEntries(paperSettings.map(k=>[k,s.settings[k]])),families:printedStops(r,s)});}
 export function printState(r:Route,s:Season){const jobs=s.prints.filter(p=>p.route===r.number);const last=jobs.at(-1);return !last?'Not printed':last.snapshot===snapshot(r,s)?'Up to date':'Needs reprint';}
 export type Diff = {added:string[];removed:string[];moved:string[];changed:{id:string;fields:string[]}[];team:boolean;route:boolean};
-export function diffSincePrint(r:Route,s:Season):Diff|null{const last=s.prints.filter(p=>p.route===r.number).at(-1);if(!last)return null;let old:{route:{ids:string[]};team:unknown;families:ReturnType<typeof printed>[]};try{old=JSON.parse(last.snapshot)}catch{return null}if(!old.route)return {added:r.ids,removed:[],moved:[],changed:[],team:true,route:true};const now=JSON.parse(snapshot(r,s));const before=old.route.ids,after=r.ids;const added=after.filter(id=>!before.includes(id)),removed=before.filter(id=>!after.includes(id));const kept=after.filter(id=>before.includes(id));const oldOrder=before.filter(id=>kept.includes(id));const moved=kept.filter((id,i)=>oldOrder[i]!==id);const changed=now.families.filter((f:ReturnType<typeof printed>)=>before.includes(f.id)).map((f:ReturnType<typeof printed>)=>{const o=old.families.find(x=>x.id===f.id);const fields=o?(Object.keys(f) as (keyof typeof f)[]).filter(k=>JSON.stringify(f[k])!==JSON.stringify(o[k])):['all'];return {id:f.id,fields}}).filter((x:{fields:string[]})=>x.fields.length);return {added,removed,moved,changed,team:JSON.stringify(now.team)!==JSON.stringify(old.team),route:JSON.stringify(now.route)!==JSON.stringify(old.route)};}
+export function diffSincePrint(r:Route,s:Season):Diff|null{const last=s.prints.filter(p=>p.route===r.number).at(-1);if(!last)return null;let old:{route:{ids:string[]};team:unknown;families:ReturnType<typeof printedStops>};try{old=JSON.parse(last.snapshot)}catch{return null}if(!old.route)return {added:r.ids,removed:[],moved:[],changed:[],team:true,route:true};const now=JSON.parse(snapshot(r,s));const before=old.route.ids,after=r.ids;const added=after.filter(id=>!before.includes(id)),removed=before.filter(id=>!after.includes(id));const kept=after.filter(id=>before.includes(id));const oldOrder=before.filter(id=>kept.includes(id));const moved=kept.filter((id,i)=>oldOrder[i]!==id);const changed=now.families.filter((f:ReturnType<typeof printedStops>[number])=>before.includes(f.id)).map((f:ReturnType<typeof printedStops>[number])=>{const o=old.families.find(x=>x.id===f.id);const fields=o?(Object.keys(f) as (keyof typeof f)[]).filter(k=>JSON.stringify(f[k])!==JSON.stringify(o[k])):['all'];return {id:f.id,fields}}).filter((x:{fields:string[]})=>x.fields.length);return {added,removed,moved,changed,team:JSON.stringify(now.team)!==JSON.stringify(old.team),route:JSON.stringify(now.route)!==JSON.stringify(old.route)};}
 const contact=/(\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4})|([\w.+-]+@[\w-]+\.[\w.]+)|(https?:\/\/|www\.)/i;
 export function letterChecks(c:Child,limit:number){const t=letterOf(c);const out:string[]=[];if(contact.test(t))out.push('contains a phone number, email, or link');if(t.length>limit)out.push(`is over ${limit} characters`);if(!t.trim()&&!c.files.length)out.push('is empty');return out;}
 // Phase 3 (Hope, 2026-11-05): letters are cleaned outside the app, so the import is trusted. A letter needs a look only when it has a warning, an upload that failed or can't be shown, or someone flagged it, and until someone says it looks good. Every other letter prints as imported.
 export function needsLook(c:Child,limit:number){if(c.state==='approved'||c.state==='do_not_print')return false;return c.state==='flagged'||letterChecks(c,limit).length>0||c.files.some(a=>a.state==='failed'||a.state==='unsupported');}
-export function familyChecks(f:Family,s:Season){const errors:string[]=[],warnings:string[]=[];if(f.status==='cancelled')errors.push(`#${f.id}: cancelled family is still routed.`);if(f.mode==='pickup')errors.push(`#${f.id}: pickup family is still routed.`);if(!['ok','manual'].includes(f.geo)||f.lat===null||f.lon===null)errors.push(`#${f.id}: review the address.`);if([f.name,...addressLines(f),f.access].some(x=>placeholder.test(x)))errors.push(`#${f.id}: placeholder text in the address or name.`);if(f.status!=='verified'&&f.status!=='routed')warnings.push(`#${f.id}: family is not verified.`);if(f.missing)warnings.push(`#${f.id}: missing from the latest import.`);if(f.children.length>6)warnings.push(`#${f.id}: ${f.children.length} children (check bag count).`);if(held(f))return {errors,warnings};f.children.forEach((c,i)=>{const who=`child ${i+1}`;if(c.state==='do_not_print')return;if(needsLook(c,s.settings.letterLimit))errors.push(`#${f.id}: ${who}'s letter needs a look.`);if(!letterOf(c).trim()&&!c.files.length)errors.push(`#${f.id}: ${who}'s letter is empty and has no upload.`);for(const a of c.files){if(a.state==='pending'||a.state==='downloaded')errors.push(`#${f.id}: ${who}'s upload is still downloading.`);if(a.state==='failed')errors.push(`#${f.id}: ${who}'s upload failed to download (${a.error||'retry or skip it in Letter cleanup'}).`);}if(contact.test(letterOf(c)))warnings.push(`#${f.id}: ${who}'s letter contains a phone number, email, or link.`);});const chars=f.children.reduce((n,c)=>n+letterOf(c).length,0),images=f.children.reduce((n,c)=>n+c.files.reduce((m,a)=>m+a.renders.length,0),0);if(1+chars/2600+images/2>3)warnings.push(`#${f.id}: letters likely run past 3 pages.`);return {errors,warnings};}
+export function familyChecks(f:Family,s:Season){const errors:string[]=[],warnings:string[]=[];if(f.status==='cancelled')errors.push(`#${f.id}: cancelled family is still routed.`);if(f.mode==='pickup')errors.push(`#${f.id}: pickup family is still routed.`);if(!zip5(f.zip))errors.push(`#${f.id}: add a valid ZIP code to the address.`);
+else if(!addressReady(f))errors.push(`#${f.id}: review the address.`);if([f.name,...addressLines(f),f.access].some(x=>placeholder.test(x)))errors.push(`#${f.id}: placeholder text in the address or name.`);if(f.status!=='verified'&&f.status!=='routed')warnings.push(`#${f.id}: family is not verified.`);if(f.missing)warnings.push(`#${f.id}: missing from the latest import.`);if(f.children.length>6)warnings.push(`#${f.id}: ${f.children.length} children (check bag count).`);if(held(f))return {errors,warnings};f.children.forEach((c,i)=>{const who=`child ${i+1}`;if(c.state==='do_not_print')return;if(needsLook(c,s.settings.letterLimit))errors.push(`#${f.id}: ${who}'s letter needs a look.`);if(!letterOf(c).trim()&&!c.files.length)errors.push(`#${f.id}: ${who}'s letter is empty and has no upload.`);for(const a of c.files){if(a.state==='pending'||a.state==='downloaded')errors.push(`#${f.id}: ${who}'s upload is still downloading.`);if(a.state==='failed')errors.push(`#${f.id}: ${who}'s upload failed to download (${a.error||'retry or skip it in Letter cleanup'}).`);}if(contact.test(letterOf(c)))warnings.push(`#${f.id}: ${who}'s letter contains a phone number, email, or link.`);});const chars=f.children.reduce((n,c)=>n+letterOf(c).length,0),images=f.children.reduce((n,c)=>n+c.files.reduce((m,a)=>m+a.renders.length,0),0);if(1+chars/2600+images/2>3)warnings.push(`#${f.id}: letters likely run past 3 pages.`);return {errors,warnings};}
 export type RouteCheck={errors:string[];warnings:string[]};
 // Built once per checkRoutes call. The old per-stop scan walked every other route's families and re-ran building() each time: 255ms to check all routes of a 740-family / 50-route season, and Print center paid that again on every local re-render (257ms).
 function buildingOwners(s:Season){const owners=new Map<string,Set<number>>();for(const r of s.routes)for(const id of r.ids){const f=family(s,id);if(!f)continue;const b=building(f);let set=owners.get(b);if(!set){set=new Set();owners.set(b,set);}set.add(r.number);}return owners;}
-function checksWith(r:Route,s:Season,owners:Map<string,Set<number>>):RouteCheck{const errors:string[]=[],warnings:string[]=[];const st=s.settings;const stats=routeStats(r,s);const team=s.teams.find(t=>t.id===r.team);if(!team)errors.push('Assign a team.');if(!r.ids.length)errors.push('Route has no stops.');if(stats.total>st.max||stats.finish>mins(st.end)-15)errors.push('Route exceeds the delivery limit.');else if(stats.total>st.target)warnings.push(`Route runs ${Math.round(stats.total-st.target)} min over the target.`);if(r.kind==='normal'&&r.ids.length&&r.ids.length<6)warnings.push('Fewer than 6 stops: candidate to merge.');if(stats.longLeg>3)warnings.push(`A ${stats.longLeg.toFixed(1)} mi leg: likely outlier.`);for(const {f} of stats.stops){const c=familyChecks(f,s);errors.push(...c.errors);warnings.push(...c.warnings);if(f.flags.includes('spanish_speaker')&&team&&!team.spanish)warnings.push(`#${f.id}: Spanish-speaking family on a team without a Spanish speaker.`);const who=owners.get(building(f));if(who&&who.size>1)errors.push(`#${f.id}: building is split across routes.`);}return {errors:[...new Set(errors)],warnings:[...new Set(warnings)]};}
+function checksWith(r:Route,s:Season,owners:Map<string,Set<number>>):RouteCheck{const errors:string[]=[],warnings:string[]=[];const st=s.settings;const stats=routeStats(r,s);const team=s.teams.find(t=>t.id===r.team);if(!team)errors.push('Assign a team.');if(!r.ids.length)errors.push('Route has no stops.');
+if(stats.stops.some(({f,firstAtBuilding},i)=>!firstAtBuilding&&building(f)!==building(stats.stops[i-1].f)))errors.push('Re-sequence the route to keep families at the same building together.');if(stats.total>st.max||stats.finish>mins(st.end)-15)errors.push('Route exceeds the delivery limit.');else if(stats.total>st.target)warnings.push(`Route runs ${Math.round(stats.total-st.target)} min over the target.`);if(r.kind==='normal'&&r.ids.length&&r.ids.length<6)warnings.push('Fewer than 6 stops: candidate to merge.');if(stats.longLeg>3)warnings.push(`A ${stats.longLeg.toFixed(1)} mi leg: likely outlier.`);for(const {f} of stats.stops){const c=familyChecks(f,s);errors.push(...c.errors);warnings.push(...c.warnings);if(r.kind==='normal'&&f.mode==='home'&&outOfArea(f,st))errors.push(`#${f.id}: outside the service area. Review the ZIP or move the family to a special route.`);if(f.flags.includes('spanish_speaker')&&team&&!team.spanish)warnings.push(`#${f.id}: Spanish-speaking family on a team without a Spanish speaker.`);const who=owners.get(building(f));if(who&&who.size>1)errors.push(`#${f.id}: building is split across routes.`);}return {errors:[...new Set(errors)],warnings:[...new Set(warnings)]};}
 export function checkRoutes(s:Season,routes:Route[]){const owners=buildingOwners(s);const out=new Map<number,RouteCheck>();for(const r of routes)out.set(r.number,checksWith(r,s,owners));return out;}
 export function checks(r:Route,s:Season){return checksWith(r,s,buildingOwners(s));}
 export const issues=(r:Route,s:Season)=>checks(r,s).errors;
@@ -86,13 +153,18 @@ export const routesOf=(s:Season,ids:Iterable<string>)=>[...new Set([...ids].map(
 // Settings reach paper through the packet snapshot (start time, depot, children per bag, street address on labels): only routes whose snapshot changes are touched.
 export function settingsRoutes(s:Season,next:Settings){const after={...s,settings:next};return s.routes.filter(r=>snapshot(r,s)!==snapshot(r,after)).map(r=>r.number);}
 export const reasonRequired='This route has been printed, so a reason is required.';
-// Service area: known city centers with a rough radius, plus the configurable buffer (miles).
-export const cityCenters:Record<string,{lat:number;lon:number;r:number}>={pasadena:{lat:34.1478,lon:-118.1445,r:4.2},altadena:{lat:34.1897,lon:-118.1312,r:2.6},'south pasadena':{lat:34.1161,lon:-118.1503,r:1.6},'san marino':{lat:34.1214,lon:-118.1064,r:1.8},'sierra madre':{lat:34.1617,lon:-118.0528,r:1.6}};
-// Known cities are checked by distance from their center; a city added in Settings without a known center counts by the family's city name.
-export function inArea(f:Family,st:Settings):boolean|null{const cities=st.serviceCities.split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);const own=f.city.split(',')[0].trim().toLowerCase();if(f.lat===null||f.lon===null)return own?cities.includes(own):null;return cities.some(c=>{const ctr=cityCenters[c];return ctr?distance(f as {lat:number;lon:number},ctr)<=ctr.r+st.serviceBuffer:own===c});}
+export function serviceZipCodes(st:Settings) {
+  return st.serviceZips.trim().split(/[,\s]+/).filter(Boolean);
+}
+export function inArea(f:Pick<Family,'zip'>,st:Settings):boolean|null {
+  const zip = zip5(f.zip);
+  return zip ? serviceZipCodes(st).includes(zip) : null;
+}
+export const addressReady = (f:Family) =>
+  (f.geo==='ok'||f.geo==='manual') && f.lat!==null && f.lon!==null && zip5(f.zip)!==undefined;
 export const outOfArea=(f:Family,st:Settings)=>inArea(f,st)===false&&!f.flags.includes('include_out_of_area');
 // LR-4: every eligible home family that is on no route, sorted into exactly one reason.
-export function unrouted(s:Season){const on=new Set(s.routes.flatMap(r=>r.ids));const all=s.families.filter(f=>eligible(f)&&!on.has(f.id));const outOfArea_:Family[]=[],needsAddress:Family[]=[],noRoom:Family[]=[];for(const f of all){if(outOfArea(f,s.settings))outOfArea_.push(f);else if(!['ok','manual'].includes(f.geo)||f.lat===null||f.lon===null)needsAddress.push(f);else noRoom.push(f);}return {all,noRoom,needsAddress,outOfArea:outOfArea_};}
+export function unrouted(s:Season){const on=new Set(s.routes.flatMap(r=>r.ids));const all=s.families.filter(f=>eligible(f)&&!on.has(f.id));const outOfArea_:Family[]=[],needsAddress:Family[]=[],noRoom:Family[]=[];for(const f of all){if(outOfArea(f,s.settings))outOfArea_.push(f);else if(!addressReady(f))needsAddress.push(f);else noRoom.push(f);}return {all,noRoom,needsAddress,outOfArea:outOfArea_};}
 export function duplicates(s:Season){const groups=new Map<string,Family[]>();for(const f of s.families){if(f.status==='cancelled'||!f.street)continue;const k=`${building(f)}|${f.unit.toLowerCase().replace(/[^a-z0-9]/g,'').replace(/^(apt|unit|ste)/,'')}`;groups.set(k,[...(groups.get(k)||[]),f]);}return [...groups.values()].filter(g=>g.length>1&&!g.every(f=>f.flags.includes('duplicate_address_ok')));}
 export function nextManualId(s:Season){let n=90001;const ids=new Set(s.families.map(f=>f.id));while(ids.has(String(n)))n++;return String(n);}
 export function moveGroup(s:Season,id:string,to:number,reason:string){const f=family(s,id);if(!f)throw Error('Family not found.');const from=routeOf(s,id);const target=s.routes.find(r=>r.number===to);if(!target)throw Error('Choose a route.');if(from===target)return;if(from?.locked||target.locked)throw Error('Unlock both routes before moving stops.');const ids=from?from.ids.filter(x=>{const o=family(s,x);return o&&building(o)===building(f)}):[id];if(from&&ids.some(x=>from.pinned.includes(x)))throw Error('Unpin this building before moving it.');if(needsReason(s,[from?.number??-1,to])&&!reason.trim())throw Error(reasonRequired);if(from)from.ids=from.ids.filter(x=>!ids.includes(x));target.ids.push(...ids);audit(s,ids.join(', '),'route',from?`Route ${from.number}`:'Unrouted',`Route ${to}`,reason);}

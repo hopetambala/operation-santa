@@ -44,11 +44,7 @@ The number of teams and "Fleet" are set in the [Route planner]({{ '/routing/rout
 
 | Setting | Default | What it does |
 |---|---|---|
-| Cities served | Pasadena, Altadena, South Pasadena, San Marino, Sierra Madre | Families outside these cities appear on Address review ▸ **Out of area**. The five default cities are checked by distance; a city you add is matched by the city name on the sign-up. |
-| Buffer beyond city limits (miles) | 1 | How far past each city's edge still counts as inside. |
-
-{: .note }
-The app knows the shape of these five cities only. Adding another city's name to the list doesn't widen the area for families already on the map.
+| ZIP codes served | The 22 ZIP codes in the [Operation Santa FAQ](https://pasadenajaycees.org/operation-santa/) | Enter five-digit ZIP codes separated by commas. A home delivery outside the list appears in Address review ▸ **Out of area**. A missing or incomplete ZIP stays in **Addresses**. |
 
 ## Printing
 
