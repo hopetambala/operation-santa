@@ -13,7 +13,7 @@ description: "Every change to the season: who, when, what and why."
 {: .why }
 In 2025, changes made after printing were tracked in a spreadsheet with no reasons, so nobody could later say why a family had been dropped or moved. The app records every change as it happens.
 
-The **Change log** page lists every recorded change, newest first: "Every change has a story".
+The **Change log** page lists every recorded change, newest first.
 
 | Column | Shows |
 |---|---|
@@ -21,7 +21,7 @@ The **Change log** page lists every recorded change, newest first: "Every change
 | WHO | The display name of whoever made it (Settings ▸ "Your display name"). |
 | RECORD | The Entry ID, route, team, "Settings" or "Season" that changed. |
 | CHANGE | What changed. Click it to see before and after. |
-| REASON | The reason given after the freeze or printing, or "Before printing" if none was needed. |
+| REASON | The reason given for a change to a printed route, or "Before printing" if none was needed. |
 
 What's recorded: imports and syncs, family edits and merges, address pins, flag decisions, letter reviews, merged cleanup packets, route moves, locks, pins, rebalances, special routes, team changes, freezing, and settings.
 

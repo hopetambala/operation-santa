@@ -19,12 +19,7 @@ MyRouteOnline is how the committee routed in 2025, and it stays the backup plan 
 
 ## Export the address list
 
-Either:
-
-- **Print center** ▸ "Other printouts and exports" ▸ **MyRouteOnline CSV**, or
-- **Families** ▸ **Fallback CSV**.
-
-Both save the same file, `MyRouteOnline.csv`, with three columns:
+Go to **Print center** ▸ "Other printouts and exports" and click **MyRouteOnline CSV**. It saves `MyRouteOnline.csv`, with three columns:
 
 | Title | Address | Service Time |
 |---|---|---|

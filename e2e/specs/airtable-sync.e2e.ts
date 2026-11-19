@@ -1,14 +1,14 @@
 import {$} from '@wdio/globals';
 import assert from 'node:assert/strict';
 import {families,AIRTABLE,airtablePages,airtableRecordLookups} from '../support/fixture';
-import {click,fill,nav,toast,noError,dialogText,pageText,installMocks,setE2e,reasonIfAsked,shot} from '../support/app';
+import {click,fill,nav,toast,noError,dialogText,pageText,installMocks,setE2e,reasonIfAsked,shot,turnOn} from '../support/app';
 import {createSeason} from '../support/season';
 // R-IMP-6/7 and R-IMP-3: pull sign-ups straight from Airtable, refresh an expired drawing link, and re-sync without losing in-app edits.
 let mocks:Awaited<ReturnType<typeof installMocks>>;
 const paths=async()=>{await mocks.airtable.update();return mocks.airtable.mock.calls.map(c=>(c[0] as {path:string}).path);};
 const fetched=async()=>{await mocks.fetch.update();return mocks.fetch.mock.calls.map(c=>(c[0] as {url:string}).url);};
 describe('Airtable sync: the same profile and merge, straight from the API',()=>{
- before(async()=>{await $('h1').waitForDisplayed({timeout:60000});mocks=await installMocks();await setE2e({airtable:{pages:airtablePages(),records:airtableRecordLookups()},expiredUrls:[AIRTABLE.expiredUrl],freshUrls:[AIRTABLE.freshUrl]});await createSeason();
+ before(async()=>{await $('h1').waitForDisplayed({timeout:60000});mocks=await installMocks();await setE2e({airtable:{pages:airtablePages(),records:airtableRecordLookups()},expiredUrls:[AIRTABLE.expiredUrl],freshUrls:[AIRTABLE.freshUrl]});await createSeason();await turnOn('Airtable Sync');
   // Opening a season starts a quiet download pass 500 ms later (main.tsx `loaded`). On a fast runner this spec reached
   // "Accept import" inside that half second, so both passes fetched the drawing and the count below doubled. A person
   // can't import that fast; let the post-open pass run first.

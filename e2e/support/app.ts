@@ -11,7 +11,7 @@ export const PASSPHRASE='e2e synthetic passphrase';
 let shots=0;
 export const shot=(name:string)=>browser.saveScreenshot(path.join(RUN_DIR,`${String(++shots).padStart(2,'0')}-${name}.png`));
 export const field=(label:string)=>$(`//label[contains(@class,"field")][span[normalize-space()="${label}"]]//*[self::input or self::textarea or self::select]`);
-// Exact visible text: a partial match would let "Approve" hit the "Approved" filter tab.
+// Exact visible text: a partial match would let one button's name hit a longer one that contains it.
 export const button=(text:string)=>$(`//button[normalize-space(.)="${text}"]`);
 export const enabledButton=async(text:string)=>{const b=await button(text);await b.waitForEnabled({timeout:15000});return b;};
 // WebDriver's elementClick scrolls the target into view itself; an explicit scrollIntoView runs as an async script,
@@ -27,7 +27,8 @@ export async function fill(label:string,value:string){const f=await field(label)
 export async function nav(page:string){await navTab(page).click();await browser.waitUntil(async()=>(await $('h1').getText()).replace(/\s+/g,' ')===page,{timeoutMsg:`${page} did not open`});}
 export async function toast(match:RegExp,timeout=30000){let last='';await browser.waitUntil(async()=>{const t=await $('.toast');last=await t.isExisting()?await t.getText():'';return match.test(last)},{timeout,timeoutMsg:`No toast matching ${match}; last toast: "${last}"`}).catch(async e=>{const err=await $('.error-banner');const banner=await err.isExisting()?await err.getText():'none';await shot('toast-timeout');throw Error(`${e.message}\nError banner: ${banner}\nPage: ${(await pageText()).slice(0,700)}`)});const close=await $('.toast button[aria-label="Dismiss"]');if(await close.isExisting())await close.click();return last;}
 export async function noError(){const e=await $('.error-banner');if(await e.isExisting())throw Error(`App error banner: ${await e.getText()}`);}
-// After freezing or printing, the app asks for a reason code (R-CHG-2). Answer it when it appears.
+// Once a change touches a printed route, the app asks for a reason code (R-CHG-2). Answer it when it appears.
+export const reasonAsked=async()=>(await dialog('Leave a note for the next person')).isExisting();
 // `other:<text>` picks Other, checks it can't be recorded without a description, then writes one.
 export async function reasonIfAsked(code:string){const m=await dialog('Leave a note for the next person');if(!(await m.isExisting()))return false;const [reason,text]=code.split(/:(.*)/s);await choose(await m.$('select'),reason);if(reason==='other'){if(await (await button('Record & continue')).isEnabled())throw Error('"other" was accepted without a description');await setInput(field('Describe the change'),text||'');}await click('Record & continue');await m.waitForExist({reverse:true});return true;}
 // WebKit's embedded driver selects options without firing `change`, which React listens for; do what a user's pick does.
@@ -57,3 +58,7 @@ export async function installMocks(){const census=Object.fromEntries(families.fi
  return {save,open,census:census_,nominatim:nom,fetch:fetch_,secretSet,secretGet,airtable};}
 export const queueOpen=(p:string)=>browser.execute((file:string)=>{(window as unknown as {__e2e:{openQueue:string[]}}).__e2e.openQueue.push(file)},p);
 export const setE2e=(patch:Record<string,unknown>)=>browser.execute((p:Record<string,unknown>)=>{Object.assign((window as unknown as {__e2e:Record<string,unknown>}).__e2e,p)},patch);
+// Settings ▸ Advanced: unproven features are off by default (Hope, 2026-11-05). Specs that cover them turn their switch on first.
+export async function turnOn(label:'Airtable Sync'|'Send letters to helpers'){await nav('Settings');const box=await $(`//label[contains(@class,"checkbox") and normalize-space()="${label}"]/input`);if(!(await box.isSelected()))await box.click();await browser.waitUntil(()=>box.isSelected(),{timeoutMsg:`${label} did not switch on`});await click('Save settings');await toast(/Settings saved/);}
+// Letter cleanup's first tab is named for its count ("3 to look at"); it holds only the letters the app flags (phase 3).
+export async function lookTab(count?:number){const tab=await $(count===undefined?'//button[@role="tab" and contains(.,"to look at")]':`//button[@role="tab" and normalize-space()="${count} to look at"]`);await tab.waitForExist({timeout:30000,timeoutMsg:`no "${count??'N'} to look at" tab`});await tab.click();}

@@ -19,6 +19,9 @@ In 2025 several people cleaned letters at once by splitting a Word file by Entry
 
 A packet contains each family's name, route and children's letters, wishes and drawings. It doesn't contain addresses, phone numbers or emails.
 
+{: .note }
+Sending letters to helpers is off by default. To turn it on, go to **Settings** ▸ **Advanced**, tick **Send letters to helpers**, and click **Save settings**. Until then, **Cleanup packet** and **Import returned packet** don't appear on Letter cleanup. Letter cleaners don't need the switch: they open a packet from the avatar menu.
+
 ## For the coordinator: send a packet
 
 1. Go to **Letter cleanup** and click **Cleanup packet**.
@@ -38,7 +41,7 @@ You can keep working on the same letters while the packet is out. If you both ch
 3. Click the **avatar** at the top right (or use Settings), then **Open a cleanup packet**.
 4. Type the "Packet passphrase" the coordinator gave you and click **Choose packet file**. Pick the `.opsanta-packet` file.
 5. The app opens in **packet mode**: the top right says "Cleanup packet · not a season file", and you see only that packet's letters, on the Letter cleanup page.
-6. Read and approve, flag or hold each letter. See [Letter cleanup]({{ '/sign-ups/letter-cleanup/' | relative_url }}#read-and-approve-letters).
+6. Open the **All letters** tab and read each letter: **Looks good · next**, **Flag** or **Don't print**. See [Letter cleanup]({{ '/sign-ups/letter-cleanup/' | relative_url }}#look-at-the-flagged-letters).
 7. When you're done (or need to stop), click **Save edited packet**, type a packet passphrase, and click **Choose where to save**. The suggested name is like `Cleaned by Ana.opsanta-packet`.
 8. Send that file back to the coordinator, and the passphrase separately.
 

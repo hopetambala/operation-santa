@@ -47,7 +47,7 @@ Red banners at the top of the page explain what went wrong. Find the message bel
 | HEIC photo could not be decoded here. Ask the family for a JPEG. | Ask the family, or **Skip upload (print placeholder)**. |
 | Letter submitted online. Paste the text into the cleaned letter. | Open the link in the original letter, copy the text, and paste it into "Cleaned letter". |
 | Attachment is larger than 30 MB. | Ask the family for a smaller file, or skip it. |
-| A converted drawing is missing. Re-run downloads in Letter cleanup. | Letter cleanup ▸ **Retry failed** or **Download uploads**. |
+| A converted drawing is missing. Re-run downloads in Letter cleanup. | Letter cleanup ▸ **Retry failed**. |
 
 ## Geocoding and routes
 
@@ -55,11 +55,11 @@ Red banners at the top of the page explain what went wrong. Find the message bel
 |---|---|
 | Geocoded …: … not found. | Fix those families on the **Addresses** tab. |
 | … families could not fit within the hard limit. Add teams or raise the limit. | See [When families don't fit]({{ '/routing/route-planner/' | relative_url }}#when-families-dont-fit). |
-| Unfreeze the plan before rebalancing. | The plan is frozen on purpose. Insert or move families instead, or unfreeze with a reason. |
+| Unfreeze the plan before rebalancing. | The plan is frozen on purpose. Insert or move families instead, or unfreeze it. |
 | Unlock both routes before moving stops. / Unlock the route first. | Click **Unlock** on the route. |
 | Unpin this building before moving it. | Click the pin icon next to the stop. |
 | Out-of-area families go only on special routes. | Put them on a special route, or mark them **Include anyway** in Address review. |
-| A reason is required after printing or freezing. | Choose a reason in the box that appears. |
+| This route has been printed, so a reason is required. | Choose a reason in the box that appears. |
 
 ## Printing
 

@@ -20,7 +20,7 @@ description: "The top bar, the Overview task list, and the reason prompt you'll 
 From left to right:
 
 - **The tree logo** goes back to the Overview.
-- **The tab icons**: Overview, Families, Address review, Route planner, Teams, Letter cleanup, Print center, Change log and Settings. Only the open tab shows its name; rest the pointer on any icon to see its name. A small number on an icon means something there needs attention: addresses to review, letters waiting, or packets to reprint.
+- **The tab icons**: Overview, Families, Address review, Route planner, Teams, Letter cleanup, Print center, Change log and Settings. Only the open tab shows its name; rest the pointer on any icon to see its name. A small number on an icon means something there needs attention: addresses to review, letters to look at, or packets to reprint.
 - **The bell** shows a dot while the Overview task list has open items.
 - **The save state**: "Encrypted · saved on this device" for a real season, "Demo · synthetic data" for the demo, or "Cleanup packet · not a season file" while a letter cleaner has a packet open.
 - **A shortcut button**: **Import families** on the Overview and Families pages, **Plan routes** on most others.
@@ -39,7 +39,7 @@ The Overview answers "what's left to do?"
 |---|---|
 | Review addresses | Address review |
 | Confirm proposed flags | Address review |
-| Give letters a final read | Letter cleanup |
+| Look at flagged letters | Letter cleanup |
 | Fix uploads | Letter cleanup |
 | Find a route for everyone | Route planner |
 | Assign every route a team | Route planner |
@@ -52,7 +52,7 @@ The Overview answers "what's left to do?"
 
 ## "Leave a note for the next person"
 
-Once the plan is frozen, or once a route's packet has been printed, the app asks why before it accepts a change that touches that route.
+Once a route's packet has been printed, the app asks why before it accepts a change that touches that route. Changes to routes that haven't been printed yet never ask, even when the plan is frozen.
 
 1. Choose a reason: cancelled by family, no response, duplicate, moved to pickup, address fix, added late, rebalanced, or other.
 2. For **other**, describe the change in a few words.

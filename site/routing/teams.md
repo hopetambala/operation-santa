@@ -24,7 +24,6 @@ A team lead's name and phone number go on the cover of their packet, and on the 
    - "Team name" (required), for example "Team 7"
    - "Team lead"
    - "Lead phone"
-   - "Seats in the car"
    - "Notes"
    - tick "Spanish-speaking team member" if someone on the team speaks Spanish
 3. Click **Save team**.
@@ -37,22 +36,16 @@ To change a team, click the **⋯** button on its card. **Remove team** is at th
 
 If the volunteer sign-up sheet is a spreadsheet, save it as CSV or Excel with these column headings. Use them exactly, in this order: the app matches headings by the words in them, so a heading like "Team lead" before "Team" can land in the wrong field.
 
-| Team | Lead | Phone | Spanish | Seats | Notes |
-|---|---|---|---|---|---|
-| Team 1 | Jamie | (626) 555-0100 | yes | 4 | Has a van |
-| Team 2 | Casey | (626) 555-0101 | no | 5 | |
+| Team | Lead | Phone | Spanish | Notes |
+|---|---|---|---|---|
+| Team 1 | Jamie | (626) 555-0100 | yes | Has a van |
+| Team 2 | Casey | (626) 555-0101 | no | |
 
 - "Spanish" counts as yes for `yes`, `y`, `sí`, `si`, `true` or `1`.
 - A row whose team name matches an existing team updates that team. New names add new teams.
+- Other columns, such as seats in the car, are ignored.
 
 Click **Import CSV** and choose the file. The message says how many teams were imported.
-
-## Export the team list
-
-Click **Export CSV** to save `Operation Santa teams.csv`: every team with its lead, lead phone, Spanish, seats, notes and route. It's handy for the volunteer coordinator's phone tree.
-
-{: .warning }
-This file isn't encrypted. Keep it off public drives and delete it after the season.
 
 ## Give each route a team
 

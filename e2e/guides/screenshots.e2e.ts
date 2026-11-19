@@ -5,7 +5,7 @@ import path from 'node:path';
 import Papa from 'papaparse';
 import {HEADERS_2025} from '../support/fixture';
 import {createSeason} from '../support/season';
-import {RUN_DIR,PASSPHRASE,click,nav,toast,dialogText,importCsv,installMocks,setE2e,queueOpen,setInput,reasonIfAsked,newestPdf} from '../support/app';
+import {RUN_DIR,PASSPHRASE,click,nav,toast,dialogText,importCsv,installMocks,setE2e,queueOpen,setInput,reasonIfAsked,newestPdf,turnOn} from '../support/app';
 import {demoSeason,type Family} from '../../apps/desktop/src/model';
 // Screenshots for the volunteer guides (site/), from the real app and its built-in demo season of fictional families.
 // Run with `npm run guides:screenshots`; never point it at a real season. Each picture is independent, so one that
@@ -32,7 +32,7 @@ describe('Guide screenshots (demo season)',()=>{
   await snap('teams',async()=>{await nav('Teams')});
   await snap('route-planner',async()=>{await nav('Route planner');await (await $('.route-card')).click();await browser.execute(()=>window.scrollTo(0,0))});
   await snap('settings',async()=>{await nav('Settings')});
-  await snap('airtable-token-saved',async()=>{await setE2e({secrets:{airtable_token:'patDEMO.not-a-real-token'}});await nav('Overview');await nav('Settings');await $('//*[contains(text(),"Token saved")]').waitForExist({timeout:5000});await $('//*[contains(text(),"Token saved")]').scrollIntoView({block:'center'})});
+  await snap('airtable-token-saved',async()=>{await turnOn('Airtable Sync');await setE2e({secrets:{airtable_token:'patDEMO.not-a-real-token'}});await nav('Overview');await nav('Settings');await $('//*[contains(text(),"Token saved")]').waitForExist({timeout:5000});await $('//*[contains(text(),"Token saved")]').scrollIntoView({block:'center'})});
   await snap('purge-dialog',async()=>{await nav('Settings');await click('Purge sensitive records');await dialogText('Purge sensitive records')});
   await snap('new-season-dialog',async()=>{await $('button.avatar').click();await click('Create new season');await dialogText('Start a new season')});
   // PDFs: a route that passes Check (its cover has the QR codes), and the label alignment test page.
@@ -43,7 +43,7 @@ describe('Guide screenshots (demo season)',()=>{
   try{await createSeason();await importCsv(demoCsv(),'Op Santa Sign-ups-Grid view.csv');await dialogText('Review your import');await click('Accept import');await $('[role="dialog"]').waitForExist({reverse:true});await browser.pause(1500);}catch(e){failed.push(`encrypted season with demo families: ${(e as Error).message.split('\n')[0]}`)}
   await snap('import-review',async()=>{await nav('Families');await importCsv(demoCsv(true),'Op Santa Sign-ups-Grid view (1).csv');await dialogText('Review your import');const more=await $('//*[@role="dialog"]//summary');if(await more.isExisting())await more.click()});
   // Packet mode: export a packet for a few demo families, then open it the way a volunteer would.
-  await snap('packet-mode',async()=>{await nav('Letter cleanup');await click('Cleanup packet');await setInput($('[role="dialog"] input[placeholder="first"]'),'26001');await setInput($('[role="dialog"] input[placeholder="last"]'),'26003');await setInput($('[role="dialog"] input[type=password]'),PASSPHRASE);await click('Choose where to save');await toast(/Packet with \d+ families saved/);const packet=readdirSync(RUN_DIR).find(f=>f.endsWith('.opsanta-packet'))!;await queueOpen(path.join(RUN_DIR,packet));await $('button.avatar').click();await click('Open a cleanup packet');await setInput($('[role="dialog"] input[type=password]'),PASSPHRASE);await click('Choose packet file');await toast(/families opened/)});
+  await snap('packet-mode',async()=>{await turnOn('Send letters to helpers');await nav('Letter cleanup');await click('Cleanup packet');await setInput($('[role="dialog"] input[placeholder="first"]'),'26001');await setInput($('[role="dialog"] input[placeholder="last"]'),'26003');await setInput($('[role="dialog"] input[type=password]'),PASSPHRASE);await click('Choose where to save');await toast(/Packet with \d+ families saved/);const packet=readdirSync(RUN_DIR).find(f=>f.endsWith('.opsanta-packet'))!;await queueOpen(path.join(RUN_DIR,packet));await $('button.avatar').click();await click('Open a cleanup packet');await setInput($('[role="dialog"] input[type=password]'),PASSPHRASE);await click('Choose packet file');await toast(/families opened/)});
   console.log(`Guide screenshots in ${OUT}\nNot taken:\n${failed.join('\n')||'(none)'}`);
  });
 });

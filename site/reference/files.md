@@ -16,7 +16,7 @@ description: "The files Operation Santa opens and saves, and the columns it expe
 | File | What it is | Made by |
 |---|---|---|
 | `Operation Santa 2026.opsanta` | The season: every family, child, letter, drawing, route, team, setting and change. Encrypted with the season passphrase. | **Create new season** |
-| `<time>-<code>.opsanta` in the app's backups folder | A backup of the season, same passphrase. The latest 20 are kept. See [Backups]({{ '/start-here/season-file/' | relative_url }}#backups). | automatic, or **Create encrypted backup** |
+| `<time>-<code>.opsanta` in the app's backups folder | A backup of the season, same passphrase. The latest 20 are kept. See [Backups]({{ '/start-here/season-file/' | relative_url }}#backups). | automatic |
 | `Cleanup 26001-26199.opsanta-packet` | A cleanup packet: some families' letters, wishes and drawings. Encrypted with its own passphrase. | Letter cleanup ▸ **Cleanup packet** |
 | `Cleaned by Ana.opsanta-packet` | A cleaner's returned packet. | **Save edited packet** |
 
@@ -39,7 +39,7 @@ Blank address parts, and values like "None" or "N/A", are left out, so they neve
 
 ### The teams spreadsheet (CSV or Excel)
 
-Columns **Team**, **Lead**, **Phone**, **Spanish**, **Seats**, **Notes**. See [Santa teams]({{ '/routing/teams/' | relative_url }}#import-teams-from-a-spreadsheet).
+Columns **Team**, **Lead**, **Phone**, **Spanish**, **Notes**. See [Santa teams]({{ '/routing/teams/' | relative_url }}#import-teams-from-a-spreadsheet).
 
 ## Files the app saves (not encrypted)
 
@@ -52,8 +52,7 @@ Columns **Team**, **Lead**, **Phone**, **Spanish**, **Seats**, **Notes**. See [S
 | `Pickup event - v1.pdf` | Check-in sheet, letters and labels for pickup families | **Pickup event packet (N)** |
 | `Coordinator holds - ….pdf` | Letters held back from the teams | **Coordinator holds (N)** |
 | `Label alignment test 5163.pdf` | Outlines of every label | **Alignment test page** |
-| `MyRouteOnline.csv` | Entry ID, address and planned stop minutes for every home-delivery family the app would route | **MyRouteOnline CSV** or **Fallback CSV** |
-| `Operation Santa teams.csv` | Teams, leads, phones and routes | Teams ▸ **Export CSV** |
+| `MyRouteOnline.csv` | Entry ID, address and planned stop minutes for every home-delivery family the app would route | Print center ▸ **MyRouteOnline CSV** |
 | `Operation Santa change log.csv` | Every recorded change | Change log ▸ **Export CSV** |
 
 {: .warning }

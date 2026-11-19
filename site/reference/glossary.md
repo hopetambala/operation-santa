@@ -29,7 +29,7 @@ description: "Words the app and the committee use."
 : A label on a family: spanish speaker, extra toys, adopt a family, do not share with volunteers, duplicate address ok, eaton impacted, paper letter, include out of area.
 
 **Freeze**
-: Locking the whole plan before printing. No rebalances, and changes need a reason.
+: Locking the whole plan before printing. No rebalances. Changes still work; they ask for a reason once their route is printed.
 
 **Geocoding**
 : Turning an address into a point on the map.

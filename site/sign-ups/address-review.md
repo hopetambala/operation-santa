@@ -48,7 +48,7 @@ The **Addresses** tab lists families the map couldn't place confidently: misses,
 ![The Addresses tab with one demo family selected, the map, and the Pin is right button]({{ '/assets/images/address-review.png' | relative_url }})
 
 {: .tip }
-To get coordinates from Google Maps: right-click the house, then click the two numbers at the top of the menu to copy them. Paste the first number into "Latitude" and the second into "Longitude". **Copy coordinates** does the reverse, so you can paste the app's pin into a map to check it.
+To get coordinates from Google Maps: right-click the house, then click the two numbers at the top of the menu to copy them. Paste the first number into "Latitude" and the second into "Longitude".
 
 ## Duplicates
 
@@ -59,9 +59,9 @@ The **Duplicates** tab groups sign-ups that share the same address and unit. For
 
 - **Merge into #…**: it's the same family twice. The second sign-up's children who aren't already on the first are added to the first, and the second is cancelled.
 - **Cancel this one**: cancel this sign-up without moving anything.
-- **Keep both (different families)**: two households at one address. The app asks why, and records it in the change log. They're marked "duplicate address ok" and stop appearing here.
+- **Keep both (different families)**: two households at one address. The change log records who kept the pair. They're marked "duplicate address ok" and stop appearing here.
 
-The app always asks for a reason for merges and cancellations here, so the History explains it later.
+Nothing on this tab asks for a reason until the family's route has been printed. Every merge, cancellation and Keep both still goes into the change log and the family's History.
 
 A story: the Santos family signs up on November 4 with two children, then again on November 18 with three, because they forgot their youngest. Click **Merge into #26031** on the second sign-up. The third child moves onto the first sign-up, and the second sign-up is cancelled.
 

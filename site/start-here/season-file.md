@@ -32,13 +32,9 @@ The top right now says "Encrypted · saved on this device", and a message says "
 {: .warning }
 **There is no way to recover a season without its passphrase.** Store it in the club's password manager straight away, and give a sealed copy to the treasurer. Don't email it or write it in a shared document.
 
-### Keep the demo instead
-
-If you've set up teams or settings in the demo and want to keep them, choose **Save this demo as a season** in the avatar menu instead of **Create new season**. The fictional families come along too, so this is only useful for practice.
-
 ## Open the season
 
-1. Click the **avatar**, then **Open encrypted season** (or Settings ▸ **Open season file**).
+1. Click the **avatar**, then **Open encrypted season**.
 2. Choose the `.opsanta` file.
 3. If the passphrase is remembered on this computer, the season opens straight away. Otherwise the "Unlock your season" box asks for it: type it and click **Open season**.
 
@@ -67,8 +63,7 @@ Lock the season whenever you step away from a shared computer.
 The app keeps encrypted backup copies of the season in its own data folder:
 
 - every 15 minutes while the season is open,
-- just before each import, geocoding run, rebalance, returned cleanup packet and purge,
-- whenever you click Settings ▸ **Create encrypted backup**.
+- and just before each import, geocoding run, rebalance, returned cleanup packet and purge.
 
 It keeps the latest 20. Backups use the same passphrase as the season.
 

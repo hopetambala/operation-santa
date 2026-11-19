@@ -57,8 +57,10 @@ describe('Season files in the App Sandbox (Mac App Store build)',()=>{
   assert.notEqual(sha(readFileSync(SEASON)),created,'the season file did not change after a save');
   assert.deepEqual(listing(CHOSEN),[NAME],'saving left something beside the season file (a WAL, lock or backup)');
  });
+ // The same command the automatic backups run (every 15 minutes and before imports, geocoding and rebalances). The
+ // Settings button that used to trigger it was removed in simplification phase 4.
  it('backs up into the container',async()=>{
-  await nav('Settings');await click('Create encrypted backup');await toast(/Encrypted backup saved/);await noError();
+  const r=await call('backup_season',{});assert.match(r,/^ok /,`backup_season failed under the sandbox: ${r}`);await noError();
   const dir=path.join(SEASONS,'backups',sha(SEASON));const fresh=listing(dir).filter(f=>statSync(path.join(dir,f)).mtimeMs>=started-2000);assert.equal(fresh.length,1,`one new backup expected in ${dir}, found ${fresh}`);
   assert.deepEqual(listing(CHOSEN),[NAME]);
  });
