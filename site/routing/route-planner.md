@@ -59,7 +59,7 @@ If there aren't enough teams, a yellow note stays under the controls: "12 famili
 
 - switch "Fleet" to **Fewest that fit** and rebalance, to see how many teams it really takes, then recruit to that number;
 - add teams and rebalance; or
-- with the committee's agreement, raise the hard maximum in Settings.
+- if more teams are unavailable, extend the delivery window only as needed, up to 8:45 PM. Update both **Delivery window ends** and **Hard maximum (minutes)** in Settings.
 
 {: .note }
 Because the app counts real stop times, it may need more teams than 2025's 45 for the same number of families. That's the honest number: in 2025 the shortfall showed up as routes running late.
@@ -71,7 +71,7 @@ Because the app counts real stop times, it may need more teams than 2025's 45 fo
 - **locked routes** exactly as they are;
 - **special routes** and their families;
 - **pinned families** on the route they're pinned to;
-- **buildings together**: every family at one address stays on one route, one after another;
+- **buildings together**: every family at one address stays on one route, one after another, with labels like 3a, 3b and 3c. Navigation uses one stop for the building.
 - **route numbers**, when a route keeps most of its families, so a team doesn't swap from Route 7 to Route 31 between drafts;
 - each route's **team**, on the same terms.
 
@@ -132,15 +132,15 @@ At the bottom of the Route planner, **Route settings** holds the 9 numbers that 
 
 | Setting | Default | What it does |
 |---|---|---|
-| Base stop time | 7 | Every stop. |
-| Per extra child | 1.5 | Added for each child after the first. |
-| Apartment | 3 | Added when the family has a unit number. |
-| Gate code | 2 | Added when the family has gate or access notes. |
-| Extra toys | 3 | Added for families flagged extra toys. |
-| Same-building discount | 3 | Taken off for a second family in the same building. |
+| Base stop time | 12 | Minutes per family. |
+| Per extra child | 0 | Added for each child after the first. |
+| Apartment | 0 | Added when the family has a unit number. |
+| Gate code | 0 | Added when the family has gate or access notes. |
+| Extra toys | 0 | Added for families flagged extra toys. |
+| Same-building discount | 0 | Taken off for a second family in the same building. |
 | Estimated speed (mph) | 18 | Average driving speed between stops. |
 | Road distance multiplier | 1.35 | Roads are longer than a straight line; this stretches the straight-line distance. |
-| Parking per stop (min) | 1.5 | Added to every drive. |
+| Parking per stop (min) | 4 | Added once per building visit. |
 
 {: .why }
 2025 planned a flat 10 minutes for every stop, whether it was a house with one child or an apartment with six behind a gate. That's how twelve routes ran past three and a half hours.

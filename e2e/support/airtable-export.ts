@@ -39,7 +39,7 @@ const ES=[(n:string,w:string)=>`Querido Santa, me llamo ${n}. Este año me gusta
 const WISH=['a soccer ball','a paint set','a doll house','a toy truck','building blocks','a superhero','a stuffed bunny','a keyboard','slime','a puzzle','a new backpack','a play kitchen','a microscope','chapter books','a princess dress'];
 
 export type Geo={lat:number;lon:number}|null;
-export type ExportFamily={id:string;name:string;spanish:boolean;hardship:string;away:boolean;city:string;street:string;unit:string;kids:number;uploads:string[];geo:Geo;outOfArea:boolean};
+export type ExportFamily={id:string;name:string;spanish:boolean;hardship:string;away:boolean;city:string;zip:string;street:string;unit:string;kids:number;uploads:string[];geo:Geo;outOfArea:boolean};
 export type SyntheticExport={csv:(o?:{fresh?:boolean})=>string;families:ExportFamily[];census:Record<string,[number,number]>;uploadUrls:(o:{fresh:boolean})=>string[]};
 
 // Upload links: an export downloaded more than a couple of hours ago carries expired links; a fresh one doesn't.
@@ -79,7 +79,7 @@ export function airtableExport(count=740,seed=2026):SyntheticExport{
   const outOfArea=['El Monte, CA','La Crescenta, CA'].includes(city);
   // The mocked Census geocoder matches 97% of addresses; the rest wait in Address review.
   const matched=r()<0.97;const g=buildings.get(key)!;if(matched)census[id]=g;
-  families.push({id,name:fam,spanish:!!L,hardship,away,city,street:`${hn} ${street}`,unit,kids,uploads:files.map(f=>`${f.n}.${f.ext}`),geo:matched?{lat:g[0],lon:g[1]}:null,outOfArea});
+  families.push({id,name:fam,spanish:!!L,hardship,away,city,zip,street:`${hn} ${street}`,unit,kids,uploads:files.map(f=>`${f.n}.${f.ext}`),geo:matched?{lat:g[0],lon:g[1]}:null,outOfArea});
  }
  const fill=(fresh:boolean)=>{for(const u of uploads)for(const f of u.files)u.row[`Child #${f.n}: Upload Letter to Santa`]=`drawing-${f.id}-${f.n}.${f.ext} (${uploadUrl(f.id,f.n,f.ext,fresh)})`;};
  return {families,census,

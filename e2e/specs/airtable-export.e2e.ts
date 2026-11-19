@@ -4,10 +4,10 @@ import {writeFileSync,statSync} from 'node:fs';
 import path from 'node:path';
 import Papa from 'papaparse';
 import {airtableExport} from '../support/airtable-export';
-import {RUN_DIR,field,shot,click,fill,nav,noError,reasonIfAsked,dialogText,pageText,importCsv,installMocks,setE2e,setInput,newestPdf,choose,lookTab} from '../support/app';
+import {RUN_DIR,field,shot,click,fill,nav,noError,dialogText,pageText,importCsv,installMocks,setE2e,setInput,newestPdf,choose,lookTab} from '../support/app';
 import {createSeason} from '../support/season';
 import {readPdf} from '../support/pdf';
-import {inArea,defaults,type Family} from '../../apps/desktop/src/model';
+import {inArea,defaults} from '../../apps/desktop/src/model';
 import {WINDOW} from '../../apps/desktop/src/windowed';
 // The usability test's success criterion: a coordinator takes the season's Airtable export, as downloaded,
 // and gets from a fresh install to a printed route packet. A season-sized synthetic export (740 families,
@@ -16,8 +16,8 @@ const x=airtableExport(740);
 const timings:Record<string,number>={};
 let t0=0;const start=()=>{t0=Date.now();};const stop=(step:string)=>{timings[step]=Math.round((Date.now()-t0)/100)/10;};
 const count=async(label:RegExp)=>Number((await $(`//button[contains(.,"(")][starts-with(normalize-space(.),"${label.source}")]`).getText()).match(/\((\d+)\)/)?.[1]??NaN);
-// Out of area by the app's own rule (service-city circles plus the buffer), for families the geocoder places.
-const away=x.families.filter(f=>f.away),outOfArea=x.families.filter(f=>f.geo&&!f.away&&inArea({lat:f.geo.lat,lon:f.geo.lon,city:f.city} as Family,defaults)===false);
+// The service area comes from the ZIP codes listed in the Operation Santa FAQ.
+const away=x.families.filter(f=>f.away),outOfArea=x.families.filter(f=>!f.away&&inArea(f,defaults)===false);
 // A season-sized run: WDIO fixes each test's limit before it starts, so the limit is set here, for the whole suite.
 describe('A coordinator’s season from an Airtable export',function(){this.timeout(25*60_000);
  before(async()=>{writeFileSync(path.join(RUN_DIR,'airtable-export-740.csv'),x.csv());await $('h1').waitForDisplayed({timeout:60000});await installMocks();
@@ -52,8 +52,8 @@ describe('A coordinator’s season from an Airtable export',function(){this.time
   start();await importCsv(x.csv({fresh:true}),'Op Santa Sign-ups-Grid view (1).csv');const text=await dialogText('Review your import');assert.ok(text.includes('0 new'),text.slice(0,300));await click('Accept import');await nav('Overview');await $('//*[contains(text(),"0 failed · 0 still downloading")]').waitForExist({timeout:300000});stop('re-import fresh export + downloads');await noError();});
  it('geocodes the whole season in one go and leaves only the real problems for review',async()=>{await nav('Address review');const misses=x.families.filter(f=>!f.geo).length;start();await $('//button[starts-with(normalize-space(.),"Geocode ")]').click();await $(`//strong[normalize-space()="${misses} addresses"]`).waitForExist({timeout:180000}).catch(async()=>{await shot('geocode-timeout');throw Error(`geocoding did not finish: Addresses (${await count(/Addresses/)}), expected ${misses} still waiting. ${(await pageText()).slice(0,1200)}`);});stop('geocode 740');await noError();await shot('address-review');
   const flags=await count(/Proposed flags/);assert.ok(flags>0);await click(`Proposed flags (${flags})`);start();await click('Accept all');await $('//button[contains(.,"Proposed flags (0)")]').waitForExist({timeout:60000});stop('accept proposed flags');
-  const area=await count(/Out of area/);assert.equal(area,outOfArea.length,'families outside the service circles are out of area');if(area){await click(`Out of area (${area})`);start();for(let i=0;i<area;i++){await click('Move to pickup');await reasonIfAsked('moved_to_pickup');}await $('//button[contains(.,"Out of area (0)")]').waitForExist();stop('out of area → pickup');}
-  await nav('Families');await choose($('select[aria-label="Filter families"]'),'pickup');assert.match(await pageText(),new RegExp(`${away.length+area} families`),'exactly the relocated, no-address and out-of-area families are pickups');await choose($('select[aria-label="Filter families"]'),'all');});
+  const area=await count(/Out of area/);assert.equal(area,outOfArea.length,'families outside the published ZIP codes are out of area');if(area){await click(`Out of area (${area})`);start();for(let i=0;i<area;i++){await click('Special delivery');}await $('//button[contains(.,"Out of area (0)")]').waitForExist();stop('out of area → special delivery');}
+  await nav('Families');await choose($('select[aria-label="Filter families"]'),'pickup');assert.match(await pageText(),new RegExp(`${away.length} families`),'pickup contains the families identified from their form answers');await choose($('select[aria-label="Filter families"]'),'all');});
  it('lets a person pin the addresses the geocoder missed',async()=>{await nav('Address review');let left=await count(/Addresses/);timings['addresses a person pins']=left;start();while(left>0){const id=(await $('.panel-padding h3').getText()).match(/#(\d+)/)![1];const f=x.families.find(z=>z.id===id)!;const at=f.city.startsWith('Altadena')?[34.19,-118.13]:[34.15,-118.13];await fill('Latitude',String(at[0]+Number(id)%50/5000));await fill('Longitude',String(at[1]-Number(id)%37/5000));await click('Pin is right');await browser.waitUntil(async()=>(await count(/Addresses/))<left,{timeout:15000});left=await count(/Addresses/);}stop('pin missed addresses');await shot('addresses-done');});
  it('plans with 2025’s 45 teams, keeps saying when they don’t fit, and finds how many teams it takes',async()=>{const sheet=(n:number)=>Papa.unparse(Array.from({length:n},(_,i)=>({Team:`Team ${String(i+1).padStart(2,'0')}`,Lead:`Lead ${i+1}`,Phone:`(626) 555-${String(100+i).padStart(4,'0')}`,Spanish:i%4===0?'Yes':'No'})));writeFileSync(path.join(RUN_DIR,'teams-45.csv'),sheet(45));
   await nav('Teams');await importCsv(sheet(45),'teams-45.csv','.planner-actions input[type=file]');await $('//*[contains(text(),"Team 45")]').waitForExist();
@@ -70,6 +70,6 @@ describe('A coordinator’s season from an Airtable export',function(){this.time
  // or a flag need a look; the rest print as imported. After the fresh re-import this export flags none.
  it('asks only about the letters it flags, then clears them',async()=>{await nav('Letter cleanup');await lookTab();start();let looked=0;while(!(await $('//*[contains(text(),"Nothing to look at")]').isExisting())){await click('Looks good · next');if(++looked>2100)throw Error('the letters to look at did not drain');}stop('look at the flagged letters');timings['letters to look at']=looked;console.log(`[letters] ${looked} of the export's letters needed a look`);await lookTab(0);await noError();});
  it('passes Check and prints every route packet in one PDF',async()=>{const n=timings['teams needed'];await nav('Print center');const t=await pageText();assert.ok(t.includes('No blocking problems.'),`Check should pass: ${t.slice(0,900)}`);// A season-sized PDF takes minutes, longer than the 6 s toast stays up, so wait for the file and its size to settle.
-  const before=newestPdf();start();await click('All routes, one PDF');let size=-1;await browser.waitUntil(async()=>{const p=newestPdf();if(!p||p===before)return false;const s=statSync(p).size;const settled=s>0&&s===size;size=s;return settled;},{timeout:540000,interval:3000,timeoutMsg:'the season PDF was not written'});stop('print every route');await noError();const pages=await readPdf(newestPdf());timings['pages printed']=pages.length;assert.equal(pages.filter(p=>/Route \d+ · Stop 1 of/.test(p.text)).length,n);await shot('printed');});
+  const before=newestPdf();start();await click('All routes, one PDF');let size=-1;await browser.waitUntil(async()=>{const p=newestPdf();if(!p||p===before)return false;const s=statSync(p).size;const settled=s>0&&s===size;size=s;return settled;},{timeout:540000,interval:3000,timeoutMsg:'the season PDF was not written'});stop('print every route');await noError();const pages=await readPdf(newestPdf());timings['pages printed']=pages.length;assert.equal(pages.filter(p=>/Route \d+ · Stop 1a? of/.test(p.text)).length,n);await shot('printed');});
 });
 after(()=>{writeFileSync(path.join(RUN_DIR,'airtable-export-timings.json'),JSON.stringify(timings,null,2));console.log('\nAirtable export timings (s):',timings,`\nEvidence: ${RUN_DIR}\n`);});

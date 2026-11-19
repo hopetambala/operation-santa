@@ -26,14 +26,14 @@ Routes can only be planned for families the app can place on a map. In 2025 MyRo
 3. Wait. The app first checks addresses it has already looked up, then sends the rest to the US Census geocoder ("Sending 120 addresses to the US Census geocoder…"), then tries OpenStreetMap for any the Census missed.
 4. A message sums it up: "Geocoded 120: 0 from cache, 112 Census, 5 OpenStreetMap, 3 not found."
 
-Confident matches inside the service area are accepted automatically. Everything else stays on the **Addresses** tab.
+Confident matches with a valid ZIP are accepted automatically. Low-confidence matches, misses and missing ZIPs stay on the **Addresses** tab.
 
 {: .note }
 Only the street, city, state and ZIP leave the computer, never names, unit numbers, phone numbers or letters. The badge "Only street, city and ZIP are sent" is a reminder.
 
 ## Fix the addresses that need a person
 
-The **Addresses** tab lists families the map couldn't place confidently: misses, low-confidence matches, and matches outside the service area.
+The **Addresses** tab lists misses, low-confidence matches and addresses that need a valid ZIP code.
 
 1. Click a family on the left. The map on the right shows where the app thinks they are.
 2. If there's a yellow "Geocoder suggestion" and it's the right place, click **Accept suggestion**.
@@ -70,16 +70,14 @@ A story: the Santos family signs up on November 4 with two children, then again 
 {: .why }
 In 2025, a few routes drove a long way for just one or two families outside Pasadena. Those routes cost a team a whole evening for very few visits.
 
-The **Out of area** tab lists home-delivery families outside the service area: the cities in Settings ▸ "Cities served" plus "Buffer beyond city limits (miles)". For each, choose:
-
-- **Move to pickup**: they'll come to the pickup event instead. Their RSVP becomes "waiting".
+The **Out of area** tab lists home deliveries outside the ZIP codes under **Settings → ZIP codes served**. For each family, choose:
 - **Special delivery**: they'll be handled outside the routes. They won't appear on any route or on the pickup packet.
 - **Include anyway**: treat them as in the area. Rebalancing may put them on any route.
 
 A family you leave on this tab can still be delivered: create a [special route]({{ '/routing/route-planner/' | relative_url }}#special-routes) for them, such as an out-of-area run. Rebalancing never puts them on an ordinary route.
 
 {: .note }
-The service area is drawn as a circle around each city in Settings, so some addresses in neighbouring cities, such as parts of San Gabriel and Arcadia, count as inside. If one of those families shouldn't be delivered, open them on the Families page and set **Delivery** to pickup or special.
+The [Operation Santa FAQ](https://pasadenajaycees.org/operation-santa/) lists the ZIP codes served, including parts of San Gabriel and Arcadia. If a family's ZIP code is wrong, open the family and correct the address.
 
 ## Proposed flags
 

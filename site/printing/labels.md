@@ -32,7 +32,7 @@ Children are split into bags by Settings ▸ "Children per bag" (3 by default). 
 In **Print center**, under the banner:
 
 1. "Labels": choose **Avery 5163 · 4×2 in · 10/sheet** (the default, with room for every child) or **Avery 5160 · 1×2⅝ in · 30/sheet** (address-label size, shorter text).
-2. "Street address on labels": tick it to add the address. Leave it off unless the committee wants it: it puts a family's address on a bag that might be left in a car.
+2. "Street address on labels" is on for new seasons, as it was in 2025. Turn it off here if you need labels without addresses.
 
 Each route's labels start on a fresh sheet, at the first label.
 

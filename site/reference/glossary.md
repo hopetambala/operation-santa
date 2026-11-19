@@ -65,7 +65,7 @@ description: "Words the app and the committee use."
 : The quiet name printed on letters for the form's poverty-level question.
 
 **Service area**
-: The cities the club visits, plus a buffer. Families outside it are **out of area**.
+: The ZIP codes in the [Operation Santa FAQ](https://pasadenajaycees.org/operation-santa/). Home deliveries outside the list are **out of area**.
 
 **Special route**
 : A route that keeps its families through every rebalance, such as an apartment complex or an out-of-area run.
