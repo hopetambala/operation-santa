@@ -1,6 +1,6 @@
 ---
 title: Reprints and the call list
-parent: "December 19: printing"
+parent: "4. Print"
 nav_order: 3
 description: "See exactly what changed on a printed route, reprint only those pages, and call the team lead."
 ---
@@ -27,7 +27,7 @@ The app remembers what was on every page of each route's packet when it was prin
 - a child's details, letter or drawing;
 - the team, lead or lead's phone, or the route's start time.
 
-The Overview's task list shows "Reprint changed packets", and the Print center tab shows a count.
+The Overview's task list shows "Reprint changed packets", and the **Print** step in the top bar shows how many need a reprint.
 
 ## See what changed
 

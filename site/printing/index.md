@@ -1,11 +1,11 @@
 ---
-title: "December 19: printing"
-nav_order: 6
+title: "4. Print"
+nav_order: 7
 has_children: true
 description: "Check the plan, print a packet for every team, and keep packets current after late changes."
 ---
 
-# December 19: printing
+# 4. Print
 
 {: .why }
 In 2025 the mail merge took about five attempts across different tools. Letters printed in sign-up order and were then sorted by hand into 45 route bundles, and the route sheets came from a different tool than the letters. Now one button makes a complete packet per team, already in stop order, and the app checks everything that would have gone wrong before it prints a page.

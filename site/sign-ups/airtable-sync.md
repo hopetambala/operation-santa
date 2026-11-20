@@ -1,6 +1,6 @@
 ---
 title: Sync from Airtable
-parent: "November: sign-ups"
+parent: "1. Import"
 nav_order: 2
 description: "Pull sign-ups straight from Airtable with a read-only token, instead of downloading a CSV."
 ---
@@ -53,7 +53,7 @@ The token goes into this computer's keychain only, never into the season file. T
 
 ## Sync
 
-1. Go to **Families**.
+1. Open **1 Import**, then **Families**.
 2. Click **Sync Airtable**. A message counts records as they're read: "Reading Airtable… 300 records".
 3. The "Review your import" box opens. Review and click **Accept import**, as for a [CSV import]({{ '/sign-ups/import-csv/' | relative_url }}#review-the-import).
 

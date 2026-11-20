@@ -1,6 +1,6 @@
 ---
 title: Letter cleanup
-parent: "November: sign-ups"
+parent: "3. Letters"
 nav_order: 5
 description: "Look at the letters the app flags, and make sure every drawing will print."
 ---
@@ -54,7 +54,7 @@ A letter **needs a look** when:
 
 Every other letter counts as read and prints as imported.
 
-1. Go to **Letter cleanup**. The first tab says how many letters need a look, for example "6 to look at", and shows them one at a time: "Ana's letter · Rivera A · Entry #26001 · 1 of 6".
+1. Open **3 Letters**. The first tab says how many letters need a look, for example "6 to look at", and shows them one at a time: "Ana's letter · Rivera A · Entry #26001 · 1 of 6".
 2. On the left: the **original letter**, the child's **gift wishes** (first and second choice, age), and any drawings.
 3. On the right, under "Clean letter", is the "Cleaned letter" box, with the warning that flagged it. Edit it if needed.
 4. Choose one:

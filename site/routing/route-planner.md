@@ -1,6 +1,6 @@
 ---
 title: Route planner
-parent: "December: routes"
+parent: "2. Routes"
 nav_order: 2
 description: "Plan balanced routes that fit the evening, then adjust them with local knowledge."
 ---
@@ -24,7 +24,7 @@ In 2025 three people planned routes in three separate MyRouteOnline accounts, so
 
 ## How the app times a route
 
-Each stop takes a **base time** (7 minutes), plus time for each extra child, an apartment, a gate code and extra toys, minus a little when the next stop is in the same building. Driving is estimated from the distance at an average speed, plus a minute and a half to park. All of these are in the planner's [Route settings](#route-settings).
+A new season starts with **12 minutes per family** and **4 minutes for parking per building visit**, plus estimated driving time. Families in the same building share a parking allowance. Check an existing season’s values in [Route settings](#route-settings).
 
 Every route leaves the North Pole at the departure time (4:30 PM by default) and comes back there. Two limits matter:
 
@@ -35,7 +35,7 @@ The "Estimated travel" badge is a reminder that times are estimates from straigh
 
 ## Plan the routes
 
-1. Go to **Route planner**.
+1. Open **2 Routes**.
 2. Choose how many teams to plan for, under "Fleet":
    - **Fixed count**: type the number of teams you have in "Teams".
    - **Fewest that fit**: the app works out the smallest number of teams that gets every family home within the hard maximum.

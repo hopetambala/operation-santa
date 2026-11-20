@@ -1,6 +1,6 @@
 ---
 title: Late changes and the freeze
-parent: "December: routes"
+parent: "2. Routes"
 nav_order: 3
 description: "Fit late sign-ups into the plan without starting over, freeze it before printing, and record why anything changes."
 ---
@@ -22,8 +22,8 @@ In 2025, after the route sheets were printed, 12 stops were dropped, 2 added and
 A story: on December 21, after the plan is frozen, the Park family calls the hotline. They missed the form, and the committee agrees to visit them.
 
 1. Add them: **Families** ▸ **Add family** for a phone call, or import or sync again for late form sign-ups.
-2. Geocode them in **Address review** (**Geocode 1**), and fix the pin if needed.
-3. Go to **Route planner** and click **Insert new families**. (It's there once the plan is frozen. Before the freeze, use **Rebalance unlocked** instead.)
+2. After the automatic lookup, open **Import** → **Address review** and fix the pin if needed. For a family added by hand, click **Geocode** there.
+3. Open **2 Routes** and click **Insert new families**. (It's there once the plan is frozen. Before the freeze, use **Rebalance unlocked** instead.)
 4. If a route has been printed, choose a reason, such as **added late**, and click **Record & continue**.
 5. Read the message, for example "1 families inserted."
 
@@ -45,7 +45,7 @@ They come off their route at once. The route's packet shows "Needs reprint" in t
 
 Freeze the plan when the routes are final, just before printing (about December 19).
 
-1. Go to **Route planner**.
+1. Open **2 Routes**.
 2. Click **Freeze plan**. The badge above the route list changes from "Draft" to "Frozen".
 
 While the plan is frozen:

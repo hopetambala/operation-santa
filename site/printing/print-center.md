@@ -1,6 +1,6 @@
 ---
 title: Check and print team packets
-parent: "December 19: printing"
+parent: "4. Print"
 nav_order: 1
 description: "Fix what blocks printing, then print one complete packet per Santa team."
 ---
@@ -33,9 +33,9 @@ See [Your team packet]({{ '/christmas-eve/team-lead/' | relative_url }}) for how
 
 ## 1. Check before printing
 
-1. Go to **Print center**.
+1. Open **4 Print**.
 2. Under "Check before printing", read the summary: "3 problems block printing. 12 warnings." or "No blocking problems."
-3. Click **Show details** to list them, with the route and Entry ID for each.
+3. Click **Show details** for the affected routes and Entry IDs. Use **Review routes**, **Review addresses**, **Review families** or **Review letters** to go directly to the work that blocks printing.
 
 Each route also has its own card saying "Ready to export", "Ready · 2 warnings" or "2 checks block printing", with the first few problems. Click **Review** on a card to open that route in the Route planner.
 

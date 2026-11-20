@@ -1,8 +1,8 @@
 ---
 title: Address review
-parent: "November: sign-ups"
+parent: "1. Import"
 nav_order: 4
-description: "Geocode addresses, fix the ones the map can't find, and sort out duplicates, out-of-area families and proposed flags."
+description: "Check the automatic address lookup, fix the ones the map can't find, and sort out duplicates, out-of-area families and proposed flags."
 ---
 
 # Address review
@@ -21,10 +21,9 @@ The page has four tabs: **Addresses**, **Duplicates**, **Out of area** and **Pro
 {: .why }
 Routes can only be planned for families the app can place on a map. In 2025 MyRouteOnline did this inside three separate accounts, and blank address parts printed as "None" in about 212 addresses. The app looks addresses up itself, accepts the confident matches, and puts only the doubtful ones in front of a person.
 
-1. Go to **Address review**. The top shows "WAITING FOR GEOCODING" with a count.
-2. Click **Geocode** followed by that number (for example **Geocode 120**).
-3. Wait. The app first checks addresses it has already looked up, then sends the rest to the US Census geocoder ("Sending 120 addresses to the US Census geocoder…"), then tries OpenStreetMap for any the Census missed.
-4. A message sums it up: "Geocoded 120: 0 from cache, 112 Census, 5 OpenStreetMap, 3 not found."
+Address lookup starts when you accept the import. The app checks its cache, asks the US Census geocoder for the remaining addresses, then tries OpenStreetMap for any the Census missed.
+
+Open **Import** and choose **Address review** to see the results. If you correct an address or a provider is unavailable, the **Geocode** button retries the remaining addresses.
 
 Confident matches with a valid ZIP are accepted automatically. Low-confidence matches, misses and missing ZIPs stay on the **Addresses** tab.
 

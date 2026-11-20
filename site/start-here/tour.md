@@ -34,18 +34,18 @@ The Overview answers "what's left to do?"
 
 - **Stat cards**: families signed up (home, pickup and special), children and drawings ready, routes planned, and packets ready to print.
 - **A progress strip**: how many families are imported, verified, geocoded and routed.
-- **Route overview**: the first eight routes, with leave and return times, stops, miles and team. Click one to open it in the Route planner.
+- **Route overview**: the first eight routes, with leave and return times, stops, miles and team. Click one to open it in **2 Routes**.
 - **Task list**: each line is a job with a count. Click it to go to the right page. When its count reaches zero it gets a check mark.
 
 | Task | Goes to |
 |---|---|
-| Review addresses | Address review |
-| Confirm proposed flags | Address review |
-| Look at flagged letters | Letter cleanup |
-| Fix uploads | Letter cleanup |
-| Find a route for everyone | Route planner |
-| Assign every route a team | Route planner |
-| Reprint changed packets | Print center |
+| Review addresses | 1 Import ▸ Address review |
+| Confirm proposed flags | 1 Import ▸ Address review |
+| Look at flagged letters | 3 Letters |
+| Fix uploads | 3 Letters |
+| Find a route for everyone | 2 Routes |
+| Assign every route a team | 2 Routes |
+| Reprint changed packets | 4 Print |
 
 ## Messages
 

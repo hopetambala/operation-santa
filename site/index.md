@@ -11,16 +11,23 @@ Every Christmas Eve, Pasadena Jaycees Santa teams visit hundreds of local famili
 
 These guides follow the season in order. Find the step you're on, or start with [your role]({{ '/roles/' | relative_url }}).
 
-![The Overview page of the built-in demo season (fictional families): stat cards, route overview and task list]({{ '/assets/images/overview.png' | relative_url }})
+![Create or open season in Operation Santa]({{ '/assets/images/create-or-open.png' | relative_url }})
+
+| Step in the app | Guide |
+|---|---|
+| **1 Import** | [Bring in sign-ups and check addresses.]({{ '/sign-ups/' | relative_url }}) |
+| **2 Routes** | [Add teams and plan the evening.]({{ '/routing/' | relative_url }}) |
+| **3 Letters** | [Review flagged letters and drawings.]({{ '/letters/' | relative_url }}) |
+| **4 Print** | [Check, print and reprint team packets.]({{ '/printing/' | relative_url }}) |
 
 ## The season at a glance
 
 | When | What happens | Who | Start here |
 |---|---|---|---|
 | Before November | Install the app, create the season file | Coordinator | [Start here]({{ '/start-here/' | relative_url }}) |
-| November | Sign-ups come in. Import them, check addresses, read letters | Coordinator, route planner, letter cleaners | [November: sign-ups]({{ '/sign-ups/' | relative_url }}) |
-| From December 1 | Draft routes, add Santa teams, fit in late sign-ups | Route planner, coordinator | [December: routes]({{ '/routing/' | relative_url }}) |
-| About December 19 | Freeze the plan, check, print team packets | Print lead, coordinator | [December 19: printing]({{ '/printing/' | relative_url }}) |
+| November | Sign-ups come in. Import them, check addresses, read letters | Coordinator, route planner, letter cleaners | [1. Import]({{ '/sign-ups/' | relative_url }}) |
+| From December 1 | Draft routes, add Santa teams, fit in late sign-ups | Route planner, coordinator | [2. Routes]({{ '/routing/' | relative_url }}) |
+| About December 19 | Freeze the plan, check, print team packets | Print lead, coordinator | [4. Print]({{ '/printing/' | relative_url }}) |
 | December 20–23 | Late changes, replacement pages, calls to team leads | Coordinator, print lead | [Reprints and the call list]({{ '/printing/reprints/' | relative_url }}) |
 | December 24 | Teams leave the North Pole at 4:30 PM | Santa team leads | [Christmas Eve]({{ '/christmas-eve/' | relative_url }}) |
 | By January 31 | Purge children's and families' details | Coordinator | [After the season]({{ '/after-the-season/purge/' | relative_url }}) |
