@@ -63,7 +63,11 @@ export function averageStop(s:Season){const homes=s.families.filter(eligible);re
 export function service(f:Family,s:Settings,repeat=false){return Math.max(5,Math.min(25,s.base+s.extra*Math.max(0,f.children.length-1)+(f.unit?s.apartment:0)+(f.access?s.gate:0)+(f.flags.includes('extra_toys')?s.toys:0)-(repeat?s.discount:0)));}
 export const mins=(t:string)=>{const [h,m]=t.split(':').map(Number);return h*60+m};
 export const clock=(m:number)=>new Date(2026,11,24,0,Math.round(m)).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-export const duration=(n:number)=>`${Math.floor(n/60)}h ${Math.round(n%60)}m`;
+// Round first: rounding only the minutes turned 179.6 into "2h 60m".
+export const duration=(n:number)=>{const m=Math.round(n);return `${Math.floor(m/60)}h ${m%60}m`;};
+// Screens use sentence case; nothing in CSS capitalizes words (RELEASE-UX-PLAN item 10).
+export const sentence=(t:string)=>t?t[0].toUpperCase()+t.slice(1):t;
+export const plural=(n:number,one:string,many=`${one}s`)=>`${n} ${n===1?one:many}`;
 export const startOf=(r:Route,s:Season)=>r.start||s.settings.start;
 function stopSuffix(index:number):string {
   let suffix = '';
