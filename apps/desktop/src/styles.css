@@ -633,3 +633,13 @@ summary { cursor: pointer; display: flex; align-items: center; min-height: var(-
 /* Letters: why a letter needs a look, under its badge (RELEASE-UX-PLAN item 8). */
 .look-status { display: flex; flex-direction: column; align-items: flex-end; gap: var(--tk-dlite-semantic-spacing-100); }
 .look-reasons { margin: 0; padding: 0; list-style: none; text-align: right; font-size: var(--tk-dlite-semantic-typography-size-300); color: var(--tk-dlite-semantic-color-feedback-warning-fg); }
+/* Settings: unsaved edits stay in view until saved or discarded (RELEASE-UX-PLAN item 11). */
+.unsaved-bar { position: sticky; top: calc(var(--topbar-height, 0px) + var(--tk-dlite-semantic-spacing-200)); z-index: 5; display: flex; align-items: center; gap: var(--tk-dlite-semantic-spacing-300); margin-bottom: var(--tk-dlite-semantic-spacing-400); padding: var(--tk-dlite-semantic-spacing-300) var(--tk-dlite-semantic-spacing-400); border-radius: var(--tk-dlite-semantic-border-radius-200); background: var(--tk-dlite-semantic-color-feedback-warning-bg); color: var(--tk-dlite-semantic-color-feedback-warning-fg); }
+.unsaved-bar strong { margin-right: auto; }
+/* Teams: one table instead of cards (RELEASE-UX-PLAN item 15). */
+.team-table th, .team-table td { padding-block: var(--tk-dlite-semantic-spacing-100); vertical-align: middle; }
+.team-table td:last-child { width: 1%; white-space: nowrap; }
+.team-table .icon-btn { min-width: var(--tk-dlite-semantic-sizing-target-min); min-height: var(--tk-dlite-semantic-sizing-target-min); padding: var(--tk-dlite-semantic-spacing-xxs); }
+/* 45 teams (2025's count) scroll inside the table, under its own header, instead of down the page. */
+.team-table-wrap { max-height: calc(100vh - var(--topbar-height, 0px) - 16rem); min-height: 12rem; overflow-y: auto; }
+.team-table-wrap thead th { position: sticky; top: 0; z-index: 1; }
