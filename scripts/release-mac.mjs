@@ -10,7 +10,7 @@ import {chmodSync,cpSync,existsSync,mkdirSync,mkdtempSync,readdirSync,rmSync,sym
 import {tmpdir} from 'node:os';
 import {basename,join} from 'node:path';
 import {ROOT,TAURI_DIR,TARGET,OUT,fail,run,capture,tauriConf,buildFrontend,gateOrFail,updaterSetup,tauriBuild} from './release-common.mjs';
-import {checkBinary,UPDATER_MARKERS} from './release-gate.mjs';
+import {checkBinary,checkIdentity,UPDATER_MARKERS} from './release-gate.mjs';
 import {checkProfile} from './release-profile.mjs';
 
 const BUNDLE_ID='org.pasadenajaycees.opsanta';
@@ -97,6 +97,7 @@ if(channel==='mas'){
 // ---------- verify the .app ----------
 
 gateOrFail({bins:[app]});
+{const id=checkIdentity(app,{required:true});if(id.length)fail(`Not the production identity:\n  ${id.join('\n  ')}`);console.log('✓ Production identity: org.pasadenajaycees.opsanta, "Operation Santa"');}
 if(channel==='mas'){const found=checkBinary(app,UPDATER_MARKERS);if(found.length)fail(`The Mac App Store build contains the updater, which App Review rejects:\n  ${found.join('\n  ')}`);console.log('✓ No updater in the Mac App Store build');}
 // App Store Connect rejects a bundle without an .icns holding a 512pt @2x image (error 90236); Tauri adds none unless
 // tauri.conf.json lists bundle.icon. Checked for both channels: the DMG would otherwise show the generic app icon.

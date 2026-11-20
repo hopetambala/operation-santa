@@ -558,3 +558,72 @@ summary { cursor: pointer; display: flex; align-items: center; min-height: var(-
 @media (--tk-dlite-bp-md-down) {
   .step-bar.nav-pills { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Dev build ribbon (main.rs app_identity). Never in the real app; hidden for guide screenshots (data-guides). */
+.dev-ribbon { position: sticky; top: 0; z-index: 60; padding: var(--tk-dlite-semantic-spacing-100) var(--tk-dlite-semantic-spacing-400); text-align: center;
+  font-size: var(--tk-dlite-semantic-typography-size-300); font-weight: 600;
+  color: var(--tk-dlite-semantic-color-feedback-warning-fg); background: var(--tk-dlite-semantic-color-feedback-warning-bg);
+  border-bottom: 3px dashed var(--tk-dlite-semantic-color-feedback-warning); }
+:root[data-guides] .dev-ribbon { display: none; }
+
+/* ── Welcome window (welcome.tsx; main.rs window_mode shrinks the window to 760×520) ── */
+.topbar[hidden] { display: none; }
+.app.welcome-mode { max-width: none; min-height: 100vh; padding: 0; display: flex; }
+.app.welcome-mode main { flex: 1; display: flex; padding: 0; }
+.welcome { flex: 1; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); min-height: 100vh; }
+.welcome-main { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--tk-dlite-semantic-spacing-200);
+  padding: var(--tk-dlite-semantic-spacing-600) var(--tk-dlite-semantic-spacing-500); text-align: center; }
+.welcome-icon { display: block; margin-bottom: var(--tk-dlite-semantic-spacing-200); }
+.welcome h1 { font-size: var(--tk-dlite-semantic-typography-size-700); }
+.welcome-version { color: var(--tk-dlite-semantic-color-text-tertiary); font-size: var(--tk-dlite-semantic-typography-size-300); margin-bottom: var(--tk-dlite-semantic-spacing-400); }
+.welcome-actions { display: flex; flex-direction: column; gap: var(--tk-dlite-semantic-spacing-100); width: 100%; max-width: 320px; }
+.welcome-action, .recent { display: flex; align-items: center; gap: var(--tk-dlite-semantic-spacing-300); width: 100%; min-height: var(--tk-dlite-semantic-sizing-target-comfortable);
+  padding: var(--tk-dlite-semantic-spacing-200) var(--tk-dlite-semantic-spacing-300); border: 0; border-radius: var(--tk-dlite-semantic-border-radius-md);
+  background: transparent; color: var(--tk-dlite-semantic-color-text-primary); text-align: left; cursor: pointer; font: inherit; }
+.welcome-action:hover, .recent:hover, .welcome-action:focus-visible, .recent:focus-visible { background: var(--tk-dlite-semantic-color-surface-sunken); }
+.welcome-action svg { color: var(--tk-dlite-semantic-color-action-primary); flex: none; }
+.welcome-action strong, .recent strong { display: block; font-size: var(--tk-dlite-semantic-typography-size-350); }
+.welcome-action small, .recent small { display: block; color: var(--tk-dlite-semantic-color-text-tertiary); font-size: var(--tk-dlite-semantic-typography-size-300); }
+.welcome-note { max-width: 320px; color: var(--tk-dlite-semantic-color-text-tertiary); font-size: var(--tk-dlite-semantic-typography-size-300); margin-top: var(--tk-dlite-semantic-spacing-300); }
+.welcome-recents { padding: var(--tk-dlite-semantic-spacing-600) var(--tk-dlite-semantic-spacing-400); background: var(--tk-dlite-semantic-color-surface-sunken);
+  border-left: var(--tk-dlite-semantic-border-weight-thin) solid var(--tk-dlite-semantic-color-border-subtle); overflow-y: auto; }
+.welcome-recents h2 { font-size: var(--tk-dlite-semantic-typography-size-300); color: var(--tk-dlite-semantic-color-text-tertiary); letter-spacing: var(--tk-dlite-semantic-typography-letter-spacing-wide);
+  text-transform: uppercase; margin-bottom: var(--tk-dlite-semantic-spacing-300); }
+.welcome-recents ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--tk-dlite-semantic-spacing-xxs); }
+.welcome-recents li { display: flex; align-items: center; }
+.recent svg { color: var(--tk-dlite-semantic-color-text-tertiary); flex: none; }
+.recent span { min-width: 0; }
+.recent strong, .recent small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent-forget { opacity: 0; }
+.welcome-recents li:hover .recent-forget, .recent-forget:focus-visible { opacity: 1; }
+.welcome-empty { color: var(--tk-dlite-semantic-color-text-tertiary); font-size: var(--tk-dlite-semantic-typography-size-300); }
+/* The welcome window is 760 wide, so it stays two columns down to phone width. */
+@media (--tk-dlite-bp-sm-down) {
+  .welcome { grid-template-columns: 1fr; }
+  .welcome-recents { border-left: 0; border-top: var(--tk-dlite-semantic-border-weight-thin) solid var(--tk-dlite-semantic-color-border-subtle); }
+}
+
+/* ── The four steps: tour card, Step 1 start, prerequisites, check marks ── */
+.four-steps, .import-start, .step-first { margin-bottom: var(--tk-dlite-semantic-spacing-400); padding: var(--tk-dlite-semantic-spacing-400) var(--tk-dlite-semantic-spacing-500);
+  border: var(--tk-dlite-semantic-border-weight-thin) solid var(--tk-dlite-semantic-color-border-subtle); border-radius: var(--tk-dlite-semantic-border-radius-lg);
+  background: var(--tk-dlite-semantic-color-surface-base); }
+.four-steps-head { display: flex; align-items: center; justify-content: space-between; gap: var(--tk-dlite-semantic-spacing-300); margin-bottom: var(--tk-dlite-semantic-spacing-300); }
+.four-steps ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--tk-dlite-semantic-spacing-400); }
+.four-steps li { display: flex; gap: var(--tk-dlite-semantic-spacing-200); align-items: flex-start; }
+.four-steps li .step-number { flex: none; color: var(--tk-dlite-semantic-color-action-primary); }
+.four-steps small, .four-steps-foot { display: block; color: var(--tk-dlite-semantic-color-text-secondary); font-size: var(--tk-dlite-semantic-typography-size-300); line-height: var(--tk-dlite-semantic-typography-line-height-snug); }
+.four-steps-foot { margin-top: var(--tk-dlite-semantic-spacing-300); color: var(--tk-dlite-semantic-color-text-tertiary); }
+.import-start { display: flex; flex-direction: column; align-items: center; gap: var(--tk-dlite-semantic-spacing-200); text-align: center;
+  padding: var(--tk-dlite-semantic-spacing-600) var(--tk-dlite-semantic-spacing-500); border-style: dashed; border-width: 2px; border-color: var(--tk-dlite-semantic-color-border-control); }
+.import-start > svg { color: var(--tk-dlite-semantic-color-action-primary); }
+.import-start p { max-width: 520px; color: var(--tk-dlite-semantic-color-text-secondary); }
+.import-start small { color: var(--tk-dlite-semantic-color-text-tertiary); }
+.import-start.over { border-color: var(--tk-dlite-semantic-color-action-primary); background: var(--tk-dlite-semantic-color-surface-sunken); }
+.step-first { display: flex; align-items: center; justify-content: space-between; gap: var(--tk-dlite-semantic-spacing-400); }
+.step-first p { color: var(--tk-dlite-semantic-color-text-secondary); }
+.step-bar button.done .step-number { background: var(--tk-dlite-semantic-color-feedback-success-bg); }
+.field-error { color: var(--tk-dlite-semantic-color-feedback-danger-fg); font-size: var(--tk-dlite-semantic-typography-size-300); margin: calc(-1 * var(--tk-dlite-semantic-spacing-200)) 0 var(--tk-dlite-semantic-spacing-200); }
+@media (--tk-dlite-bp-md-down) {
+  .four-steps ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .step-first { flex-direction: column; align-items: flex-start; }
+}

@@ -5,7 +5,7 @@ import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {homedir} from 'node:os';
 import path from 'node:path';
-import {RUN_DIR,shot,seasonAction,click,fill,nav,toast,noError,dialogText} from '../support/app';
+import {RUN_DIR,shot,seasonAction,click,fill,nav,toast,noError,dialogText,newPassphrase} from '../support/app';
 // Season files with the Mac App Store sandbox on (docs/RELEASE.md § Season files under the sandbox). Run by
 // `npm run e2e:sandbox`, which builds a sandboxed, ad-hoc-signed copy of the E2E app under its own bundle id.
 // Synthetic data only. Unlike the other specs, the keychain is real: whether it works under the sandbox is the question.
@@ -38,8 +38,8 @@ describe('Season files in the App Sandbox (Mac App Store build)',()=>{
  const queueOpen=(p:string)=>browser.execute((f:string)=>{(window as unknown as {__opens:string[]}).__opens.push(f)},p);
  it('runs sandboxed: the binary carries the sandbox entitlement',()=>{const e=spawnSync('codesign',['-d','--entitlements','-','--xml',EXE],{encoding:'utf8'});assert.match(`${e.stdout}${e.stderr}`,/com\.apple\.security\.app-sandbox/,`${EXE} is not sandboxed`);});
  it('creates the season in the chosen folder and remembers the passphrase in the keychain',async()=>{
-  await seasonAction('Create new season');await dialogText('Start a new season');
-  await $('[role="dialog"] input[type=password]').setValue(PASS);
+  await seasonAction('New season…');await dialogText('Start a new season');
+  await newPassphrase(PASS);
   await $('//label[contains(.,"Remember on this computer")]/input').click();
   await click('Choose save location');
   await toast(/Encrypted season created/);await noError();await shot('sandbox-created');
@@ -66,7 +66,7 @@ describe('Season files in the App Sandbox (Mac App Store build)',()=>{
  });
  it('locks, then reopens with the passphrase from the keychain and finds the change',async()=>{
   await $('button.avatar').click();await click('Lock now');await toast(/Season locked/);
-  await queueOpen(SEASON);await seasonAction('Open encrypted season');
+  await queueOpen(SEASON);await seasonAction('Open season…');
   // A remembered passphrase opens the season without asking. If the keychain failed, the unlock form shows instead.
   await browser.waitUntil(async()=>await $('[role="dialog"][aria-label="Unlock your season"]').isExisting()||/Encrypted season open/.test(await $('.toast').isExisting()?await $('.toast').getText():''),{timeout:30000,timeoutMsg:'the season neither opened nor asked for its passphrase'});
   assert.equal(await $('[role="dialog"][aria-label="Unlock your season"]').isExisting(),false,'the keychain did not return the remembered passphrase under the sandbox');
@@ -78,6 +78,17 @@ describe('Season files in the App Sandbox (Mac App Store build)',()=>{
   copyFileSync(SEASON,STRAY);
   const r=await call('open_season',{path:STRAY,passphrase:PASS});
   assert.match(r,/^error: .*(Season file not found|Cannot open season file)/,`a sandboxed app must not reach ${STRAY}, got: ${r}`);
+ });
+ // Recent seasons (welcome window). After a relaunch the sandbox no longer lets the app read a file picked in an earlier
+ // run, so main.rs season_access must say "denied" (not "missing") and the window asks for it in the Open panel, in its
+ // folder. STRAY stands in for such a file: it exists, and this run was never given it.
+ it('tells a season it may not read ("denied") from one that moved ("missing"), for recent seasons',async()=>{
+  assert.equal(await call('season_access',{path:SEASON}),'ok "ok"','the season in the granted folder is readable');
+  const stray=await call('season_access',{path:STRAY});
+  assert.equal(stray,'ok "denied"',`a season outside the granted folder must read as denied, got: ${stray}`);
+  const gone=await call('season_access',{path:path.join(CHOSEN,'Never existed.opsanta')});
+  assert.equal(gone,'ok "missing"',`a missing season in the granted folder must read as missing, got: ${gone}`);
+  console.log(`\nseason_access under the sandbox: granted=ok, outside=${stray}, missing=${gone}`);
  });
  after(async()=>{
   // Leave nothing in the login keychain, and close the season so its file is complete on disk.

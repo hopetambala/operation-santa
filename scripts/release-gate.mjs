@@ -12,6 +12,11 @@ export const DIST_MARKERS=['WDIO Tauri Plugin','__wdio_mocks__'];
 // tauri-plugin-updater's own error text, and the `updater` capability's permission. The Mac App Store build must carry
 // neither: Apple updates store copies and rejects apps that update themselves.
 export const UPDATER_MARKERS=['Updater does not have any endpoints set.','updater:default'];
+// Release builds are the production identity; agents' and E2E builds are "Operation Santa Dev" (tauri.dev.conf.json).
+// A dev identity in a release would install beside, or be mistaken for, the real app (ONBOARDING-AND-ENVIRONMENTS-PLAN.md §2).
+export const PRODUCTION_ID='org.pasadenajaycees.opsanta';
+export const PRODUCTION_NAME='Operation Santa';
+export const DEV_MARKERS=['org.pasadenajaycees.opsanta.dev','Operation Santa Dev'];
 
 function walk(dir){return readdirSync(dir,{withFileTypes:true}).flatMap(e=>{const p=join(dir,e.name);return e.isDirectory()?walk(p):[p]})}
 
@@ -38,9 +43,22 @@ export function checkDist(dir){
   return problems;
 }
 
+const plistString=(xml,key)=>xml.match(new RegExp(`<key>${key}</key>\\s*<string>([^<]*)</string>`))?.[1];
+/** A .app must carry the production bundle ID and name. With `required`, a missing Info.plist is a problem too. */
+export function checkIdentity(path,{required=false}={}){
+  if(!path.endsWith('.app'))return [];
+  const plist=join(path,'Contents','Info.plist');
+  if(!existsSync(plist))return required?[`${path}: no Contents/Info.plist, so its identity cannot be checked`]:[];
+  const xml=readFileSync(plist,'utf8');const problems=[];
+  const id=plistString(xml,'CFBundleIdentifier'),name=plistString(xml,'CFBundleName');
+  if(id!==PRODUCTION_ID)problems.push(`${path}: CFBundleIdentifier is "${id}", not the production "${PRODUCTION_ID}"`);
+  if(name!==PRODUCTION_NAME)problems.push(`${path}: CFBundleName is "${name}", not "${PRODUCTION_NAME}"`);
+  return problems;
+}
+
 /** Returns the list of problems; empty means the gate passes. */
 export function gate({dist,bins=[]}){
-  return [...(dist?checkDist(dist):[]),...bins.flatMap(b=>checkBinary(b))];
+  return [...(dist?checkDist(dist):[]),...bins.flatMap(b=>[...checkBinary(b),...checkBinary(b,DEV_MARKERS),...checkIdentity(b)])];
 }
 
 if(process.argv[1]&&pathToFileURL(process.argv[1]).href===import.meta.url){
@@ -48,6 +66,6 @@ if(process.argv[1]&&pathToFileURL(process.argv[1]).href===import.meta.url){
   for(let i=0;i<args.length;i++){if(args[i]==='--dist')dist=args[++i];else if(args[i]==='--bin')bins.push(args[++i]);else{console.error(`Unknown argument ${args[i]}`);process.exit(2)}}
   if(!dist&&bins.length===0){console.error('Usage: release-gate.mjs --dist <dir> --bin <app|exe> ...');process.exit(2)}
   const problems=gate({dist,bins});
-  if(problems.length){console.error('✗ Release gate FAILED: this build contains the E2E test bridge.\n  '+problems.join('\n  '));process.exit(1)}
-  console.log(`✓ Release gate passed: no E2E bridge in ${[dist,...bins].filter(Boolean).join(', ')}`);
+  if(problems.length){console.error('✗ Release gate FAILED: this build contains the E2E test bridge or the Dev identity.\n  '+problems.join('\n  '));process.exit(1)}
+  console.log(`✓ Release gate passed: no E2E bridge or Dev identity in ${[dist,...bins].filter(Boolean).join(', ')}`);
 }

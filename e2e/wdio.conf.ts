@@ -9,6 +9,10 @@ const root=path.resolve(import.meta.dirname,'..');
 const app=process.env.OPSANTA_E2E_APP??path.join(root,'target','debug',process.platform==='win32'?'opsanta.exe':'opsanta');
 // The app inherits this and writes any panic there (main.rs `record_panics`); CI uploads e2e/.artifacts.
 process.env.OPSANTA_E2E_LOG=path.join(root,'e2e','.artifacts','app-panics.log');
+// A fresh app data folder per run (main.rs `app_data`, honored only in E2E builds), so season working copies and backups
+// from tests never pile up in a real install's Application Support. The sandbox proof is the exception: there the
+// container is what's under test, and the sandbox wouldn't allow a folder outside it anyway.
+if(!process.env.OPSANTA_SANDBOX_ID)process.env.OPSANTA_DATA_DIR??=path.join(root,'e2e','.artifacts',`appdata-${new Date().toISOString().replace(/[:.]/g,'-')}`);
 export const config:WebdriverIO.Config={
  runner:'local',
  specs:['./specs/**/*.e2e.ts'],

@@ -51,7 +51,9 @@ TestFlight updates the app for you. TestFlight builds expire after 90 days, so t
 
 ## The first time you open it
 
-The app opens on **Create or open season**. To begin, [create a season file]({{ '/start-here/season-file/' | relative_url }}).
+The app opens on a small welcome window. To begin, [create a season file]({{ '/start-here/season-file/' | relative_url }}).
+
+If you installed from the download and opened the app straight from the disk image or your Downloads folder, it asks **"Move Operation Santa to the Applications folder?"** Click **Move and Restart**. An app left outside Applications can't update itself.
 
 ## Updates
 

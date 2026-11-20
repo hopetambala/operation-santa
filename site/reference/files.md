@@ -15,7 +15,7 @@ description: "The files Operation Santa opens and saves, and the columns it expe
 
 | File | What it is | Made by |
 |---|---|---|
-| `Operation Santa 2026.opsanta` | The season: every family, child, letter, drawing, route, team, setting and change. Encrypted with the season passphrase. | **Create new season** |
+| `Operation Santa 2026.opsanta` | The season: every family, child, letter, drawing, route, team, setting and change. Encrypted with the season passphrase. | **New season…** |
 | `<time>-<code>.opsanta` in the app's backups folder | A backup of the season, same passphrase. The latest 20 are kept. See [Backups]({{ '/start-here/season-file/' | relative_url }}#backups). | automatic |
 | `Cleanup 26001-26199.opsanta-packet` | A cleanup packet: some families' letters, wishes and drawings. Encrypted with its own passphrase. | Letter cleanup ▸ **Cleanup packet** |
 | `Cleaned by Ana.opsanta-packet` | A cleaner's returned packet. | **Save edited packet** |

@@ -23,7 +23,8 @@ function demoCsv(update=false){const demo=demoSeason().families;const row=(f:Fam
  return '﻿'+Papa.unparse({fields:HEADERS_2025,data:update?[row(demo[0],0),row(edited,1),row(demo[2],2),row(fresh as Family,3)]:[row(demo[0],0),row(demo[1],1),row(demo[2],2)]});}
 describe('Guide screenshots (demo season)',()=>{
  // Animations only run while the window is in front, so a background run could catch a highlight mid-slide: turn them off.
- before(async()=>{await $('h1').waitForDisplayed({timeout:60000});await installMocks();await browser.execute(()=>{const st=document.createElement('style');st.textContent='*,*::before,*::after{transition:none!important;animation:none!important}';document.head.append(st)});await browser.pause(1500);});
+ before(async()=>{await $('h1').waitForDisplayed({timeout:60000});await installMocks();await browser.execute(()=>{document.documentElement.dataset.guides='1'});// no Dev ribbon in the volunteers' pictures
+ await browser.execute(()=>{const st=document.createElement('style');st.textContent='*,*::before,*::after{transition:none!important;animation:none!important}';document.head.append(st)});await browser.pause(1500);});
  it('takes every screenshot it can',async function(){this.timeout(15*60_000);
   await snap('create-or-open',async()=>{});
   await practiceSeason();
@@ -35,7 +36,7 @@ describe('Guide screenshots (demo season)',()=>{
   await snap('route-planner',async()=>{await nav('Route planner');await (await $('.route-card')).click();await browser.execute(()=>window.scrollTo(0,0))});
   await snap('settings',async()=>{await nav('Settings')});
   await snap('airtable-token-saved',async()=>{await turnOn('Airtable Sync');await setE2e({secrets:{airtable_token:'patDEMO.not-a-real-token'}});await nav('Overview');await nav('Settings');await $('//*[contains(text(),"Token saved")]').waitForExist({timeout:5000});await $('//*[contains(text(),"Token saved")]').scrollIntoView({block:'center'})});
-  await snap('new-season-dialog',async()=>{await seasonAction('Create new season');await dialogText('Start a new season')});
+  await snap('new-season-dialog',async()=>{await seasonAction('New season…');await dialogText('Start a new season')});
   // PDFs: a route that passes Check (its cover has the QR codes), and the label alignment test page.
   const pdfNamed=async(prefix:string)=>browser.waitUntil(async()=>readdirSync(RUN_DIR).some(f=>f.startsWith(prefix)&&f.endsWith('.pdf')),{timeout:60000,timeoutMsg:`no ${prefix} PDF`});
   try{await nav('Print center');await (await $('//button[normalize-space(.)="Export PDF" and not(@disabled)]')).click();await reasonIfAsked('other:Guide screenshots from the demo season');await pdfNamed('Route');pdfPage('route-packet-cover');}catch(e){failed.push(`route-packet-cover: ${(e as Error).message.split('\n')[0]}`)}

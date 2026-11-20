@@ -71,3 +71,21 @@ The Mac App Store build runs in Apple's App Sandbox, which lets the app reach on
 - The keychain entry is deleted at the end. The container stays at `~/Library/Containers/org.pasadenajaycees.opsanta.sandboxtest` as evidence.
 
 The real panels are checked by hand on the first TestFlight build (`docs/RELEASE.md`). It needs no other E2E app on port 4445; the runner refuses to start otherwise.
+
+## Move to Applications (macOS only)
+
+```bash
+npm run e2e:move
+```
+
+The direct-download build offers to move itself into Applications when it runs from a disk image, Downloads, the Desktop or a translocated copy (`main.rs` `install_location` / `move_to_applications`). `e2e/install/run.mjs` tests that with a real app bundle:
+
+- It builds the Dev app with the `e2e` and `updater` features (debug), copies it into `Downloads` inside a throwaway home folder, and points "Applications" at a scratch folder (`OPSANTA_APPLICATIONS_DIR`, honored only in debug builds). The real `/Applications`, Downloads and Trash are never touched.
+- `install/move.e2e.ts` waits for the offer and clicks **Move and Restart**.
+- The app then quits on purpose, so WebDriver's own session teardown fails. The runner judges the result from what happened instead: the app is in Applications with the same signature, the original left Downloads for the Trash, and the copy reopened from Applications. Then it stops that copy and unregisters both from Launch Services.
+
+## Isolation
+
+- E2E builds are the Dev identity (`tauri.dev.conf.json`), never `org.pasadenajaycees.opsanta`. `e2e/build.mjs` refuses the production ID.
+- Each run gets a fresh app data folder, `e2e/.artifacts/appdata-<timestamp>` (`OPSANTA_DATA_DIR`, honored only in E2E builds). The sandbox proof is the exception: there the container is what's under test.
+- Each spec file's app starts with empty webview storage (`apps/desktop/src/e2e.ts`). WebKit keeps localStorage per bundle ID across runs, and recent seasons or "four steps seen" would otherwise leak between runs.

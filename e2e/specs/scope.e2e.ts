@@ -1,6 +1,6 @@
-import {$,$$} from '@wdio/globals';
+import {browser,$,$$} from '@wdio/globals';
 import assert from 'node:assert/strict';
-import {practiceSeason,nav,pageText,button,click} from '../support/app';
+import {practiceSeason,nav,pageText,button,click,welcomeAction} from '../support/app';
 // The app's agreed scope (docs/feature-grounding-audit.md): features cut on 2026-10-30 must not come back,
 // and the grounded ones they were weighed against must stay. Runs on the built-in demo season, so no setup.
 const absent=async(text:string)=>assert.equal(await (await button(text)).isExisting(),false,`"${text}" should be gone`);
@@ -9,15 +9,20 @@ const hasField=async(label:string)=>$(`//label[contains(@class,"field")]/span[no
 const closeDialog=async()=>{await $('[role="dialog"] button[aria-label="Close dialog"]').click();await $('[role="dialog"]').waitForExist({reverse:true});};
 describe('Scope: only features grounded in the 2025 problems',()=>{
  before(async()=>{await $('h1').waitForDisplayed({timeout:60000});});
- it('starts on Create or open season with no practice families or workflow buttons',async()=>{
-  assert.equal(await $('h1').getText(),'Create or open season');
-  await present('Create new season');await present('Open encrypted season');
+ it('starts on the welcome window with no practice families or workflow buttons',async()=>{
+  assert.equal(await $('h1').getText(),'Operation Santa');
+  for(const a of ['New season…','Open season…','Open the guide'])assert.ok(await welcomeAction(a).isExisting(),`welcome window has "${a}"`);
+  assert.ok(await $('//h2[normalize-space()="Recent seasons"]').isExisting(),'welcome window lists recent seasons');
   assert.equal(await $('nav.step-bar').isExisting(),false);
+  // The welcome window is small and fixed (main.rs window_mode); a season grows it into the workspace.
+  const welcome=await browser.execute(()=>({w:window.innerWidth,h:window.innerHeight}));
+  assert.ok(welcome.w<=800&&welcome.h<=560,`welcome window is ${welcome.w}×${welcome.h}`);
  });
  it('shows precisely four numbered workflow steps in a season',async()=>{
   await practiceSeason();
+  await browser.waitUntil(async()=>(await browser.execute(()=>window.innerWidth))>=1000,{timeoutMsg:'the window did not grow into the workspace'});
   assert.deepEqual(await $$('.step-bar strong').map(el=>el.getText()),['Import','Routes','Letters','Print']);
-  assert.deepEqual(await $$('.step-number').map(el=>el.getText()),['1','2','3','4']);
+  assert.deepEqual(await $$('.step-bar .step-number').map(el=>el.getText()),['1','2','3','4']);
  });
  it('Overview has no countdown or date strip',async()=>{assert.ok(!/days to Christmas Eve/.test(await pageText()));assert.equal(await $('.season-strip').isExisting(),false);});
  it('Route planner: no team-count sweep, scenarios or split; rebalance stays',async()=>{await nav('Route planner');const t=await pageText();assert.ok(!t.includes('How many teams do we need?'),'team-count sweep section is gone');for(const b of ['Run sweep','Save scenario','Split'])await absent(b);await present('Rebalance unlocked');});

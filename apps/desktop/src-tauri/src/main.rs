@@ -61,7 +61,12 @@ fn backup_of(s:&OpenSeason)->Result<PathBuf,String>{s.conn.execute_batch("PRAGMA
 fn purge_backups_of(s:&OpenSeason)->Result<u32,String>{let dir=s.root.join("backups").join(key_of(&s.path));if !dir.is_dir(){return Ok(0)}let n=fs::read_dir(&dir).map_err(|e|e.to_string())?.filter_map(Result::ok).filter(|e|e.path().extension().is_some_and(|x|x=="opsanta")).count() as u32;fs::remove_dir_all(&dir).map_err(|_|"Could not delete this season's backups.")?;Ok(n)}
 // A clean close publishes and deletes the working copy, so app data keeps no extra copy of families' records.
 fn close_out(s:OpenSeason)->Result<(),String>{publish(&s)?;let work=s.work.clone();drop(s);remove_work(&work);Ok(())}
-fn seasons_root(app:&tauri::AppHandle)->Result<PathBuf,String>{use tauri::Manager;let d=app.path().app_data_dir().map_err(|_|"No app data folder.")?.join("seasons");fs::create_dir_all(&d).map_err(|_|"Cannot create the app data folder.")?;Ok(d)}
+// E2E builds only: OPSANTA_DATA_DIR gives each test run a fresh app data folder (e2e/wdio.conf.ts), the way VS Code's and
+// Zed's test launches use a throwaway user-data-dir. Release and dev builds ignore it.
+fn app_data(app:&tauri::AppHandle)->Result<PathBuf,String>{
+ #[cfg(feature="e2e")]if let Some(d)=std::env::var_os("OPSANTA_DATA_DIR").filter(|d|!d.is_empty()){return Ok(PathBuf::from(d))}
+ use tauri::Manager;app.path().app_data_dir().map_err(|_|"No app data folder.".into())}
+fn seasons_root(app:&tauri::AppHandle)->Result<PathBuf,String>{let d=app_data(app)?.join("seasons");fs::create_dir_all(&d).map_err(|_|"Cannot create the app data folder.")?;Ok(d)}
 // Argon2id here is m=64MiB, t=3, p=1: 90ms on this machine before the season file is even read.
 // A plain command runs on the UI thread. `async` is Tauri's blocking-pool flag, same as save_season.
 #[tauri::command(async)]
@@ -85,7 +90,150 @@ fn purge_backups(store:tauri::State<Store>)->Result<u32,String>{let g=store.0.lo
 // close publishes the whole database back to the user's file, same rewrite save_season keeps off the UI thread.
 #[tauri::command(async)]
 fn close_season(store:tauri::State<Store>)->Result<(),String>{let s=store.0.lock().map_err(|_|"Season is busy.")?.take();match s{Some(s)=>close_out(s),None=>Ok(())}}
-const SERVICE:&str="org.pasadenajaycees.opsanta";
+// The keychain service is the running app's bundle ID, so "Operation Santa Dev" (tauri.dev.conf.json), the sandbox proof
+// and the real app never read or overwrite each other's saved passphrases (ONBOARDING-AND-ENVIRONMENTS-PLAN.md §2).
+static SERVICE:OnceLock<String>=OnceLock::new();
+fn service()->Result<&'static str,String>{SERVICE.get().map(String::as_str).ok_or_else(||"Keychain is not ready yet.".into())}
+// Window titles follow productName, so the Dev build says "Operation Santa Dev" in the title bar and Mission Control.
+fn identity_setup(app:&tauri::App){use tauri::Manager;let _=SERVICE.set(app.config().identifier.clone());let name=app.package_info().name.clone();for w in app.webview_windows().values(){let _=w.set_title(&name);}}
+// Before a recent season opens (welcome window): "ok", "missing" (moved or deleted), or "denied". The Mac App Store build
+// may only read a file the coordinator picked in this run, so after a relaunch a recent season is "denied" there and the
+// window asks for it in the Open panel, already in its folder.
+#[tauri::command(async)]
+fn season_access(path:String)->&'static str{let p=Path::new(&path);if !p.is_absolute()||p.extension().is_none_or(|e|e!="opsanta"){return "missing"}match File::open(p){Ok(_)=>"ok",Err(e) if e.kind()==std::io::ErrorKind::NotFound=>"missing",Err(_)=>"denied"}}
+// ── Move to Applications (direct-download build only) ──────────────────────────────────────────────────────────────
+// Opened from a disk image or Downloads, macOS runs a downloaded app from a random read-only copy ("App Translocation"),
+// where it can't update itself. Slack, Discord, Claude, Canva and GitHub Desktop all offer to move themselves into
+// Applications; this follows GitHub Desktop's dialog (ONBOARDING-AND-ENVIRONMENTS-PLAN.md §3). The Mac App Store build
+// never asks: the store installs it in Applications, and the sandbox couldn't move it anyway.
+#[derive(Serialize,Debug,PartialEq)]#[serde(rename_all="camelCase")]
+struct InstallLocation{suggest_move:bool,place:String,destination:String}
+// Why this copy should move: "a disk image", "Downloads", "Desktop" or "a temporary copy" (translocated). None when
+// it's in an Applications folder, or anywhere else (a developer's build folder, a folder someone chose on purpose).
+fn misplaced(bundle:&Path,apps:&Path,home:&Path)->Option<&'static str>{
+ if bundle.starts_with(apps)||bundle.starts_with(home.join("Applications")){return None}
+ if bundle.components().any(|c|c.as_os_str()=="AppTranslocation"){return Some("a temporary copy")}
+ if bundle.starts_with("/Volumes"){return Some("a disk image")}
+ if bundle.starts_with(home.join("Downloads")){return Some("Downloads")}
+ if bundle.starts_with(home.join("Desktop")){return Some("Desktop")}
+ None
+}
+fn running_bundle()->Option<PathBuf>{let exe=std::env::current_exe().ok()?;let b=exe.parent()?.parent()?.parent()?;(b.extension()?=="app").then(||b.to_path_buf())}
+fn home()->Option<PathBuf>{std::env::var_os("HOME").map(PathBuf::from)}
+// Debug builds can point "Applications" elsewhere, so the move can be tried without touching the real folder.
+fn applications_dir()->PathBuf{#[cfg(debug_assertions)]if let Some(d)=std::env::var_os("OPSANTA_APPLICATIONS_DIR"){return PathBuf::from(d)}PathBuf::from("/Applications")}
+#[tauri::command]
+fn install_location()->InstallLocation{
+ let none=InstallLocation{suggest_move:false,place:String::new(),destination:String::new()};
+ if !cfg!(all(target_os="macos",feature="updater")){return none}
+ let (Some(bundle),Some(home))=(running_bundle(),home()) else {return none};
+ let apps=applications_dir();
+ match misplaced(&bundle,&apps,&home){Some(place)=>InstallLocation{suggest_move:true,place:place.into(),destination:apps.join(bundle.file_name().unwrap_or_default()).display().to_string()},None=>none}
+}
+// Copies the app into Applications (ditto keeps its signature), clears the download quarantine on the copy, puts an
+// older copy there in the Trash, and puts the original in the Trash when it sits in an ordinary folder. A disk image
+// or a translocated copy is read-only and is left alone.
+// macOS only (ditto, xattr, the Trash). The App Store build compiles it but never calls it.
+#[cfg(target_os="macos")]#[cfg_attr(not(feature="updater"),allow(dead_code))]
+fn move_bundle(src:&Path,apps:&Path,trash:&Path)->Result<PathBuf,String>{
+ let name=src.file_name().ok_or("This copy of the app has no name.")?;let dest=apps.join(name);
+ let stamp=std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_secs();
+ let trashed=|p:&Path,what:&str|trash.join(format!("{} ({what} {stamp}).app",p.file_stem().unwrap_or_default().to_string_lossy()));
+ if dest.exists(){fs::create_dir_all(trash).ok();fs::rename(&dest,trashed(&dest,"replaced")).map_err(|_|"An older copy in Applications couldn't be moved to the Trash. Quit it if it's open, or drag Operation Santa into Applications yourself.")?;}
+ let copied=std::process::Command::new("/usr/bin/ditto").arg(src).arg(&dest).status().map(|s|s.success()).unwrap_or(false);
+ if !copied{let _=fs::remove_dir_all(&dest);return Err("Operation Santa couldn't copy itself into Applications. On some Macs that needs an administrator: drag Operation Santa into Applications instead.".into())}
+ let _=std::process::Command::new("/usr/bin/xattr").args(["-dr","com.apple.quarantine"]).arg(&dest).status();
+ let read_only=src.starts_with("/Volumes")||src.components().any(|c|c.as_os_str()=="AppTranslocation");
+ if !read_only{fs::create_dir_all(trash).ok();let _=fs::rename(src,trashed(src,"moved to Applications"));}
+ Ok(dest)
+}
+#[tauri::command(async)]
+fn move_to_applications(app:tauri::AppHandle)->Result<(),String>{
+ #[cfg(all(target_os="macos",feature="updater"))]{
+  let src=running_bundle().ok_or("Couldn't find this copy of the app.")?;let home=home().ok_or("No home folder.")?;
+  let dest=move_bundle(&src,&applications_dir(),&home.join(".Trash"))?;
+  std::process::Command::new("/usr/bin/open").arg("-n").arg(&dest).spawn().map_err(|_|"Moved to Applications. Open it from there.")?;
+  app.exit(0);Ok(())
+ }
+ #[cfg(not(all(target_os="macos",feature="updater")))]{let _=app;Err("This copy of Operation Santa is managed by the App Store.".into())}
+}
+// The volunteer guide (site/, GitHub Pages). Only this site opens, at a page path made of letters, digits, - and /.
+const GUIDE_URL:&str="https://hopetambala.github.io/operation-santa/";
+fn guide_page_ok(p:&str)->bool{p.len()<120&&!p.starts_with('/')&&!p.contains("//")&&p.chars().all(|c|c.is_ascii_alphanumeric()||c=='-'||c=='/')}
+#[tauri::command]
+fn open_guide(page:Option<String>,app:tauri::AppHandle)->Result<(),String>{use tauri_plugin_opener::OpenerExt;let page=page.unwrap_or_default();if !guide_page_ok(&page){return Err("Unknown guide page.".into())}app.opener().open_url(format!("{GUIDE_URL}{page}"),None::<&str>).map_err(|e|format!("Could not open the guide: {e}"))}
+// One window, two sizes (ONBOARDING-AND-ENVIRONMENTS-PLAN.md §4). With no season open it is a small welcome window, the
+// way Xcode and Obsidian open; with a season open it is the workspace, at the size and place the coordinator left it
+// (HIG: restore window state). The workspace frame is kept in app data as window.json.
+const WELCOME:(f64,f64)=(760.0,520.0);
+const WORKSPACE_DEFAULT:(f64,f64)=(1440.0,940.0);
+const WORKSPACE_MIN:(f64,f64)=(1000.0,700.0);
+static IN_WORKSPACE:Mutex<bool>=Mutex::new(false);
+#[derive(Serialize,Deserialize,Clone,Copy,Debug,PartialEq)]
+struct Frame{x:f64,y:f64,w:f64,h:f64}
+fn frame_file(app:&tauri::AppHandle)->Option<PathBuf>{app_data(app).ok().map(|d|d.join("window.json"))}
+fn read_frame(app:&tauri::AppHandle)->Option<Frame>{let f:Frame=serde_json::from_str(&fs::read_to_string(frame_file(app)?).ok()?).ok()?;(f.w>=WORKSPACE_MIN.0&&f.h>=WORKSPACE_MIN.1&&f.w<20000.0&&f.h<20000.0).then_some(f)}
+fn save_frame(w:&tauri::WebviewWindow){use tauri::Manager;
+ if w.is_fullscreen().unwrap_or(false)||w.is_minimized().unwrap_or(false){return}
+ let (Ok(scale),Ok(pos),Ok(size))=(w.scale_factor(),w.outer_position(),w.inner_size()) else {return};
+ let (p,sz)=(pos.to_logical::<f64>(scale),size.to_logical::<f64>(scale));
+ let Some(file)=frame_file(w.app_handle()) else {return};
+ if let Some(dir)=file.parent(){let _=fs::create_dir_all(dir);}
+ let _=fs::write(file,serde_json::to_string(&Frame{x:p.x,y:p.y,w:sz.width,h:sz.height}).unwrap_or_default());
+}
+// A saved frame is used only if its top-left corner is on a screen that is still attached, and only up to that screen's size.
+fn fit(w:&tauri::WebviewWindow,f:Option<Frame>)->(Frame,bool){
+ let monitors=w.available_monitors().unwrap_or_default();
+ let on=|x:f64,y:f64|monitors.iter().find(|m|{let s=m.scale_factor();let p=m.position().to_logical::<f64>(s);let z=m.size().to_logical::<f64>(s);x>=p.x&&y>=p.y&&x<p.x+z.width-40.0&&y<p.y+z.height-40.0});
+ if let Some(f)=f{if let Some(m)=on(f.x,f.y){let s=m.scale_factor();let z=m.size().to_logical::<f64>(s);return (Frame{w:f.w.min(z.width),h:f.h.min(z.height),..f},true)}}
+ let screen=w.current_monitor().ok().flatten().map(|m|m.size().to_logical::<f64>(m.scale_factor()));
+ let (sw,sh)=screen.map_or(WORKSPACE_DEFAULT,|z|(z.width*0.94,z.height*0.92));
+ (Frame{x:0.0,y:0.0,w:WORKSPACE_DEFAULT.0.min(sw).max(WORKSPACE_MIN.0),h:WORKSPACE_DEFAULT.1.min(sh).max(WORKSPACE_MIN.1)},false)
+}
+fn apply_mode(w:&tauri::WebviewWindow,workspace:bool)->tauri::Result<()>{
+ use tauri::{LogicalPosition,LogicalSize,Size,Position,Manager};
+ let mut current=IN_WORKSPACE.lock().unwrap_or_else(|e|e.into_inner());
+ if *current==workspace{return Ok(())}
+ if workspace{
+  let (f,placed)=fit(w,read_frame(w.app_handle()));
+  w.set_resizable(true)?;w.set_maximizable(true)?;w.set_min_size(Some(Size::Logical(LogicalSize::new(WORKSPACE_MIN.0,WORKSPACE_MIN.1))))?;
+  w.set_size(Size::Logical(LogicalSize::new(f.w,f.h)))?;
+  if placed{w.set_position(Position::Logical(LogicalPosition::new(f.x,f.y)))?;}else{w.center()?;}
+ }else{
+  save_frame(w);
+  if w.is_fullscreen().unwrap_or(false){w.set_fullscreen(false)?;}
+  if w.is_maximized().unwrap_or(false){w.unmaximize()?;}
+  w.set_min_size(None::<Size>)?;w.set_size(Size::Logical(LogicalSize::new(WELCOME.0,WELCOME.1)))?;w.set_resizable(false)?;w.set_maximizable(false)?;w.center()?;
+ }
+ *current=workspace;Ok(())
+}
+#[tauri::command]
+fn window_mode(workspace:bool,window:tauri::WebviewWindow)->Result<(),String>{apply_mode(&window,workspace).map_err(|e|e.to_string())}
+// macOS menu bar (Apple's standard App, File, Edit, View, Window, Help menus). Items the app handles go to the webview as a
+// "menu" event with the item's id; the predefined ones (Edit, Window, About, Quit) are the system's own.
+#[cfg(target_os="macos")]
+fn app_menu(app:&tauri::App)->tauri::Result<tauri::menu::Menu<tauri::Wry>>{
+ use tauri::menu::{AboutMetadataBuilder,MenuBuilder,MenuItemBuilder,SubmenuBuilder};
+ let item=|id:&str,text:&str,key:Option<&str>|{let b=MenuItemBuilder::with_id(id,text);match key{Some(k)=>b.accelerator(k),None=>b}.build(app)};
+ let p=app.package_info();
+ let channel=if cfg!(feature="updater"){"Direct download"}else{"Mac App Store / TestFlight"};
+ let about=AboutMetadataBuilder::new().name(Some(p.name.clone())).version(Some(p.version.to_string())).short_version(None::<String>).copyright(Some("© 2026 Pasadena Jaycees")).credits(Some(format!("Season and Christmas Eve delivery planning.\n{channel}"))).build();
+ let app_menu=SubmenuBuilder::new(app,&p.name).about(Some(about)).separator().item(&item("settings","Settings…",Some("CmdOrCtrl+,"))?).separator().services().separator().hide().hide_others().show_all().separator().quit().build()?;
+ let file=SubmenuBuilder::new(app,"File").item(&item("new_season","New Season…",Some("CmdOrCtrl+N"))?).item(&item("open_season","Open Season…",Some("CmdOrCtrl+O"))?).separator().item(&item("import","Import Airtable Export…",Some("CmdOrCtrl+I"))?).item(&item("print","Print Center",Some("CmdOrCtrl+P"))?).separator().item(&item("lock","Lock Season",Some("CmdOrCtrl+L"))?).separator().close_window().build()?;
+ let edit=SubmenuBuilder::new(app,"Edit").undo().redo().separator().cut().copy().paste().select_all().build()?;
+ let view=SubmenuBuilder::new(app,"View").item(&item("step_1","1  Import",Some("CmdOrCtrl+1"))?).item(&item("step_2","2  Routes",Some("CmdOrCtrl+2"))?).item(&item("step_3","3  Letters",Some("CmdOrCtrl+3"))?).item(&item("step_4","4  Print",Some("CmdOrCtrl+4"))?).separator().item(&item("overview","Overview",Some("CmdOrCtrl+0"))?).item(&item("change_log","Change Log",None)?).separator().fullscreen().build()?;
+ let window=SubmenuBuilder::new(app,"Window").minimize().maximize().build()?;
+ let help=SubmenuBuilder::new(app,"Help").item(&item("guide","Operation Santa Guide",Some("CmdOrCtrl+?"))?).item(&item("four_steps","How the Four Steps Work",None)?).build()?;
+ let menu=MenuBuilder::new(app).items(&[&app_menu,&file,&edit,&view,&window,&help]).build()?;
+ let _=window.set_as_windows_menu_for_nsapp();let _=help.set_as_help_menu_for_nsapp();
+ Ok(menu)
+}
+#[derive(Serialize)]#[serde(rename_all="camelCase")]
+struct AppIdentity{identifier:String,name:String,version:String,dev:bool,self_updating:bool}
+// The webview shows a "Dev build" ribbon from this, and About shows the version. `dev` is any identity but the
+// production one, so a renamed or sandbox-test build is never mistaken for the real app either.
+#[tauri::command]
+fn app_identity(app:tauri::AppHandle)->AppIdentity{let identifier=app.config().identifier.clone();let p=app.package_info();AppIdentity{dev:identifier!="org.pasadenajaycees.opsanta",identifier,name:p.name.clone(),version:p.version.to_string(),self_updating:cfg!(feature="updater")}}
 const UA:&str="OperationSanta/0.1 (Pasadena Jaycees route planner; local desktop app)";
 const MAX_ATTACHMENT:usize=30*1024*1024;
 static AIRTABLE_SLOT:Mutex<Option<Instant>>=Mutex::new(None);
@@ -125,7 +273,7 @@ async fn airtable_get(path:String)->Result<String,String>{
  Ok(text)
 }
 fn valid_secret(n:&str)->bool{n=="airtable_token"||n.strip_prefix("passphrase:").is_some_and(|u|u.len()==36&&u.chars().all(|c|c.is_ascii_digit()||('a'..='f').contains(&c)||c=='-'))}
-fn entry(n:&str)->Result<keyring::Entry,String>{if !valid_secret(n){return Err("Unknown secret name.".into())}keyring::Entry::new(SERVICE,n).map_err(|e|format!("Keychain unavailable: {e}"))}
+fn entry(n:&str)->Result<keyring::Entry,String>{if !valid_secret(n){return Err("Unknown secret name.".into())}keyring::Entry::new(service()?,n).map_err(|e|format!("Keychain unavailable: {e}"))}
 fn secret_read(n:&str)->Result<Option<String>,String>{match entry(n)?.get_password(){Ok(v)=>Ok(Some(v)),Err(keyring::Error::NoEntry)=>Ok(None),Err(e)=>Err(format!("Keychain error: {e}"))}}
 #[tauri::command(async)]
 fn secret_set(name:String,mut value:String)->Result<(),String>{let r=entry(&name).and_then(|e|e.set_password(&value).map_err(|e|format!("Keychain error: {e}")));value.zeroize();r}
@@ -218,6 +366,8 @@ fn write_export(path:String,data:String)->Result<(),String>{let p=PathBuf::from(
 // ends the app without a trace, and several runs lost the app mid-test.
 #[cfg(feature="e2e")]
 fn record_panics(){let Ok(path)=std::env::var("OPSANTA_E2E_LOG") else {return};let previous=std::panic::take_hook();std::panic::set_hook(Box::new(move|info|{use std::io::Write;if let Ok(mut f)=OpenOptions::new().create(true).append(true).open(&path){let _=writeln!(f,"[{:?}] {info}\n{}",std::thread::current().name(),std::backtrace::Backtrace::force_capture());}previous(info)}));}
+#[cfg(all(debug_assertions,feature="e2e",target_os="macos"))]
+fn keep_drawing(app:&tauri::App)->tauri::Result<()>{use tauri::Manager;use objc2::{class,msg_send,sel,runtime::AnyObject};if let Some(w)=app.get_webview_window("main"){w.with_webview(|v|unsafe{let wk=v.inner() as *mut AnyObject;let known:bool=msg_send![wk,respondsToSelector:sel!(_setWindowOcclusionDetectionEnabled:)];let win:*mut AnyObject=msg_send![wk,window];if !known||win.is_null(){return}let _:()=msg_send![wk,_setWindowOcclusionDetectionEnabled:false];let center:*mut AnyObject=msg_send![class!(NSNotificationCenter),defaultCenter];let name:*mut AnyObject=msg_send![class!(NSString),stringWithUTF8String:c"NSWindowDidChangeOcclusionStateNotification".as_ptr()];let _:()=msg_send![center,postNotificationName:name,object:win];})?;}Ok(())}
 fn main(){#[cfg(feature="e2e")]record_panics();let builder=tauri::Builder::default();
  #[cfg(all(debug_assertions,feature="e2e"))]
  let builder=builder.plugin(tauri_plugin_wdio_webdriver::init()).plugin(tauri_plugin_wdio::init());
@@ -227,12 +377,32 @@ fn main(){#[cfg(feature="e2e")]record_panics();let builder=tauri::Builder::defau
  // power saving. WebKit decides visibility once the view is in its window, before setup runs, and rechecks only when
  // the window's occlusion changes, so the switch is followed by that notification.
  // The switch is private WebKit API, so it is skipped if a macOS release drops it.
- #[cfg(all(debug_assertions,feature="e2e",target_os="macos"))]
- let builder=builder.setup(|app|{use tauri::Manager;use objc2::{class,msg_send,sel,runtime::AnyObject};if let Some(w)=app.get_webview_window("main"){w.with_webview(|v|unsafe{let wk=v.inner() as *mut AnyObject;let known:bool=msg_send![wk,respondsToSelector:sel!(_setWindowOcclusionDetectionEnabled:)];let win:*mut AnyObject=msg_send![wk,window];if !known||win.is_null(){return}let _:()=msg_send![wk,_setWindowOcclusionDetectionEnabled:false];let center:*mut AnyObject=msg_send![class!(NSNotificationCenter),defaultCenter];let name:*mut AnyObject=msg_send![class!(NSString),stringWithUTF8String:c"NSWindowDidChangeOcclusionStateNotification".as_ptr()];let _:()=msg_send![center,postNotificationName:name,object:win];})?;}Ok(())});
  #[cfg(feature="updater")]
  let builder=builder.plugin(tauri_plugin_updater::Builder::new().build());
- builder.plugin(tauri_plugin_dialog::init()).manage(Store::default()).invoke_handler(tauri::generate_handler![create_season,open_season,save_season,backup_season,close_season,fetch_attachment,airtable_get,secret_set,secret_get,secret_delete,geocode_census,geocode_nominatim,asset_put,asset_get,asset_prune,vacuum_season,purge_backups,restart_app,updater_built_in,export_packet,open_packet,write_export]).run(tauri::generate_context!()).expect("Unable to launch Operation Santa");}
-#[cfg(test)] mod tests {use super::*;#[test]fn encrypted_roundtrip(){let p=std::env::temp_dir().join(format!("opsanta-{}.opsanta",rand::random::<u64>()));{let c=connection(&p,"a test passphrase",true).unwrap();c.execute("INSERT INTO season_state VALUES(1,?1)",["private synthetic family"]).unwrap();}let bytes=fs::read(&p).unwrap();assert!(!bytes.windows(7).any(|w|w==b"private"));assert!(!bytes.starts_with(b"SQLite format 3"));assert!(connection(&p,"incorrect password",false).is_err());let c=connection(&p,"a test passphrase",false).unwrap();let text:String=c.query_row("SELECT data FROM season_state",[],|r|r.get(0)).unwrap();assert_eq!(text,"private synthetic family");drop(c);fs::remove_file(p).unwrap();}
+ let builder=builder.setup(|app|{identity_setup(app);#[cfg(target_os="macos")]{let menu=app_menu(app)?;app.set_menu(menu)?;app.on_menu_event(|app,e|{use tauri::Emitter;let _=app.emit_to("main","menu",e.id().0.clone());});}#[cfg(all(debug_assertions,feature="e2e",target_os="macos"))]keep_drawing(app)?;Ok(())});
+ builder.plugin(tauri_plugin_dialog::init()).plugin(tauri_plugin_opener::init()).on_window_event(|w,e|{use tauri::Manager;if let tauri::WindowEvent::CloseRequested{..}=e{if *IN_WORKSPACE.lock().unwrap_or_else(|e|e.into_inner()){if let Some(w)=w.app_handle().get_webview_window(w.label()){save_frame(&w);}}}}).manage(Store::default()).invoke_handler(tauri::generate_handler![create_season,open_season,save_season,backup_season,close_season,fetch_attachment,airtable_get,secret_set,secret_get,secret_delete,geocode_census,geocode_nominatim,asset_put,asset_get,asset_prune,vacuum_season,purge_backups,restart_app,updater_built_in,app_identity,open_guide,window_mode,season_access,install_location,move_to_applications,export_packet,open_packet,write_export]).run(tauri::generate_context!()).expect("Unable to launch Operation Santa");}
+#[cfg(test)] mod tests {use super::*;
+#[test]fn move_to_applications_only_from_download_places(){
+ let (apps,home)=(Path::new("/Applications"),Path::new("/Users/pat"));
+ let at=|p:&str|misplaced(Path::new(p),apps,home);
+ assert_eq!(at("/Applications/Operation Santa.app"),None);assert_eq!(at("/Users/pat/Applications/Operation Santa.app"),None);
+ assert_eq!(at("/Volumes/Operation Santa/Operation Santa.app"),Some("a disk image"));
+ assert_eq!(at("/private/var/folders/xy/T/AppTranslocation/1234-ABCD/d/Operation Santa.app"),Some("a temporary copy"));
+ assert_eq!(at("/Users/pat/Downloads/Operation Santa.app"),Some("Downloads"));assert_eq!(at("/Users/pat/Desktop/Operation Santa.app"),Some("Desktop"));
+ assert_eq!(at("/Users/pat/code/op-santa-app/target/release/bundle/macos/Operation Santa.app"),None);
+}
+#[cfg(target_os="macos")]#[test]fn move_bundle_copies_trashes_the_old_copy_and_the_original(){
+ let root=std::env::temp_dir().join(format!("opsanta-move-{}",rand::random::<u64>()));let (dl,apps,trash)=(root.join("Downloads"),root.join("Applications"),root.join("Trash"));
+ let app=|dir:&Path,body:&str|{let m=dir.join("Operation Santa.app/Contents/MacOS");fs::create_dir_all(&m).unwrap();fs::write(m.join("opsanta"),body).unwrap();dir.join("Operation Santa.app")};
+ let src=app(&dl,"new");app(&apps,"old");
+ let dest=move_bundle(&src,&apps,&trash).unwrap();
+ assert_eq!(fs::read_to_string(dest.join("Contents/MacOS/opsanta")).unwrap(),"new");
+ assert!(!src.exists(),"the original went to the Trash");
+ let trashed:Vec<String>=fs::read_dir(&trash).unwrap().map(|e|e.unwrap().file_name().to_string_lossy().into_owned()).collect();
+ assert_eq!(trashed.len(),2);assert!(trashed.iter().any(|n|n.starts_with("Operation Santa (replaced")));assert!(trashed.iter().any(|n|n.starts_with("Operation Santa (moved to Applications")));
+ let old=trash.join(trashed.iter().find(|n|n.contains("replaced")).unwrap());assert_eq!(fs::read_to_string(old.join("Contents/MacOS/opsanta")).unwrap(),"old");
+ fs::remove_dir_all(root).unwrap();
+}#[test]fn encrypted_roundtrip(){let p=std::env::temp_dir().join(format!("opsanta-{}.opsanta",rand::random::<u64>()));{let c=connection(&p,"a test passphrase",true).unwrap();c.execute("INSERT INTO season_state VALUES(1,?1)",["private synthetic family"]).unwrap();}let bytes=fs::read(&p).unwrap();assert!(!bytes.windows(7).any(|w|w==b"private"));assert!(!bytes.starts_with(b"SQLite format 3"));assert!(connection(&p,"incorrect password",false).is_err());let c=connection(&p,"a test passphrase",false).unwrap();let text:String=c.query_row("SELECT data FROM season_state",[],|r|r.get(0)).unwrap();assert_eq!(text,"private synthetic family");drop(c);fs::remove_file(p).unwrap();}
 fn tmp(ext:&str)->PathBuf{std::env::temp_dir().join(format!("opsanta-{}.{ext}",rand::random::<u64>()))}
 #[test]fn attachment_allowlist(){
  let ok=|s:&str|allowed_url(&reqwest::Url::parse(s).unwrap());

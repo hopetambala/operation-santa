@@ -23,8 +23,13 @@ export async function practiceSeason(){
  await browser.execute(()=>window.dispatchEvent(new Event('opsanta:practice')));
  await $('nav.step-bar').waitForDisplayed();
 }
+// The new-season sheet asks for the passphrase twice.
+export async function newPassphrase(pass:string){for(const f of await $$('[role="dialog"] input[type=password]'))await f.setValue(pass);}
+// The welcome window's actions carry a one-line description, so they're found by their bold label.
+export const welcomeAction=(label:string)=>$(`//button[contains(@class,"welcome-action")][.//strong[normalize-space(.)="${label}"]]`);
 export async function seasonAction(action:string){
  if(await $('button.avatar').isExisting())await $('button.avatar').click();
+ else if(await welcomeAction(action).isExisting()){await welcomeAction(action).click();return;}
  await click(action);
 }
 // A button inside a named dialog, for labels that also appear on the page behind it ("Save scenario").

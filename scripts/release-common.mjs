@@ -5,7 +5,8 @@ import {readFileSync,readdirSync,rmSync,existsSync,mkdtempSync,writeFileSync} fr
 import {tmpdir} from 'node:os';
 import {dirname,join,relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {gate} from './release-gate.mjs';
+import {gate,PRODUCTION_ID} from './release-gate.mjs';
+export {PRODUCTION_ID};
 
 export const ROOT=join(dirname(fileURLToPath(import.meta.url)),'..');
 export const DESKTOP=join(ROOT,'apps','desktop');
@@ -109,8 +110,8 @@ export function buildFrontend(){
 
 export function gateOrFail(what){
   const problems=gate(what);
-  if(problems.length)fail('Release gate FAILED: this build contains the E2E test bridge.\n  '+problems.join('\n  '));
-  console.log(`✓ Release gate: no E2E bridge in ${[what.dist,...(what.bins??[])].filter(Boolean).map(p=>relative(ROOT,p)).join(', ')}`);
+  if(problems.length)fail('Release gate FAILED: this build contains the E2E test bridge or the Dev identity.\n  '+problems.join('\n  '));
+  console.log(`✓ Release gate: no E2E bridge or Dev identity in ${[what.dist,...(what.bins??[])].filter(Boolean).map(p=>relative(ROOT,p)).join(', ')}`);
 }
 
 /**
