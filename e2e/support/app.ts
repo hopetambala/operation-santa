@@ -19,12 +19,25 @@ export const enabledButton=async(text:string)=>{const b=await button(text);await
 export async function click(text:string){const b=await enabledButton(text);await b.click();}
 // A dialog is named by its visible heading (aria-labelledby), so find it by that heading, as a screen reader names it.
 export const dialog=(title:string)=>$(`//*[@role="dialog"][@aria-labelledby=//h2[normalize-space(.)="${title}"]/@id]`);
-// A workspace tab, by its visible label. Its accessible name adds the badge count when one shows ("Address review, 3").
-export const navTab=(page:string)=>$(`//nav//button[span[normalize-space(.)="${page}"]]`);
+export async function practiceSeason(){
+ await browser.execute(()=>window.dispatchEvent(new Event('opsanta:practice')));
+ await $('nav.step-bar').waitForDisplayed();
+}
+export async function seasonAction(action:string){
+ if(await $('button.avatar').isExisting())await $('button.avatar').click();
+ await click(action);
+}
 // A button inside a named dialog, for labels that also appear on the page behind it ("Save scenario").
 export async function clickIn(title:string,text:string){const b=await dialog(title).$(`.//button[normalize-space(.)="${text}"]`);await b.waitForEnabled();await b.click();}
 export async function fill(label:string,value:string){const f=await field(label);await f.waitForDisplayed();await setInput(f,value);}
-export async function nav(page:string){await navTab(page).click();await browser.waitUntil(async()=>(await $('h1').getText()).replace(/\s+/g,' ')===page,{timeoutMsg:`${page} did not open`});}
+export async function nav(page:string){
+ const steps:Record<string,string>={'Families':'Import','Address review':'Import','Route planner':'Routes','Teams':'Routes','Letter cleanup':'Letters','Print center':'Print'};
+ if(steps[page]){
+   await $(`//nav[@aria-label="Season workflow"]//button[.//strong[normalize-space(.)="${steps[page]}"]]`).click();
+   if(page==='Address review'||page==='Teams')await $(`//nav[contains(@class,"workspace-sections")]/button[normalize-space(.)="${page}"]`).click();
+ }else await seasonAction(page);
+ await browser.waitUntil(async()=>(await $('h1').getText()).replace(/\s+/g,' ')===page,{timeoutMsg:`${page} did not open`});
+}
 export async function toast(match:RegExp,timeout=30000){let last='';await browser.waitUntil(async()=>{const t=await $('.toast');last=await t.isExisting()?await t.getText():'';return match.test(last)},{timeout,timeoutMsg:`No toast matching ${match}; last toast: "${last}"`}).catch(async e=>{const err=await $('.error-banner');const banner=await err.isExisting()?await err.getText():'none';await shot('toast-timeout');throw Error(`${e.message}\nError banner: ${banner}\nPage: ${(await pageText()).slice(0,700)}`)});const close=await $('.toast button[aria-label="Dismiss"]');if(await close.isExisting())await close.click();return last;}
 export async function noError(){const e=await $('.error-banner');if(await e.isExisting())throw Error(`App error banner: ${await e.getText()}`);}
 // Once a change touches a printed route, the app asks for a reason code (R-CHG-2). Answer it when it appears.

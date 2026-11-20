@@ -5,7 +5,7 @@ import path from 'node:path';
 import Papa from 'papaparse';
 import {HEADERS_2025} from '../support/fixture';
 import {createSeason} from '../support/season';
-import {RUN_DIR,PASSPHRASE,click,nav,toast,dialogText,importCsv,installMocks,setE2e,queueOpen,setInput,reasonIfAsked,newestPdf,turnOn} from '../support/app';
+import {RUN_DIR,PASSPHRASE,practiceSeason,seasonAction,click,nav,toast,dialogText,importCsv,installMocks,setE2e,queueOpen,setInput,reasonIfAsked,newestPdf,turnOn} from '../support/app';
 import {demoSeason,type Family} from '../../apps/desktop/src/model';
 // Screenshots for the volunteer guides (site/), from the real app and its built-in demo season of fictional families.
 // Run with `npm run guides:screenshots`; never point it at a real season. Each picture is independent, so one that
@@ -25,6 +25,8 @@ describe('Guide screenshots (demo season)',()=>{
  // Animations only run while the window is in front, so a background run could catch a highlight mid-slide: turn them off.
  before(async()=>{await $('h1').waitForDisplayed({timeout:60000});await installMocks();await browser.execute(()=>{const st=document.createElement('style');st.textContent='*,*::before,*::after{transition:none!important;animation:none!important}';document.head.append(st)});await browser.pause(1500);});
  it('takes every screenshot it can',async function(){this.timeout(15*60_000);
+  await snap('create-or-open',async()=>{});
+  await practiceSeason();
   await snap('overview',async()=>{await nav('Overview')});
   await snap('families-filter',async()=>{await nav('Families');await $('select[aria-label="Filter families"]').click()});
   await snap('address-review',async()=>{await nav('Address review');const t=await $('//button[starts-with(normalize-space(.),"Addresses (")]');if(await t.isExisting())await t.click();await $('//button[normalize-space(.)="Pin is right"]').scrollIntoView({block:'end'})});
@@ -33,14 +35,14 @@ describe('Guide screenshots (demo season)',()=>{
   await snap('route-planner',async()=>{await nav('Route planner');await (await $('.route-card')).click();await browser.execute(()=>window.scrollTo(0,0))});
   await snap('settings',async()=>{await nav('Settings')});
   await snap('airtable-token-saved',async()=>{await turnOn('Airtable Sync');await setE2e({secrets:{airtable_token:'patDEMO.not-a-real-token'}});await nav('Overview');await nav('Settings');await $('//*[contains(text(),"Token saved")]').waitForExist({timeout:5000});await $('//*[contains(text(),"Token saved")]').scrollIntoView({block:'center'})});
-  await snap('purge-dialog',async()=>{await nav('Settings');await click('Purge sensitive records');await dialogText('Purge sensitive records')});
-  await snap('new-season-dialog',async()=>{await $('button.avatar').click();await click('Create new season');await dialogText('Start a new season')});
+  await snap('new-season-dialog',async()=>{await seasonAction('Create new season');await dialogText('Start a new season')});
   // PDFs: a route that passes Check (its cover has the QR codes), and the label alignment test page.
   const pdfNamed=async(prefix:string)=>browser.waitUntil(async()=>readdirSync(RUN_DIR).some(f=>f.startsWith(prefix)&&f.endsWith('.pdf')),{timeout:60000,timeoutMsg:`no ${prefix} PDF`});
   try{await nav('Print center');await (await $('//button[normalize-space(.)="Export PDF" and not(@disabled)]')).click();await reasonIfAsked('other:Guide screenshots from the demo season');await pdfNamed('Route');pdfPage('route-packet-cover');}catch(e){failed.push(`route-packet-cover: ${(e as Error).message.split('\n')[0]}`)}
   try{await nav('Print center');await click('Alignment test page');await pdfNamed('Label alignment');pdfPage('label-alignment-test');}catch(e){failed.push(`label-alignment-test: ${(e as Error).message.split('\n')[0]}`)}
   // Importing and packets need an encrypted season: a new one, with the demo families imported, then an update.
   try{await createSeason();await importCsv(demoCsv(),'Op Santa Sign-ups-Grid view.csv');await dialogText('Review your import');await click('Accept import');await $('[role="dialog"]').waitForExist({reverse:true});await browser.pause(1500);}catch(e){failed.push(`encrypted season with demo families: ${(e as Error).message.split('\n')[0]}`)}
+  await snap('purge-dialog',async()=>{await seasonAction('Purge sensitive records');await dialogText('Purge sensitive records')});
   await snap('import-review',async()=>{await nav('Families');await importCsv(demoCsv(true),'Op Santa Sign-ups-Grid view (1).csv');await dialogText('Review your import');const more=await $('//*[@role="dialog"]//summary');if(await more.isExisting())await more.click()});
   // Packet mode: export a packet for a few demo families, then open it the way a volunteer would.
   await snap('packet-mode',async()=>{await turnOn('Send letters to helpers');await nav('Letter cleanup');await click('Cleanup packet');await setInput($('[role="dialog"] input[placeholder="first"]'),'26001');await setInput($('[role="dialog"] input[placeholder="last"]'),'26003');await setInput($('[role="dialog"] input[type=password]'),PASSPHRASE);await click('Choose where to save');await toast(/Packet with \d+ families saved/);const packet=readdirSync(RUN_DIR).find(f=>f.endsWith('.opsanta-packet'))!;await queueOpen(path.join(RUN_DIR,packet));await $('button.avatar').click();await click('Open a cleanup packet');await setInput($('[role="dialog"] input[type=password]'),PASSPHRASE);await click('Choose packet file');await toast(/families opened/)});

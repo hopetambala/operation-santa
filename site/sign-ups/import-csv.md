@@ -29,7 +29,7 @@ Use a view that shows **every** field. If the view hides a column, the app impor
 ## 2. Import it
 
 1. Open your season. Imports don't work in the demo; you'll see "Create or open an encrypted season before importing family records."
-2. Go to **Overview** or **Families** and click **Import families** at the top right.
+2. Open **Import** and click **Import Airtable export (.csv)**.
 3. Choose the CSV file you downloaded. Excel files (`.xlsx`) work too.
 
 ## 3. Review the import {#review-the-import}

@@ -539,3 +539,22 @@ summary { cursor: pointer; display: flex; align-items: center; min-height: var(-
   .dup-row.padded, .stop, .scenario-row, .dup-group { padding-inline: var(--tk-dlite-semantic-spacing-400); }
   .letter-original, .attachment { margin-inline: var(--tk-dlite-semantic-spacing-400); }
 }
+
+.step-bar.nav-pills {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.step-bar small { display: block; font-weight: var(--tk-dlite-primitive-fontWeight-medium); }
+.step-number {
+  display: grid;
+  place-items: center;
+  min-width: var(--tk-dlite-semantic-sizing-target-min);
+  height: var(--tk-dlite-semantic-sizing-target-min);
+  border: var(--tk-dlite-semantic-border-weight-thin) solid currentColor;
+  border-radius: var(--tk-dlite-semantic-border-radius-full);
+}
+.workspace-sections { display: flex; flex-wrap: wrap; gap: var(--tk-dlite-semantic-spacing-200); margin-bottom: var(--tk-dlite-semantic-spacing-400); }
+.start-actions { justify-content: center; }
+@media (--tk-dlite-bp-md-down) {
+  .step-bar.nav-pills { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

@@ -1,6 +1,6 @@
 import {$,$$} from '@wdio/globals';
 import assert from 'node:assert/strict';
-import {nav,pageText,button,click} from '../support/app';
+import {practiceSeason,nav,pageText,button,click} from '../support/app';
 // The app's agreed scope (docs/feature-grounding-audit.md): features cut on 2026-10-30 must not come back,
 // and the grounded ones they were weighed against must stay. Runs on the built-in demo season, so no setup.
 const absent=async(text:string)=>assert.equal(await (await button(text)).isExisting(),false,`"${text}" should be gone`);
@@ -9,11 +9,20 @@ const hasField=async(label:string)=>$(`//label[contains(@class,"field")]/span[no
 const closeDialog=async()=>{await $('[role="dialog"] button[aria-label="Close dialog"]').click();await $('[role="dialog"]').waitForExist({reverse:true});};
 describe('Scope: only features grounded in the 2025 problems',()=>{
  before(async()=>{await $('h1').waitForDisplayed({timeout:60000});});
- it('has no Dispatch or Outreach tab',async()=>{const tabs=await Promise.all(await $$('nav.nav-pills button > span').map(s=>s.getProperty('textContent') as Promise<string>));for(const cut of ['Dispatch','Outreach'])assert.ok(!tabs.includes(cut),`${cut} tab should be gone; tabs: ${tabs}`);for(const t of ['Families','Address review','Route planner','Teams','Letter cleanup','Print center','Change log','Settings'])assert.ok(tabs.includes(t),`${t} tab missing`);});
+ it('starts on Create or open season with no practice families or workflow buttons',async()=>{
+  assert.equal(await $('h1').getText(),'Create or open season');
+  await present('Create new season');await present('Open encrypted season');
+  assert.equal(await $('nav.step-bar').isExisting(),false);
+ });
+ it('shows precisely four numbered workflow steps in a season',async()=>{
+  await practiceSeason();
+  assert.deepEqual(await $$('.step-bar strong').map(el=>el.getText()),['Import','Routes','Letters','Print']);
+  assert.deepEqual(await $$('.step-number').map(el=>el.getText()),['1','2','3','4']);
+ });
  it('Overview has no countdown or date strip',async()=>{assert.ok(!/days to Christmas Eve/.test(await pageText()));assert.equal(await $('.season-strip').isExisting(),false);});
  it('Route planner: no team-count sweep, scenarios or split; rebalance stays',async()=>{await nav('Route planner');const t=await pageText();assert.ok(!t.includes('How many teams do we need?'),'team-count sweep section is gone');for(const b of ['Run sweep','Save scenario','Split'])await absent(b);await present('Rebalance unlocked');});
  it('Print center: QR phone links and the MyRouteOnline fallback stay; the Circuit export is gone',async()=>{await nav('Print center');await absent('Circuit / RoadWarrior CSV');await present('MyRouteOnline CSV');assert.ok((await $$('//button[normalize-space()="Phone links"]')).length>0,'phone links (QR codes) stay');});
- it('Settings: no next-season or post-season report',async()=>{await nav('Settings');for(const b of ['Start next season from this one','Post-season report (.md)'])await absent(b);await present('Purge sensitive records');});
+ it('Settings: no next-season or post-season report',async()=>{await nav('Settings');for(const b of ['Start next season from this one','Post-season report (.md)'])await absent(b);await absent('Purge sensitive records');});
  it('Families keeps manual "Add family"',async()=>{await nav('Families');await present('Add family');});
  // Phase 3: the import is trusted; the queue holds only flagged letters, with "Looks good · next" and "Don't print".
  it('Letter cleanup asks only about flagged letters',async()=>{await nav('Letter cleanup');for(const b of ['Approve','Hold from print'])await absent(b);for(const b of ['Looks good · next','Don’t print'])await present(b);assert.ok(await $('//button[@role="tab" and contains(.,"to look at")]').isExisting(),'the first tab counts the letters to look at');});
@@ -21,7 +30,7 @@ describe('Scope: only features grounded in the 2025 problems',()=>{
  it('Settings has one home for each control, and no duplicate season, packet or backup buttons',async()=>{await nav('Settings');for(const b of ['New encrypted season','Open season file','Create encrypted backup','Open a cleanup packet'])await absent(b);for(const f of ['Number of teams','Team count','Labels','Label start slot','Base stop time','Parking per stop (min)'])assert.equal(await hasField(f),false,`Settings should not repeat "${f}"`);for(const f of ['Depot latitude','Stops per Google Maps link (max 9)','Flag letters longer than (characters)'])assert.ok(await $(`//fieldset[legend[normalize-space()="Advanced"]]//label[contains(@class,"field")]/span[normalize-space()="${f}"]`).isExisting(),`"${f}" sits under Advanced`);});
  it('Route planner keeps the 9 stop-time numbers in Route settings, and shows Rebalance or Insert, not both',async()=>{await nav('Route planner');for(const f of ['Base stop time','Per extra child','Apartment','Gate code','Extra toys','Same-building discount','Estimated speed (mph)','Road distance multiplier','Parking per stop (min)'])assert.ok(await hasField(f),`Route settings shows "${f}"`);await present('Save route settings');await present('Rebalance unlocked');await absent('Insert new families');});
  it('the four extra buttons are gone',async()=>{await nav('Families');await absent('Fallback CSV');await (await $('tbody tr')).click();await $('[role="dialog"]').waitForExist();for(const f of ['Latitude','Longitude'])assert.equal(await hasField(f),false,`family editor has no "${f}"`);assert.ok(!(await pageText()).includes('I verified this address'),'no "I verified" box');assert.equal(await $('//*[@role="dialog"]//select[option[normalize-space()="Not on a route"]]').isExisting(),false,'no Route menu in the family editor');await closeDialog();await nav('Address review');await absent('Copy coordinates');await nav('Letter cleanup');await absent('Download uploads');await present('Retry failed');await nav('Teams');await absent('Export CSV');await click('Add team');await $('[role="dialog"]').waitForExist();assert.equal(await hasField('Seats in the car'),false,'no team seats');await closeDialog();});
- it('Print center has no "Start at slot", and the avatar menu no "Save this demo"',async()=>{await nav('Print center');assert.equal(await hasField('Start at slot'),false);await present('MyRouteOnline CSV');await $('button.avatar').click();await $('[role="dialog"]').waitForExist();await absent('Save this demo as a season');await present('Open a cleanup packet');await closeDialog();});
+ it('Print center has no "Start at slot", and the avatar menu no "Save this demo"',async()=>{await nav('Print center');assert.equal(await hasField('Start at slot'),false);await present('MyRouteOnline CSV');await $('button.avatar').click();await $('[role="dialog"]').waitForExist();await absent('Save this demo as a season');await absent('Open a cleanup packet');await closeDialog();});
  // Settings ▸ Advanced (simplification phase 2): unproven features stay in the code but aren't rendered until their switch is on.
  it('Airtable Sync and cleanup packets are hidden until switched on',async()=>{await nav('Families');await absent('Sync Airtable');await nav('Letter cleanup');for(const b of ['Cleanup packet','Import returned packet'])await absent(b);await nav('Settings');assert.equal(await $('//h2[normalize-space()="Airtable connection"]').isExisting(),false,'the Airtable token panel is hidden');assert.equal(await $('//label[normalize-space()="Base ID (app…)"]').isExisting(),false,'Airtable base and table are hidden');for(const label of ['Airtable Sync','Send letters to helpers'])assert.equal(await $(`//label[contains(@class,"checkbox") and normalize-space()="${label}"]/input`).isSelected(),false,`${label} starts off`);});
 });

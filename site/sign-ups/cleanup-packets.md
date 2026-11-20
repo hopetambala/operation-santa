@@ -38,7 +38,7 @@ You can keep working on the same letters while the packet is out. If you both ch
 
 1. [Install the app]({{ '/start-here/install/' | relative_url }}) if you haven't.
 2. Go to **Settings**, put your name in "Your display name", and click **Save settings**. Your name goes on every letter you review and on the file you send back.
-3. Click the **avatar** at the top right (or use Settings), then **Open a cleanup packet**.
+3. From the start screen, click **Open encrypted season** and choose the packet. In a season with **Send letters to helpers** enabled, you can also click your initial and choose **Open a cleanup packet**.
 4. Type the "Packet passphrase" the coordinator gave you and click **Choose packet file**. Pick the `.opsanta-packet` file.
 5. The app opens in **packet mode**: the top right says "Cleanup packet · not a season file", and you see only that packet's letters, on the Letter cleanup page.
 6. Open the **All letters** tab and read each letter: **Looks good · next**, **Flag** or **Don't print**. See [Letter cleanup]({{ '/sign-ups/letter-cleanup/' | relative_url }}#look-at-the-flagged-letters).

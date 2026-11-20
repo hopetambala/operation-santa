@@ -82,9 +82,9 @@ The Airtable token isn't a season setting; it's saved on the right under "Airtab
 
 ## Other panels on the Settings page
 
-- **Your season, on your device**: where the season is kept, and **Check for updates** (installed copies outside the App Store). Create, open and lock seasons from the avatar menu. See [Season files and passphrases]({{ '/start-here/season-file/' | relative_url }}) and [Install and update]({{ '/start-here/install/' | relative_url }}).
+- **Your season, on your device**: where the season is kept. Create, open and lock seasons from the menu under your initial. Downloaded copies also offer **Check for updates** there. See [Season files and passphrases]({{ '/start-here/season-file/' | relative_url }}) and [Install and update]({{ '/start-here/install/' | relative_url }}).
 - **Airtable connection** (with Advanced ▸ "Airtable Sync" on): the read-only token.
-- **After the season**: **Purge sensitive records**. See [Purge at season end]({{ '/after-the-season/purge/' | relative_url }}).
+- Open the menu under your initial for **Purge sensitive records**. See [Purge at season end]({{ '/after-the-season/purge/' | relative_url }}).
 
 ## If Save settings is refused
 

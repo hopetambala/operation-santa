@@ -17,14 +17,16 @@ description: "The top bar, the Overview task list, and the reason prompt you'll 
 
 ## The top bar
 
-From left to right:
+The four numbered steps show how much work remains in the open season.
 
-- **The tree logo** goes back to the Overview.
-- **The tab icons**: Overview, Families, Address review, Route planner, Teams, Letter cleanup, Print center, Change log and Settings. Only the open tab shows its name; rest the pointer on any icon to see its name. A small number on an icon means something there needs attention: addresses to review, letters to look at, or packets to reprint.
-- **The bell** shows a dot while the Overview task list has open items.
-- **The save state**: "Encrypted · saved on this device" for a real season, "Demo · synthetic data" for the demo, or "Cleanup packet · not a season file" while a letter cleaner has a packet open.
-- **A shortcut button**: **Import families** on the Overview and Families pages, **Plan routes** on most others.
-- **The avatar** (your initial) opens "Your season": create, open or lock the season, open a cleanup packet, or go to Settings.
+| Step | What you can do |
+|---|---|
+| **1 Import** | Import a sign-up export, search Families, and open Address review. |
+| **2 Routes** | Plan deliveries, assign Teams, and adjust Route settings. |
+| **3 Letters** | Review the letters the app flags. |
+| **4 Print** | Check route packets, export PDFs, and reprint changed routes. |
+
+Click the Operation Santa logo for the **Overview**. The save indicator beside your initial shows when a change reaches the encrypted file. Click your initial for **Your season**. This menu holds **Settings**, **Change log**, and the commands to open, create or lock a season. It also holds the purge command and, on builds with automatic updates, **Check for updates**.
 
 ## The Overview
 

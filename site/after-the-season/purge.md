@@ -44,7 +44,7 @@ The season holds children's names, letters and drawings, and families' addresses
 ## Purge
 
 1. Open the season.
-2. Go to **Settings**. Under "After the season", click **Purge sensitive records**.
+2. Click your initial at the top right, then **Purge sensitive records**.
 3. Read the box. In "Type PURGE CHILD DATA to continue", type `PURGE CHILD DATA` exactly, in capitals.
 4. Click **Purge now**.
 
