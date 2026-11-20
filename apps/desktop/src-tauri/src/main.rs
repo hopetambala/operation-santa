@@ -133,6 +133,8 @@ fn install_location()->InstallLocation{
 // Copies the app into Applications (ditto keeps its signature), clears the download quarantine on the copy, puts an
 // older copy there in the Trash, and puts the original in the Trash when it sits in an ordinary folder. A disk image
 // or a translocated copy is read-only and is left alone.
+// macOS only (ditto, xattr, the Trash). The App Store build compiles it but never calls it.
+#[cfg(target_os="macos")]#[cfg_attr(not(feature="updater"),allow(dead_code))]
 fn move_bundle(src:&Path,apps:&Path,trash:&Path)->Result<PathBuf,String>{
  let name=src.file_name().ok_or("This copy of the app has no name.")?;let dest=apps.join(name);
  let stamp=std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_secs();
@@ -147,11 +149,13 @@ fn move_bundle(src:&Path,apps:&Path,trash:&Path)->Result<PathBuf,String>{
 }
 #[tauri::command(async)]
 fn move_to_applications(app:tauri::AppHandle)->Result<(),String>{
- if !cfg!(all(target_os="macos",feature="updater")){return Err("This copy of Operation Santa is managed by the App Store.".into())}
- let src=running_bundle().ok_or("Couldn't find this copy of the app.")?;let home=home().ok_or("No home folder.")?;
- let dest=move_bundle(&src,&applications_dir(),&home.join(".Trash"))?;
- std::process::Command::new("/usr/bin/open").arg("-n").arg(&dest).spawn().map_err(|_|"Moved to Applications. Open it from there.")?;
- app.exit(0);Ok(())
+ #[cfg(all(target_os="macos",feature="updater"))]{
+  let src=running_bundle().ok_or("Couldn't find this copy of the app.")?;let home=home().ok_or("No home folder.")?;
+  let dest=move_bundle(&src,&applications_dir(),&home.join(".Trash"))?;
+  std::process::Command::new("/usr/bin/open").arg("-n").arg(&dest).spawn().map_err(|_|"Moved to Applications. Open it from there.")?;
+  app.exit(0);Ok(())
+ }
+ #[cfg(not(all(target_os="macos",feature="updater")))]{let _=app;Err("This copy of Operation Santa is managed by the App Store.".into())}
 }
 // The volunteer guide (site/, GitHub Pages). Only this site opens, at a page path made of letters, digits, - and /.
 const GUIDE_URL:&str="https://hopetambala.github.io/operation-santa/";
@@ -387,7 +391,7 @@ fn main(){#[cfg(feature="e2e")]record_panics();let builder=tauri::Builder::defau
  assert_eq!(at("/Users/pat/Downloads/Operation Santa.app"),Some("Downloads"));assert_eq!(at("/Users/pat/Desktop/Operation Santa.app"),Some("Desktop"));
  assert_eq!(at("/Users/pat/code/op-santa-app/target/release/bundle/macos/Operation Santa.app"),None);
 }
-#[test]fn move_bundle_copies_trashes_the_old_copy_and_the_original(){
+#[cfg(target_os="macos")]#[test]fn move_bundle_copies_trashes_the_old_copy_and_the_original(){
  let root=std::env::temp_dir().join(format!("opsanta-move-{}",rand::random::<u64>()));let (dl,apps,trash)=(root.join("Downloads"),root.join("Applications"),root.join("Trash"));
  let app=|dir:&Path,body:&str|{let m=dir.join("Operation Santa.app/Contents/MacOS");fs::create_dir_all(&m).unwrap();fs::write(m.join("opsanta"),body).unwrap();dir.join("Operation Santa.app")};
  let src=app(&dl,"new");app(&apps,"old");
