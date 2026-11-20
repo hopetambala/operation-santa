@@ -103,6 +103,8 @@ if(channel==='mas'){const found=checkBinary(app,UPDATER_MARKERS);if(found.length
 const iconFile=capture('plutil',['-extract','CFBundleIconFile','raw',join(app,'Contents','Info.plist')]).out.trim();
 if(!iconFile||!existsSync(join(app,'Contents','Resources',iconFile.endsWith('.icns')?iconFile:`${iconFile}.icns`)))fail(`${app} has no app icon. List the icons in tauri.conf.json bundle.icon.`);
 console.log(`✓ App icon: ${iconFile}`);
+// src-tauri/Info.plist carries Hope's export compliance answer; without it every TestFlight build waits on the question.
+if(channel==='mas'){const ec=capture('plutil',['-extract','ITSAppUsesNonExemptEncryption','raw',join(app,'Contents','Info.plist')]).out.trim();if(ec!=='false')fail(`${app} has no ITSAppUsesNonExemptEncryption=false (apps/desktop/src-tauri/Info.plist), so App Store Connect would hold the build on export compliance.`);console.log('✓ Export compliance answered in Info.plist');}
 const exe=join(app,'Contents','MacOS',readdirSync(join(app,'Contents','MacOS'))[0]);
 const archs=capture('lipo',['-archs',exe]).out.trim();
 if(!(archs.includes('arm64')&&archs.includes('x86_64')))fail(`${exe} is not universal (archs: ${archs})`);
