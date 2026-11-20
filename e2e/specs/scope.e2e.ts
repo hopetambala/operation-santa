@@ -1,4 +1,4 @@
-import {$,$$} from '@wdio/globals';
+import {browser,$,$$} from '@wdio/globals';
 import assert from 'node:assert/strict';
 import {practiceSeason,nav,pageText,button,click,welcomeAction} from '../support/app';
 // The app's agreed scope (docs/feature-grounding-audit.md): features cut on 2026-10-30 must not come back,
@@ -14,9 +14,13 @@ describe('Scope: only features grounded in the 2025 problems',()=>{
   for(const a of ['New season…','Open season…','Open the guide'])assert.ok(await welcomeAction(a).isExisting(),`welcome window has "${a}"`);
   assert.ok(await $('//h2[normalize-space()="Recent seasons"]').isExisting(),'welcome window lists recent seasons');
   assert.equal(await $('nav.step-bar').isExisting(),false);
+  // The welcome window is small and fixed (main.rs window_mode); a season grows it into the workspace.
+  const welcome=await browser.execute(()=>({w:window.innerWidth,h:window.innerHeight}));
+  assert.ok(welcome.w<=800&&welcome.h<=560,`welcome window is ${welcome.w}×${welcome.h}`);
  });
  it('shows precisely four numbered workflow steps in a season',async()=>{
   await practiceSeason();
+  await browser.waitUntil(async()=>(await browser.execute(()=>window.innerWidth))>=1000,{timeoutMsg:'the window did not grow into the workspace'});
   assert.deepEqual(await $$('.step-bar strong').map(el=>el.getText()),['Import','Routes','Letters','Print']);
   assert.deepEqual(await $$('.step-bar .step-number').map(el=>el.getText()),['1','2','3','4']);
  });

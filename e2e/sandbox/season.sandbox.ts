@@ -79,6 +79,17 @@ describe('Season files in the App Sandbox (Mac App Store build)',()=>{
   const r=await call('open_season',{path:STRAY,passphrase:PASS});
   assert.match(r,/^error: .*(Season file not found|Cannot open season file)/,`a sandboxed app must not reach ${STRAY}, got: ${r}`);
  });
+ // Recent seasons (welcome window). After a relaunch the sandbox no longer lets the app read a file picked in an earlier
+ // run, so main.rs season_access must say "denied" (not "missing") and the window asks for it in the Open panel, in its
+ // folder. STRAY stands in for such a file: it exists, and this run was never given it.
+ it('tells a season it may not read ("denied") from one that moved ("missing"), for recent seasons',async()=>{
+  assert.equal(await call('season_access',{path:SEASON}),'ok "ok"','the season in the granted folder is readable');
+  const stray=await call('season_access',{path:STRAY});
+  assert.equal(stray,'ok "denied"',`a season outside the granted folder must read as denied, got: ${stray}`);
+  const gone=await call('season_access',{path:path.join(CHOSEN,'Never existed.opsanta')});
+  assert.equal(gone,'ok "missing"',`a missing season in the granted folder must read as missing, got: ${gone}`);
+  console.log(`\nseason_access under the sandbox: granted=ok, outside=${stray}, missing=${gone}`);
+ });
  after(async()=>{
   // Leave nothing in the login keychain, and close the season so its file is complete on disk.
   const del=await call('secret_delete',{name:pathKey(SEASON)}).catch(e=>String(e));
