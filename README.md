@@ -11,6 +11,8 @@ npm ci
 npm run desktop
 ```
 
+`npm run desktop` (and `desktop:dev-app`, `e2e:build`, the guide screenshots) builds **Operation Santa Dev**: bundle ID `org.pasadenajaycees.opsanta.dev`, a slate icon with a hazard band, and a "Dev build" ribbon. It has its own app data and keychain entries, so it never touches a real install. Only the `release:*` scripts build the production identity, and the release gate refuses a Dev build. The rules for agents are in `AGENTS.md`.
+
 For an in-memory preview with synthetic families:
 
 ```sh
