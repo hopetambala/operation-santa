@@ -2,7 +2,6 @@ import {$,$$} from '@wdio/globals';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {existsSync,readdirSync} from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import {families} from '../support/fixture';
 import {PASSPHRASE,SEASON_PATH,seasonAction,click,fill,nav,toast,dialogText,pageText,installMocks,setE2e,queueOpen,button,setInput,field} from '../support/app';
@@ -10,8 +9,9 @@ import {importFixture,lockSeason} from '../support/season';
 // R-SEA-2 (keychain) and R-DSH-3 (purge). The OS keychain is mocked so the run never touches the real login keychain.
 let mocks:Awaited<ReturnType<typeof installMocks>>;let key='';
 // Backups live in the app's data folder, keyed by the season file's path (see main.rs `key_of`).
-const appData=process.platform==='win32'?process.env.APPDATA!:process.platform==='darwin'?path.join(os.homedir(),'Library','Application Support'):process.env.XDG_DATA_HOME||path.join(os.homedir(),'.local','share');
-const backupsDir=()=>path.join(appData,'org.pasadenajaycees.opsanta','seasons','backups',createHash('sha256').update(SEASON_PATH).digest('hex'));
+// E2E runs keep app data in their own folder (OPSANTA_DATA_DIR, set by wdio.conf.ts), never in a real install's.
+const appData=process.env.OPSANTA_DATA_DIR!;
+const backupsDir=()=>path.join(appData,'seasons','backups',createHash('sha256').update(SEASON_PATH).digest('hex'));
 const backupCount=()=>existsSync(backupsDir())?readdirSync(backupsDir()).length:0;
 async function reopen(){await queueOpen(SEASON_PATH);await seasonAction('Open encrypted season');}
 describe('Season security: remembered passphrase and post-season purge',()=>{

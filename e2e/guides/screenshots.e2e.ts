@@ -23,7 +23,8 @@ function demoCsv(update=false){const demo=demoSeason().families;const row=(f:Fam
  return '﻿'+Papa.unparse({fields:HEADERS_2025,data:update?[row(demo[0],0),row(edited,1),row(demo[2],2),row(fresh as Family,3)]:[row(demo[0],0),row(demo[1],1),row(demo[2],2)]});}
 describe('Guide screenshots (demo season)',()=>{
  // Animations only run while the window is in front, so a background run could catch a highlight mid-slide: turn them off.
- before(async()=>{await $('h1').waitForDisplayed({timeout:60000});await installMocks();await browser.execute(()=>{const st=document.createElement('style');st.textContent='*,*::before,*::after{transition:none!important;animation:none!important}';document.head.append(st)});await browser.pause(1500);});
+ before(async()=>{await $('h1').waitForDisplayed({timeout:60000});await installMocks();await browser.execute(()=>{document.documentElement.dataset.guides='1'});// no Dev ribbon in the volunteers' pictures
+ await browser.execute(()=>{const st=document.createElement('style');st.textContent='*,*::before,*::after{transition:none!important;animation:none!important}';document.head.append(st)});await browser.pause(1500);});
  it('takes every screenshot it can',async function(){this.timeout(15*60_000);
   await snap('create-or-open',async()=>{});
   await practiceSeason();

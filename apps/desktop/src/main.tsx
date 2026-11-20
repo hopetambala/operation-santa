@@ -28,6 +28,7 @@ const loadPrintCenter=loadOnce(()=>import('./printcenter'));
 const lazyPrintCenter=()=>lazy(()=>loadPrintCenter().then(m=>({default:m.PrintCenter})));
 // Without a boundary, a chunk that fails to load (or a render error) unmounts the whole window, not just this page.
 class PageFailed extends React.Component<{onRetry:()=>void;children:React.ReactNode},{failed:boolean}>{state={failed:false};static getDerivedStateFromError(){return {failed:true}}render(){return this.state.failed?<section className="panel"><p>Print center could not open.</p><Button onClick={()=>{this.props.onRetry();this.setState({failed:false})}}>Try again</Button></section>:this.props.children}}
+type AppIdentity={identifier:string;name:string;version:string;dev:boolean;selfUpdating:boolean};
 function App(){const [s,setS]=useState<Season>(emptySeason);const current=useRef(s);const [PrintCenter,setPrintCenter]=useState(()=>lazyPrintCenter());const [page,setPage]=useState('Families');const [selectedRoute,setSelectedRoute]=useState<number|undefined>();const [family,setFamily]=useState<{f:Family;isNew:boolean;tab:string}|null>(null);const [modal,setModal]=useState('');const [preview,setPreview]=useState<ImportPreview|null>(null);const [toast,setToast]=useState('');const [error,setError]=useState('');const [busy,setBusy]=useState(false);const [saved,setSaved]=useState(false);const [dirty,setDirty]=useState(false);const [saveFailed,setSaveFailed]=useState(false);const [path,setPath]=useState('');const [pendingPath,setPendingPath]=useState('');const [pass,setPass]=useState('');const [remember,setRemember]=useState(false);const [reason,setReason]=useState('');const [pending,setPending]=useState<null|((reason:string)=>void)>(null);const [purgeText,setPurgeText]=useState('');const [query,setQuery]=useState('');const [filter,setFilter]=useState('all');const [picked,setPicked]=useState<string[]>([]);const input=useRef<HTMLInputElement>(null);const topbar=useRef<HTMLElement>(null);// The pinned bar's height, for scroll-padding-top in components.css (2.4.11). It changes as the tabs wrap.
  useEffect(()=>{const el=topbar.current;if(!el)return;const ro=new ResizeObserver(()=>document.documentElement.style.setProperty('--topbar-height',`${el.offsetHeight}px`));ro.observe(el);return()=>ro.disconnect()},[]);const [saves]=useState(()=>autosave<Season>(data=>invoke('save_season',{data}),{clean:()=>setDirty(false),failed:e=>{setSaveFailed(true);setError(`Saving failed: ${errText(e).replace(/\.?$/,".")} Your changes are still in this window. Don’t close the app; choose Try saving again.`);setDirty(true)}}));const liveSaved=useRef(saved);liveSaved.current=saved;const closing=useRef(false);
  useEffect(()=>{if(toast){const t=setTimeout(()=>setToast(''),6000);return()=>clearTimeout(t)}},[toast]);
@@ -45,6 +46,9 @@ function App(){const [s,setS]=useState<Season>(emptySeason);const current=useRef
    return ()=>window.removeEventListener('opsanta:practice',practice);
  },[]);
  useEffect(()=>{loadPrintCenter().catch(()=>{});},[]);
+ // Which app this is (main.rs app_identity). Agents' and test builds are "Operation Santa Dev" and say so on every screen.
+ const [identity,setIdentity]=useState<AppIdentity|null>(null);
+ useEffect(()=>{if(native)invoke<AppIdentity>('app_identity').then(setIdentity,()=>{})},[]);
  // Updates are offered once at launch and from Settings; nothing installs until the coordinator clicks.
  const [offer,setOffer]=useState<Update|null>(null);
  useEffect(()=>{checkForUpdate(invoke,new Date()).then(u=>{if(u)setOffer(u)})},[]);
@@ -125,6 +129,7 @@ if(['street','city','zip'].some(k=>changed.includes(k as keyof Family))){if(old.
  const menuPage=(name:string)=>{setModal('');navigate(name)};
  const showPurge=()=>{setPurgeText('');setModal('purge')};
  return <div className="app"><a className="skip-link" href="#workspace">Skip to workspace</a>
+ {identity?.dev&&<div className="dev-ribbon" role="note">Dev build · synthetic data only · {identity.identifier}</div>}
  <header ref={topbar} className="topbar">
    <BrandLockup onClick={workspaceOpen?()=>navigate('Overview'):undefined}/>
    {workspaceOpen&&<><div className="topbar-right">

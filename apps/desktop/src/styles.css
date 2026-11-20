@@ -558,3 +558,10 @@ summary { cursor: pointer; display: flex; align-items: center; min-height: var(-
 @media (--tk-dlite-bp-md-down) {
   .step-bar.nav-pills { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Dev build ribbon (main.rs app_identity). Never in the real app; hidden for guide screenshots (data-guides). */
+.dev-ribbon { position: sticky; top: 0; z-index: 60; padding: var(--tk-dlite-semantic-spacing-100) var(--tk-dlite-semantic-spacing-400); text-align: center;
+  font-size: var(--tk-dlite-semantic-typography-size-300); font-weight: 600;
+  color: var(--tk-dlite-semantic-color-feedback-warning-fg); background: var(--tk-dlite-semantic-color-feedback-warning-bg);
+  border-bottom: 3px dashed var(--tk-dlite-semantic-color-feedback-warning); }
+:root[data-guides] .dev-ribbon { display: none; }

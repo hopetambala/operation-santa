@@ -61,7 +61,12 @@ fn backup_of(s:&OpenSeason)->Result<PathBuf,String>{s.conn.execute_batch("PRAGMA
 fn purge_backups_of(s:&OpenSeason)->Result<u32,String>{let dir=s.root.join("backups").join(key_of(&s.path));if !dir.is_dir(){return Ok(0)}let n=fs::read_dir(&dir).map_err(|e|e.to_string())?.filter_map(Result::ok).filter(|e|e.path().extension().is_some_and(|x|x=="opsanta")).count() as u32;fs::remove_dir_all(&dir).map_err(|_|"Could not delete this season's backups.")?;Ok(n)}
 // A clean close publishes and deletes the working copy, so app data keeps no extra copy of families' records.
 fn close_out(s:OpenSeason)->Result<(),String>{publish(&s)?;let work=s.work.clone();drop(s);remove_work(&work);Ok(())}
-fn seasons_root(app:&tauri::AppHandle)->Result<PathBuf,String>{use tauri::Manager;let d=app.path().app_data_dir().map_err(|_|"No app data folder.")?.join("seasons");fs::create_dir_all(&d).map_err(|_|"Cannot create the app data folder.")?;Ok(d)}
+// E2E builds only: OPSANTA_DATA_DIR gives each test run a fresh app data folder (e2e/wdio.conf.ts), the way VS Code's and
+// Zed's test launches use a throwaway user-data-dir. Release and dev builds ignore it.
+fn app_data(app:&tauri::AppHandle)->Result<PathBuf,String>{
+ #[cfg(feature="e2e")]if let Some(d)=std::env::var_os("OPSANTA_DATA_DIR").filter(|d|!d.is_empty()){return Ok(PathBuf::from(d))}
+ use tauri::Manager;app.path().app_data_dir().map_err(|_|"No app data folder.".into())}
+fn seasons_root(app:&tauri::AppHandle)->Result<PathBuf,String>{let d=app_data(app)?.join("seasons");fs::create_dir_all(&d).map_err(|_|"Cannot create the app data folder.")?;Ok(d)}
 // Argon2id here is m=64MiB, t=3, p=1: 90ms on this machine before the season file is even read.
 // A plain command runs on the UI thread. `async` is Tauri's blocking-pool flag, same as save_season.
 #[tauri::command(async)]
@@ -85,7 +90,18 @@ fn purge_backups(store:tauri::State<Store>)->Result<u32,String>{let g=store.0.lo
 // close publishes the whole database back to the user's file, same rewrite save_season keeps off the UI thread.
 #[tauri::command(async)]
 fn close_season(store:tauri::State<Store>)->Result<(),String>{let s=store.0.lock().map_err(|_|"Season is busy.")?.take();match s{Some(s)=>close_out(s),None=>Ok(())}}
-const SERVICE:&str="org.pasadenajaycees.opsanta";
+// The keychain service is the running app's bundle ID, so "Operation Santa Dev" (tauri.dev.conf.json), the sandbox proof
+// and the real app never read or overwrite each other's saved passphrases (ONBOARDING-AND-ENVIRONMENTS-PLAN.md §2).
+static SERVICE:OnceLock<String>=OnceLock::new();
+fn service()->Result<&'static str,String>{SERVICE.get().map(String::as_str).ok_or_else(||"Keychain is not ready yet.".into())}
+// Window titles follow productName, so the Dev build says "Operation Santa Dev" in the title bar and Mission Control.
+fn identity_setup(app:&tauri::App){use tauri::Manager;let _=SERVICE.set(app.config().identifier.clone());let name=app.package_info().name.clone();for w in app.webview_windows().values(){let _=w.set_title(&name);}}
+#[derive(Serialize)]#[serde(rename_all="camelCase")]
+struct AppIdentity{identifier:String,name:String,version:String,dev:bool,self_updating:bool}
+// The webview shows a "Dev build" ribbon from this, and About shows the version. `dev` is any identity but the
+// production one, so a renamed or sandbox-test build is never mistaken for the real app either.
+#[tauri::command]
+fn app_identity(app:tauri::AppHandle)->AppIdentity{let identifier=app.config().identifier.clone();let p=app.package_info();AppIdentity{dev:identifier!="org.pasadenajaycees.opsanta",identifier,name:p.name.clone(),version:p.version.to_string(),self_updating:cfg!(feature="updater")}}
 const UA:&str="OperationSanta/0.1 (Pasadena Jaycees route planner; local desktop app)";
 const MAX_ATTACHMENT:usize=30*1024*1024;
 static AIRTABLE_SLOT:Mutex<Option<Instant>>=Mutex::new(None);
@@ -125,7 +141,7 @@ async fn airtable_get(path:String)->Result<String,String>{
  Ok(text)
 }
 fn valid_secret(n:&str)->bool{n=="airtable_token"||n.strip_prefix("passphrase:").is_some_and(|u|u.len()==36&&u.chars().all(|c|c.is_ascii_digit()||('a'..='f').contains(&c)||c=='-'))}
-fn entry(n:&str)->Result<keyring::Entry,String>{if !valid_secret(n){return Err("Unknown secret name.".into())}keyring::Entry::new(SERVICE,n).map_err(|e|format!("Keychain unavailable: {e}"))}
+fn entry(n:&str)->Result<keyring::Entry,String>{if !valid_secret(n){return Err("Unknown secret name.".into())}keyring::Entry::new(service()?,n).map_err(|e|format!("Keychain unavailable: {e}"))}
 fn secret_read(n:&str)->Result<Option<String>,String>{match entry(n)?.get_password(){Ok(v)=>Ok(Some(v)),Err(keyring::Error::NoEntry)=>Ok(None),Err(e)=>Err(format!("Keychain error: {e}"))}}
 #[tauri::command(async)]
 fn secret_set(name:String,mut value:String)->Result<(),String>{let r=entry(&name).and_then(|e|e.set_password(&value).map_err(|e|format!("Keychain error: {e}")));value.zeroize();r}
@@ -218,6 +234,8 @@ fn write_export(path:String,data:String)->Result<(),String>{let p=PathBuf::from(
 // ends the app without a trace, and several runs lost the app mid-test.
 #[cfg(feature="e2e")]
 fn record_panics(){let Ok(path)=std::env::var("OPSANTA_E2E_LOG") else {return};let previous=std::panic::take_hook();std::panic::set_hook(Box::new(move|info|{use std::io::Write;if let Ok(mut f)=OpenOptions::new().create(true).append(true).open(&path){let _=writeln!(f,"[{:?}] {info}\n{}",std::thread::current().name(),std::backtrace::Backtrace::force_capture());}previous(info)}));}
+#[cfg(all(debug_assertions,feature="e2e",target_os="macos"))]
+fn keep_drawing(app:&tauri::App)->tauri::Result<()>{use tauri::Manager;use objc2::{class,msg_send,sel,runtime::AnyObject};if let Some(w)=app.get_webview_window("main"){w.with_webview(|v|unsafe{let wk=v.inner() as *mut AnyObject;let known:bool=msg_send![wk,respondsToSelector:sel!(_setWindowOcclusionDetectionEnabled:)];let win:*mut AnyObject=msg_send![wk,window];if !known||win.is_null(){return}let _:()=msg_send![wk,_setWindowOcclusionDetectionEnabled:false];let center:*mut AnyObject=msg_send![class!(NSNotificationCenter),defaultCenter];let name:*mut AnyObject=msg_send![class!(NSString),stringWithUTF8String:c"NSWindowDidChangeOcclusionStateNotification".as_ptr()];let _:()=msg_send![center,postNotificationName:name,object:win];})?;}Ok(())}
 fn main(){#[cfg(feature="e2e")]record_panics();let builder=tauri::Builder::default();
  #[cfg(all(debug_assertions,feature="e2e"))]
  let builder=builder.plugin(tauri_plugin_wdio_webdriver::init()).plugin(tauri_plugin_wdio::init());
@@ -227,11 +245,10 @@ fn main(){#[cfg(feature="e2e")]record_panics();let builder=tauri::Builder::defau
  // power saving. WebKit decides visibility once the view is in its window, before setup runs, and rechecks only when
  // the window's occlusion changes, so the switch is followed by that notification.
  // The switch is private WebKit API, so it is skipped if a macOS release drops it.
- #[cfg(all(debug_assertions,feature="e2e",target_os="macos"))]
- let builder=builder.setup(|app|{use tauri::Manager;use objc2::{class,msg_send,sel,runtime::AnyObject};if let Some(w)=app.get_webview_window("main"){w.with_webview(|v|unsafe{let wk=v.inner() as *mut AnyObject;let known:bool=msg_send![wk,respondsToSelector:sel!(_setWindowOcclusionDetectionEnabled:)];let win:*mut AnyObject=msg_send![wk,window];if !known||win.is_null(){return}let _:()=msg_send![wk,_setWindowOcclusionDetectionEnabled:false];let center:*mut AnyObject=msg_send![class!(NSNotificationCenter),defaultCenter];let name:*mut AnyObject=msg_send![class!(NSString),stringWithUTF8String:c"NSWindowDidChangeOcclusionStateNotification".as_ptr()];let _:()=msg_send![center,postNotificationName:name,object:win];})?;}Ok(())});
  #[cfg(feature="updater")]
  let builder=builder.plugin(tauri_plugin_updater::Builder::new().build());
- builder.plugin(tauri_plugin_dialog::init()).manage(Store::default()).invoke_handler(tauri::generate_handler![create_season,open_season,save_season,backup_season,close_season,fetch_attachment,airtable_get,secret_set,secret_get,secret_delete,geocode_census,geocode_nominatim,asset_put,asset_get,asset_prune,vacuum_season,purge_backups,restart_app,updater_built_in,export_packet,open_packet,write_export]).run(tauri::generate_context!()).expect("Unable to launch Operation Santa");}
+ let builder=builder.setup(|app|{identity_setup(app);#[cfg(all(debug_assertions,feature="e2e",target_os="macos"))]keep_drawing(app)?;Ok(())});
+ builder.plugin(tauri_plugin_dialog::init()).manage(Store::default()).invoke_handler(tauri::generate_handler![create_season,open_season,save_season,backup_season,close_season,fetch_attachment,airtable_get,secret_set,secret_get,secret_delete,geocode_census,geocode_nominatim,asset_put,asset_get,asset_prune,vacuum_season,purge_backups,restart_app,updater_built_in,app_identity,export_packet,open_packet,write_export]).run(tauri::generate_context!()).expect("Unable to launch Operation Santa");}
 #[cfg(test)] mod tests {use super::*;#[test]fn encrypted_roundtrip(){let p=std::env::temp_dir().join(format!("opsanta-{}.opsanta",rand::random::<u64>()));{let c=connection(&p,"a test passphrase",true).unwrap();c.execute("INSERT INTO season_state VALUES(1,?1)",["private synthetic family"]).unwrap();}let bytes=fs::read(&p).unwrap();assert!(!bytes.windows(7).any(|w|w==b"private"));assert!(!bytes.starts_with(b"SQLite format 3"));assert!(connection(&p,"incorrect password",false).is_err());let c=connection(&p,"a test passphrase",false).unwrap();let text:String=c.query_row("SELECT data FROM season_state",[],|r|r.get(0)).unwrap();assert_eq!(text,"private synthetic family");drop(c);fs::remove_file(p).unwrap();}
 fn tmp(ext:&str)->PathBuf{std::env::temp_dir().join(format!("opsanta-{}.{ext}",rand::random::<u64>()))}
 #[test]fn attachment_allowlist(){

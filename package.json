@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build",
     "test": "vitest run",
     "tauri": "cd apps/desktop && tauri",
-    "desktop": "cd apps/desktop && tauri dev",
+    "desktop": "cd apps/desktop && tauri dev --config src-tauri/tauri.dev.conf.json",
     "desktop:build": "cd apps/desktop && tauri build",
     "e2e:build": "node e2e/build.mjs",
     "e2e": "wdio run e2e/wdio.conf.ts",
@@ -21,7 +21,8 @@
     "release:windows": "node scripts/release-windows.mjs",
     "release:manifest": "node scripts/release-manifest.mjs",
     "release:notes": "node scripts/release-notes.mjs",
-    "guides:screenshots": "wdio run e2e/wdio.guides.conf.ts"
+    "guides:screenshots": "wdio run e2e/wdio.guides.conf.ts",
+    "desktop:dev-app": "cd apps/desktop && tauri build --debug --bundles app --config src-tauri/tauri.dev.conf.json"
   },
   "dependencies": {
     "@tauri-apps/api": "2.12.4",
