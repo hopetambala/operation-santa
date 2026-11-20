@@ -2,7 +2,7 @@
 title: A tour of the app
 parent: Start here
 nav_order: 3
-description: "The top bar, the Overview task list, and the reason prompt you'll see after printing."
+description: "The four steps along the top, and the reason prompt you'll see after printing."
 ---
 
 # A tour of the app
@@ -13,39 +13,20 @@ description: "The top bar, the Overview task list, and the reason prompt you'll 
 1. TOC
 {:toc}
 
-![The whole app window on the demo season's Overview, with the navigation along the top]({{ '/assets/images/overview.png' | relative_url }})
+![The whole app window on the demo season, with the four steps along the top]({{ '/assets/images/workspace.png' | relative_url }})
 
 ## The top bar
 
-The four numbered steps show how much work remains in the open season.
+The four numbered steps are the app's task list. Each says how much work is left in the open season and gets a check mark once it had work and none is left.
 
-| Step | What you can do |
-|---|---|
-| **1 Import** | Import a sign-up export, search Families, and open Address review. |
-| **2 Routes** | Plan deliveries, assign Teams, and adjust Route settings. |
-| **3 Letters** | Review the letters the app flags. |
-| **4 Print** | Check route packets, export PDFs, and reprint changed routes. |
+| Step | What you can do | What its count means |
+|---|---|---|
+| **1 Import** | Import a sign-up export, search Families, and open Address review. | Addresses, duplicates, out-of-area families and proposed flags to check. While there are any, clicking the step opens Address review. |
+| **2 Routes** | Plan deliveries, assign Teams, and adjust Route settings. | Families you could put on a route now. Families still waiting on an address are counted in step 1. |
+| **3 Letters** | Review the letters the app flags. | Letters that need a look. |
+| **4 Print** | Check route packets, export PDFs, and reprint changed routes. | Before anything is printed: the problems that block printing. After that: the routes to reprint. |
 
-Click the Operation Santa logo for the **Overview**. The save indicator beside your initial shows when a change reaches the encrypted file. Click your initial for **Your season**. This menu holds **Settings**, **Change log**, and the commands to open, create or lock a season. It also holds the purge command and, on builds with automatic updates, **Check for updates**.
-
-## The Overview
-
-The Overview answers "what's left to do?"
-
-- **Stat cards**: families signed up (home, pickup and special), children and drawings ready, routes planned, and packets ready to print.
-- **A progress strip**: how many families are imported, verified, geocoded and routed.
-- **Route overview**: the first eight routes, with leave and return times, stops, miles and team. Click one to open it in **2 Routes**.
-- **Task list**: each line is a job with a count. Click it to go to the right page. When its count reaches zero it gets a check mark.
-
-| Task | Goes to |
-|---|---|
-| Review addresses | 1 Import ▸ Address review |
-| Confirm proposed flags | 1 Import ▸ Address review |
-| Look at flagged letters | 3 Letters |
-| Fix uploads | 3 Letters |
-| Find a route for everyone | 2 Routes |
-| Assign every route a team | 2 Routes |
-| Reprint changed packets | 4 Print |
+The line above each page's title is the name of the season file that's open. The save indicator beside your initial shows when a change reaches the encrypted file. Click your initial for **Your season**. This menu holds **Settings**, **Change log**, and the commands to open, create or lock a season. It also holds the purge command and, on builds with automatic updates, **Check for updates**.
 
 ## Messages
 

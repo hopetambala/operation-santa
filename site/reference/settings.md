@@ -16,7 +16,7 @@ description: "Every setting in the Settings page, its default, and what it chang
 {: .why }
 In 2025 the routing settings lived in each MyRouteOnline account and the print layout lived in a Word template on one laptop. Here they're stored in the season file itself, so everyone working on the season uses the same ones.
 
-Change any value under "Season settings", then click **Save settings** at the bottom. If the change alters a printed packet (start time, North Pole address, children per bag, street address on labels), the app asks for a reason, and every changed setting is recorded in the [Change log]({{ '/reference/change-log/' | relative_url }}).
+Change any value under "Season settings", then click **Save** in the "Unsaved changes" bar (or **Save settings** at the bottom). Settings is the one page that doesn't save by itself, because these values change every route. **Discard** puts the saved values back, and opening another page with unsaved changes asks first. If the change alters a printed packet (start time, North Pole address, children per bag, street address on labels), the app asks for a reason, and every changed setting is recorded in the [Change log]({{ '/reference/change-log/' | relative_url }}).
 
 ![The Settings page on the demo season]({{ '/assets/images/settings.png' | relative_url }})
 
@@ -31,7 +31,7 @@ Change any value under "Season settings", then click **Save settings** at the bo
 
 | Setting | Default | What it does |
 |---|---|---|
-| North Pole address | 150 N Madison Ave, Pasadena, CA 91101 | Where every route starts and ends. Printed on covers and used in phone links. If you change it, change "Depot latitude" and "Depot longitude" under Advanced too. |
+| North Pole address | 150 N Madison Ave, Pasadena, CA 91101 | Where every route starts and ends. Printed on covers and used in phone links. If you change it, change "North Pole latitude" and "North Pole longitude" under Advanced too. |
 | North Pole phone (printed on packets) | blank | The number team leads call on the night. Fill it in. |
 | Departure time | 4:30 PM | When routes leave (a single route can start at a different time in the Route planner). |
 | Delivery window ends | 8:30 PM | The end of the visiting window. |
@@ -58,7 +58,7 @@ Leave these as they are unless you know why.
 
 | Setting | Default | What it does |
 |---|---|---|
-| Depot latitude / Depot longitude | 34.1478 / -118.1445 | The North Pole on the map. **If you change the North Pole address, change these too.** |
+| North Pole latitude / North Pole longitude | 34.1478 / -118.1445 | The North Pole on the map. **If you change the North Pole address, change these too.** |
 | Stops per Google Maps link (max 9) | 9 | How many stops each phone link and QR code covers. |
 | Flag letters longer than (characters) | 1500 | Letters longer than this need a look in Letter cleanup. |
 

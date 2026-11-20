@@ -28,9 +28,9 @@ A team lead's name and phone number go on the cover of their packet, and on the 
    - tick "Spanish-speaking team member" if someone on the team speaks Spanish
 3. Click **Save team**.
 
-To change a team, click the **⋯** button on its card. **Remove team** is at the bottom of that box; it also takes the team off its route.
+Teams are one table: team, lead, phone, Spanish speaker and route. To change a team, click the **⋯** button at the end of its row. **Remove team** is at the bottom of that box; it also takes the team off its route. With many teams the table scrolls on its own, under its headings.
 
-![The Teams page on the demo season with eight team cards]({{ '/assets/images/teams.png' | relative_url }})
+![The Teams table on the demo season with eight teams]({{ '/assets/images/teams.png' | relative_url }})
 
 ## Import teams from a spreadsheet
 
@@ -53,6 +53,6 @@ Click **Import CSV** and choose the file. The message says how many teams were i
 2. Under the map, choose from **Team**. Each choice shows the lead's name, "ES" if the team has a Spanish speaker, and "(also Route 5)" if the team already has a route.
 3. If the route has been printed, the app asks for a reason, and the route will need a reprint, because the team is on the cover.
 
-A team can run two short routes: give both routes the same team. The Overview's task list counts "routes without a team" until every route has one.
+A team can run two short routes: give both routes the same team. A route without a team can't print: Print's check says "Assign a team."
 
 Rebalancing keeps each route's team when the route keeps most of its families.

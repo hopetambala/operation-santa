@@ -28,6 +28,8 @@ describe('Guide screenshots (demo season)',()=>{
  it('takes every screenshot it can',async function(){this.timeout(15*60_000);
   await snap('create-or-open',async()=>{});
   await practiceSeason();
+  // The tour's picture of the whole window (Overview, which it used to show, is gone: RELEASE-UX-PLAN item 12).
+  await snap('workspace',async()=>{await nav('Families')});
   await snap('families-filter',async()=>{await nav('Families');await $('select[aria-label="Filter families"]').click()});
   await snap('address-review',async()=>{await nav('Address review');const t=await $('//button[starts-with(normalize-space(.),"Addresses (")]');if(await t.isExisting())await t.click();await $('//button[normalize-space(.)="Pin is right"]').scrollIntoView({block:'end'})});
   await snap('letter-cleanup',async()=>{await nav('Letter cleanup')});

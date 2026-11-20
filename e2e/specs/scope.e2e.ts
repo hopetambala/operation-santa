@@ -22,7 +22,9 @@ describe('Scope: only features grounded in the 2025 problems',()=>{
   await practiceSeason();
   await browser.waitUntil(async()=>(await browser.execute(()=>window.innerWidth))>=1000,{timeoutMsg:'the window did not grow into the workspace'});
   assert.deepEqual(await $$('.step-bar strong').map(el=>el.getText()),['Import','Routes','Letters','Print']);
-  assert.deepEqual(await $$('.step-bar .step-number').map(el=>el.getText()),['1','2','3','4']);
+  // A step that had work and has none left shows a check mark instead of its number (here Routes: the demo's families waiting on an address are Import's work, RELEASE-UX-PLAN item 4).
+  const numbers=await $$('.step-bar .step-number').map(async el=>(await el.getText())||await el.getAttribute('aria-label'));
+  assert.equal(numbers.length,4);numbers.forEach((n,i)=>assert.ok(n===String(i+1)||n===`Step ${i+1}, done`,`step ${i+1} shows "${n}"`));
  });
  // RELEASE-UX-PLAN items 12 and 16: Overview repeated the step bar, Routes and Print, so it's gone; the header names only the season.
  it('has no Overview, and the header names only the season',async()=>{assert.ok(!/days to Christmas Eve/.test(await pageText()));await $('button.avatar').click();await $('[role="dialog"]').waitForExist();await absent('Overview');await closeDialog();assert.equal(await $('.eyebrow').getText(),'Operation Santa 2026');assert.equal(await $('.stats-grid').isExisting(),false);});

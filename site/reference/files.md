@@ -53,7 +53,7 @@ Columns **Team**, **Lead**, **Phone**, **Spanish**, **Notes**. See [Santa teams]
 | `Coordinator holds - ….pdf` | Letters held back from the teams | **Coordinator holds (N)** |
 | `Label alignment test 5163.pdf` | Outlines of every label | **Alignment test page** |
 | `MyRouteOnline.csv` | Entry ID, address and planned stop minutes for every home-delivery family the app would route | Print center ▸ **MyRouteOnline CSV** |
-| `Operation Santa change log.csv` | Every recorded change | Change log ▸ **Export CSV** |
+| `Operation Santa change log.csv` | Every recorded change | Change log ▸ **Export change log (.csv)** |
 
 {: .warning }
 These files aren't protected by the season passphrase. Keep them on the print computer, and delete them after December 26. The purge doesn't reach them.

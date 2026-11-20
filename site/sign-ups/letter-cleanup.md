@@ -21,7 +21,7 @@ For 2026 the letters are cleaned outside the app, in Airtable and with a hand ch
 
 ## Uploads: drawings and uploaded letters
 
-The top of the page shows:
+When the season has uploads, the top of the page shows:
 
 - "UPLOADS": how many are ready to print, out of how many.
 - "DOWNLOADING · FAILED · BY HAND": still downloading, failed, and ones a person needs to handle.
@@ -37,7 +37,7 @@ What happens to each kind of upload:
 
 Downloads start by themselves after an import and whenever the season opens. **Retry failed** tries the failed ones again.
 
-The **Uploads to check** tab lists every child with an upload that isn't ready. For each failed upload you can click **Retry**, or **Skip upload (print placeholder)**: the letter then prints "Letter submitted online — ask the coordinator" where the drawing would be.
+The **Uploads to check** tab lists every child with an upload that isn't ready. The tab and the uploads counts appear only when the season has uploads. For each failed upload you can click **Retry**, or **Skip upload (print placeholder)**: the letter then prints "Letter submitted online — ask the coordinator" where the drawing would be.
 
 {: .note }
 Some iPhone photos (HEIC) can't be decoded on every computer: "HEIC photo could not be decoded here. Ask the family for a JPEG." If a link has expired, import a fresh CSV from Airtable and the drawing downloads again.
@@ -52,7 +52,11 @@ A letter **needs a look** when:
 - its upload failed, or can't be shown (a Google Docs link, for example);
 - or someone clicked **Flag** on it.
 
-Every other letter counts as read and prints as imported.
+Every other letter counts as read and prints as imported. Under the "Needs a look" badge, the app says why: for example "Contains a phone number, email, or link", "Flagged by Robin" or "Upload failed".
+
+### Spanish letters and their translations
+
+When the team has written an English translation of a Spanish letter in Airtable (children 1 to 6 have a translation field), the app imports it. Letters shows it under the original letter, and the printed letter has it under the original, headed "English translation". A phone number, email or link in the translation makes the letter need a look too. Translations are only edited in Airtable: change one there and import again.
 
 1. Open **3 Letters**. The first tab says how many letters need a look, for example "6 to look at", and shows them one at a time: "Ana's letter · Rivera A · Entry #26001 · 1 of 6".
 2. On the left: the **original letter**, the child's **gift wishes** (first and second choice, age), and any drawings.

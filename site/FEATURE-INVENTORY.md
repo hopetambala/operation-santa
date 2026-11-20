@@ -20,9 +20,8 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 | Update offer at launch: **Install and restart** / **Later** | banner under the page title | `main.tsx`, `updates.ts`, `main.rs` `restart_app` | C | `updates.e2e.ts`, unit | `start-here/install.md` |
 | **Check for updates** | Settings ▸ "Your season, on your device" | `more.tsx`, `main.tsx` `checkUpdates` | C | `updates.e2e.ts` | `start-here/install.md` |
 | Updates paused Dec 20–26 | automatic | `updates.ts` `updateWindowOpen` | everyone | unit | `start-here/install.md`, `christmas-eve/north-pole.md` |
-| Demo season with fictional families on first launch | Overview banner, **New season** | `main.tsx`, `solver.ts` `demo`, `model.ts` `demoSeason` | everyone | `scope.e2e.ts` (runs on it) | `start-here/tour.md` |
+| Demo season with fictional families (test and guide builds only) | none in the app | `main.tsx`, `solver.ts` `demo`, `model.ts` `demoSeason` | everyone | `scope.e2e.ts` (runs on it) | `start-here/tour.md` |
 | Top bar: tab icons, badges, bell (open tasks), save state, **Import families** / **Plan routes** shortcut, avatar menu | every page | `main.tsx` | everyone | `scope.e2e.ts` (tab names) | `start-here/tour.md` |
-| Overview: stat cards, funnel, "Route overview", "Task list" | Overview | `main.tsx` | C | none | `start-here/tour.md` |
 | "Leave a note for the next person" reason prompt (8 reasons, "other" needs text) | appears only for a change to a printed route | `main.tsx` `withReason`, `model.ts` `needsReason` | C, RP, LC | `planning-and-pickup.e2e.ts`, unit | `routing/late-changes.md`, `start-here/tour.md` |
 | Error banner and toasts | every page | `main.tsx` | everyone | none | `reference/troubleshooting.md` |
 
@@ -45,7 +44,7 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 
 | Feature | Where in the app | Code | Who | Evidence | Guide |
 |---|---|---|---|---|---|
-| **Import families** (Airtable "Download CSV" `.csv`, or `.xlsx`) | top bar on Overview and Families | `main.tsx` `handleImport`, `importer.ts` `parseImport` | C | `journey.e2e.ts`, `airtable-export.e2e.ts`, unit | `sign-ups/import-csv.md` |
+| **Import families** (Airtable "Download CSV" `.csv`, or `.xlsx`) | Import ▸ Families | `main.tsx` `handleImport`, `importer.ts` `parseImport` | C | `journey.e2e.ts`, `airtable-export.e2e.ts`, unit | `sign-ups/import-csv.md` |
 | 2025 form profile: Entry ID, address parts, up to 13 children, hardship (any year), poverty → "Rudolph Route", Spanish detection | import | `importer.ts` `parseRows` | C | unit, `airtable-export.e2e.ts` | `sign-ups/import-csv.md`, `reference/files.md` |
 | "Review your import": new / changed / missing / uploads / proposed-flag counts, field-by-field diff, warnings (missing columns, unknown hardship answers, child-count mismatch), **Cancel import** / **Accept import** | modal | `main.tsx` | C | `journey.e2e.ts`, `airtable-export.e2e.ts` | `sign-ups/import-csv.md` |
 | Re-import is safe: in-app edits win, missing families flagged not deleted, changed addresses re-geocoded | Accept import | `importer.ts` `mergeImport` | C | `airtable-sync.e2e.ts`, unit | `sign-ups/import-csv.md` |
@@ -62,7 +61,7 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 |---|---|---|---|---|---|
 | Search (name, address, email, Entry ID) | Families | `main.tsx` | C, RP | none | `sign-ups/families.md` |
 | Filters: All families, Home delivery, Pickup, Special delivery, New, Verified, Not on a route, Proposed flags, Missing from latest import, Cancelled | Families | `main.tsx` | C, RP | none | `sign-ups/families.md` |
-| Table columns and flag legend (SS, ET, AAF, DNSWV, "?" proposed) | Families | `main.tsx` | C, RP | none | `sign-ups/families.md` |
+| Table columns; flags as words (Spanish, Extra toys, Adopt, Held, Airtable hold, "?" proposed); Pin OK / Check pin | Families | `main.tsx` | C, RP | none | `sign-ups/families.md` |
 | Bulk edit: **Set status…**, **Set delivery…**, **Add flag…**, **Remove flag…**, **Clear** | Families, after ticking rows | `main.tsx` `bulk` | C | none | `sign-ups/families.md` |
 | **Add family** (manual Entry IDs from 90001; never flagged missing) | Families | `main.tsx`, `model.ts` `nextManualId` | C | `scope.e2e.ts` (button present) | `sign-ups/families.md` |
 | Family editor, Details tab: contact and address, Delivery, Status, Pickup RSVP, Rudolph Route, Hardship, Answer language, flags, printed notes, coordinator notes, Route | click a row | `main.tsx` `FamilyModal` | C, RP | `journey.e2e.ts` (Save family) | `sign-ups/families.md` |
@@ -151,7 +150,7 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 | Feature | Where in the app | Code | Who | Evidence | Guide |
 |---|---|---|---|---|---|
 | Change log: search, newest 500, before/after, reason ("Before printing" when none) | Change log | `more.tsx` `ChangeLog`, `model.ts` `audit` | C | none | `reference/change-log.md` |
-| Change log **Export CSV** | Change log | `more.tsx` | C | none | `reference/change-log.md` |
+| Change log **Export change log (.csv)**; Change column shows before → after, search reads the values | Change log | `more.tsx` | C | none | `reference/change-log.md` |
 | Settings: Season, North Pole and delivery window, Service area, Printing (children per bag), Advanced, Airtable; **Save settings** with validation | Settings | `more.tsx` | C | `airtable-sync.e2e.ts`, `cleanup-packets.e2e.ts` | `reference/settings.md` |
 | Settings ▸ Advanced switches, off by default: **Airtable Sync**, **Send letters to helpers**. With a switch off, its buttons aren't rendered | Settings | `model.ts` `features`, `more.tsx` | C | `scope.e2e.ts`, `airtable-sync.e2e.ts`, `cleanup-packets.e2e.ts`, unit | `reference/settings.md` |
 | **Purge sensitive records**: type PURGE CHILD DATA, **Purge now**; deletes backups; Jan 31 reminder | Settings ▸ "After the season" | `main.tsx`, `workflow.ts` `purge`, `main.rs` `vacuum_season`/`purge_backups` | C | `season-security.e2e.ts`, unit | `after-the-season/purge.md` |
@@ -163,5 +162,5 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 | Browser preview (`npm run dev`) | Developer tool with synthetic data only. Covered by the repo README. |
 | E2E build (`e2e` Cargo feature) | Must never reach volunteers. Covered by `e2e/README.md`. |
 | ~~Family statuses "delivered" and "missed"~~ | Removed (Nov 5): older season files turn them back into routed or verified. |
-| Overview funnel (Imported → Verified → Geocoded → Routed) | Described in one line in the tour. The 2026-10-30 audit called it "not grounded"; it's still in the app. See open questions. |
+| Overview page (stat cards, funnel, Route overview, Task list) and its season-menu and menu-bar items | Removed (Nov 20): the step bar, Routes and Print already show all of it. |
 | `asset_*`, `vacuum_season`, `write_export` and other internal commands | No direct user action; they run behind the features above. |

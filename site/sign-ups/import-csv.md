@@ -26,6 +26,11 @@ In 2025 the export needed a custom cleanup script before anything could use it (
 {: .tip }
 Use a view that shows **every** field. If the view hides a column, the app imports that field blank and warns you about it.
 
+The app also reads two things the team adds in Airtable:
+
+- **Spanish to English translations** of the letters (children 1 to 6), the gate code and the additional information. They print under the original.
+- **Status**. A family marked "Issue, Investigating" stays on its route, but its route can't print until the team sets the Status to Checked and you import again.
+
 ## 2. Import it
 
 1. Open your encrypted season.
