@@ -46,6 +46,7 @@ describe('Guide screenshots (demo season)',()=>{
   await snap('import-review',async()=>{await nav('Families');await importCsv(demoCsv(true),'Op Santa Sign-ups-Grid view (1).csv');await dialogText('Review your import');const more=await $('//*[@role="dialog"]//summary');if(await more.isExisting())await more.click()});
   // Packet mode: export a packet for a few demo families, then open it the way a volunteer would.
   await snap('packet-mode',async()=>{await turnOn('Send letters to helpers');await nav('Letter cleanup');await click('Cleanup packet');await setInput($('[role="dialog"] input[placeholder="first"]'),'26001');await setInput($('[role="dialog"] input[placeholder="last"]'),'26003');await setInput($('[role="dialog"] input[type=password]'),PASSPHRASE);await click('Choose where to save');await toast(/Packet with \d+ families saved/);const packet=readdirSync(RUN_DIR).find(f=>f.endsWith('.opsanta-packet'))!;await queueOpen(path.join(RUN_DIR,packet));await $('button.avatar').click();await click('Open a cleanup packet');await setInput($('[role="dialog"] input[type=password]'),PASSPHRASE);await click('Choose packet file');await toast(/families opened/)});
+  if(failed.length)throw Error(failed.join('\n'));
   console.log(`Guide screenshots in ${OUT}\nNot taken:\n${failed.join('\n')||'(none)'}`);
  });
 });

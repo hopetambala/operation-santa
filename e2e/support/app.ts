@@ -36,7 +36,7 @@ export async function nav(page:string){
    await $(`//nav[@aria-label="Season workflow"]//button[.//strong[normalize-space(.)="${steps[page]}"]]`).click();
    if(page==='Address review'||page==='Teams')await $(`//nav[contains(@class,"workspace-sections")]/button[normalize-space(.)="${page}"]`).click();
  }else await seasonAction(page);
- await browser.waitUntil(async()=>(await $('h1').getText()).replace(/\s+/g,' ')===page,{timeoutMsg:`${page} did not open`});
+ await browser.waitUntil(async()=>(await $('h1').getText()).replace(/\s+/g,' ')===(steps[page]??page),{timeoutMsg:`${page} did not open`});
 }
 export async function toast(match:RegExp,timeout=30000){let last='';await browser.waitUntil(async()=>{const t=await $('.toast');last=await t.isExisting()?await t.getText():'';return match.test(last)},{timeout,timeoutMsg:`No toast matching ${match}; last toast: "${last}"`}).catch(async e=>{const err=await $('.error-banner');const banner=await err.isExisting()?await err.getText():'none';await shot('toast-timeout');throw Error(`${e.message}\nError banner: ${banner}\nPage: ${(await pageText()).slice(0,700)}`)});const close=await $('.toast button[aria-label="Dismiss"]');if(await close.isExisting())await close.click();return last;}
 export async function noError(){const e=await $('.error-banner');if(await e.isExisting())throw Error(`App error banner: ${await e.getText()}`);}
