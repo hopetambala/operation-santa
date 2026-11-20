@@ -11,7 +11,7 @@ Every Christmas Eve, Pasadena Jaycees Santa teams visit hundreds of local famili
 
 These guides follow the season in order. Find the step you're on, or start with [your role]({{ '/roles/' | relative_url }}).
 
-![Create or open season in Operation Santa]({{ '/assets/images/create-or-open.png' | relative_url }})
+![The Operation Santa welcome window]({{ '/assets/images/create-or-open.png' | relative_url }})
 
 | Step in the app | Guide |
 |---|---|
@@ -53,4 +53,4 @@ Each guide starts with a short **Why this step exists** note that ties the step 
 - The examples use made-up families like the Rivera and Bennett families, the same fictional households the app's demo season shows. Never copy a real family's details into a guide, a chat or a screenshot.
 
 {: .tip }
-New to the app? Start with **Create or open season**, then follow the guide for your role.
+New to the app? Start with **New season…** in the welcome window, then follow the guide for your role. **Help ▸ How the Four Steps Work** shows the four steps again any time.

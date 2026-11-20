@@ -19,13 +19,14 @@ The season holds children's names, letters and drawings, and families' addresses
 
 ## Create the season
 
-1. Open Operation Santa. The first screen says **Create or open season**.
-2. Click **Create new season**. If another season is already open, click your initial at the top right to find this command.
-3. In "Season passphrase", type a passphrase of at least 10 characters. A short sentence is easiest to type and hard to guess.
-4. Optional: tick "Remember on this computer (system keychain)". Do this only on the coordinator's own computer.
-5. Click **Choose save location**, pick a folder and keep the suggested name (for example `Operation Santa 2026.opsanta`), then click **Save**.
+1. Open Operation Santa. A small **welcome window** opens, with **New season…**, **Open season…** and **Open the guide** on the left and your recent seasons on the right.
+2. Click **New season…** (or choose **File ▸ New Season…**, ⌘N). If another season is already open, click your initial at the top right to find this command.
+3. Keep the suggested "Season name" (for example `Operation Santa 2026`) or change it.
+4. In "Season passphrase", type a passphrase of at least 10 characters, then type it again in "Type it again". A short sentence is easiest to type and hard to guess.
+5. Optional: tick "Remember on this computer (system keychain)". Do this only on the coordinator's own computer.
+6. Click **Choose save location**, pick a folder on this computer and keep the suggested name, then click **Save**. If the folder syncs to iCloud Drive, Dropbox, OneDrive or Google Drive, the app asks first: a synced copy of a live season file can come back out of date. Choose a folder that stays on this Mac.
 
-The top right now says "Encrypted · saved on this device", and a message says "Encrypted season created. Changes save automatically."
+The window grows into the workspace and opens on step 1, **Import**. The top right says "Encrypted · saved on this device", and a message says "Encrypted season created. Changes save automatically."
 
 ![The "Start a new season" box with the passphrase field and the keychain checkbox]({{ '/assets/images/new-season-dialog.png' | relative_url }})
 
@@ -34,8 +35,8 @@ The top right now says "Encrypted · saved on this device", and a message says "
 
 ## Open the season
 
-1. Click **Open encrypted season** on the start screen or in the menu under your initial.
-2. Choose the `.opsanta` file.
+1. In the welcome window, click the season under **Recent seasons**, or click **Open season…** (also **File ▸ Open Season…**, ⌘O, or the menu under your initial).
+2. If you clicked **Open season…**, choose the `.opsanta` file. In the TestFlight version, a recent season opens the file picker in its folder the first time after the app restarts: choose the file again.
 3. If the passphrase is remembered on this computer, the season opens straight away. Otherwise the "Unlock your season" box asks for it: type it and click **Open season**.
 
 If a remembered passphrase no longer works (someone changed the file on another computer, for example), the app asks for the passphrase instead.
@@ -53,7 +54,7 @@ While the season is open, the file is locked to this app. Anyone else who tries 
 
 ## Locking
 
-- **Lock now**: click the **avatar**, then **Lock now**. The season closes and the app returns to **Create or open season**.
+- **Lock now**: click the **avatar**, then **Lock now**. The season closes and the app returns to the welcome window.
 - **Automatic lock**: after 30 minutes without a click or a key press, the season locks itself and says "Season locked after 30 minutes of inactivity. Open it again to continue."
 
 Lock the season whenever you step away from a shared computer.
@@ -77,7 +78,7 @@ There's no restore button yet. To go back to a backup:
    - **Windows:** paste `%APPDATA%\org.pasadenajaycees.opsanta\seasons\backups\` into the File Explorer address bar.
 3. Open the folder inside it with the newest date. The backup files are named by time, newest last.
 4. Copy the backup you want to a safe place, such as next to the season file, and give it a clear name like `Operation Santa 2026 restored.opsanta`.
-5. Open the app and use **Open encrypted season** on that copy, with the usual passphrase.
+5. Open the app and use **Open season…** on that copy, with the usual passphrase.
 
 ## On a new computer
 

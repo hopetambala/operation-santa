@@ -30,15 +30,15 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 
 | Feature | Where in the app | Code | Who | Evidence | Guide |
 |---|---|---|---|---|---|
-| **Create new season**: passphrase (10+ characters), **Choose save location**, `.opsanta` file | avatar ▸ "Your season" | `main.tsx` `create`, `main.rs` `create_season` | C | `journey.e2e.ts` | `start-here/season-file.md` |
-| **Open encrypted season**, "Unlock your season", **Open season** | avatar menu | `main.tsx` `openSeason`/`unlock`, `main.rs` `open_season` | C | `journey.e2e.ts`, `season-security.e2e.ts` | `start-here/season-file.md` |
+| **New season…**: name, passphrase twice (10+ characters), **Choose save location**, synced-folder warning, `.opsanta` file | welcome window, File ▸ New Season…, avatar ▸ "Your season" | `main.tsx` `create`, `main.rs` `create_season` | C | `journey.e2e.ts` | `start-here/season-file.md` |
+| **Open season…**, recent seasons, "Unlock your season", **Open season** | welcome window, File ▸ Open Season…, avatar menu | `main.tsx` `openSeason`/`unlock`, `main.rs` `open_season` | C | `journey.e2e.ts`, `season-security.e2e.ts` | `start-here/season-file.md` |
 | "Remember on this computer (system keychain)" | create and unlock dialogs | `main.tsx`, `native.ts` `secretSet`, `main.rs` `secret_*` | C | `season-security.e2e.ts` | `start-here/season-file.md` |
 | Wrong remembered passphrase falls back to asking | open | `main.tsx` | C | `season-security.e2e.ts` | `start-here/season-file.md` |
 | Automatic save after every change ("Saving…" / "Encrypted · saved on this device") | top bar | `main.tsx` `update`, `main.rs` `save_season` | everyone | `journey.e2e.ts` | `start-here/season-file.md` |
 | One file, one user: file locked while open | automatic | `main.rs` (flock on the file) | C | Rust tests | `start-here/season-file.md` |
 | **Lock now**; auto-lock after 30 minutes idle | avatar menu; automatic | `main.tsx` `lock`, `main.rs` `close_season` | C | `journey.e2e.ts` (Lock now) | `start-here/season-file.md` |
 | Encrypted backups: every 15 minutes, before imports, geocoding, rebalancing, packet merges and the purge; last 20 kept | automatic | `main.tsx` `backup`, `main.rs` `backup_season` | C | `season-security.e2e.ts` (backup folder) | `start-here/season-file.md`, `reference/files.md` |
-| Restore a backup (open the backup `.opsanta` file with the same passphrase) | outside the app, then **Open encrypted season** | `main.rs` `backup_of`, `docs/RELEASE.md` | C | Rust test (restored backup wins) | `start-here/season-file.md` |
+| Restore a backup (open the backup `.opsanta` file with the same passphrase) | outside the app, then **Open season…** | `main.rs` `backup_of`, `docs/RELEASE.md` | C | Rust test (restored backup wins) | `start-here/season-file.md` |
 | Open a newer-version file: "created by a newer version" error | open | `main.rs` | C | none | `reference/troubleshooting.md` |
 
 ## 3. Sign-ups: import and Airtable sync

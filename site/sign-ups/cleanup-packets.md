@@ -37,7 +37,7 @@ You can keep working on the same letters while the packet is out. If you both ch
 ## For letter cleaners: clean a packet
 
 1. [Install the app]({{ '/start-here/install/' | relative_url }}) if you haven't.
-2. On **Create or open season**, click **Open encrypted season** and choose the `.opsanta-packet` file.
+2. In the welcome window, click **Open season…** and choose the `.opsanta-packet` file.
 3. Type the packet passphrase and click **Open packet**. The **Letters** step opens with only the families in the packet.
 4. Click your initial, choose **Settings**, enter your name under “Your display name”, and click **Save settings**.
 5. Return to **Letters**.
