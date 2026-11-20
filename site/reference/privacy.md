@@ -26,8 +26,8 @@ The season holds children's names, letters and drawings, and families' addresses
 
 | To | What | When |
 |---|---|---|
-| US Census geocoder | Street, city, state and ZIP. No names, units, phones or letters. | **Geocode** in Address review |
-| OpenStreetMap (Nominatim) | Street, city, state and ZIP of addresses the Census couldn't find | **Geocode** |
+| US Census geocoder | Street, city, state and ZIP. No names, units, phones or letters. | After **Accept import** and when retrying **Geocode** in Address review |
+| OpenStreetMap (Nominatim) | Street, city, state and ZIP of addresses the Census couldn't find | During address lookup for unmatched addresses |
 | Airtable | Requests to read the sign-ups table, with the read-only token | **Sync Airtable**, and refreshing expired drawing links. Both only with Settings ▸ Advanced ▸ "Airtable Sync" on |
 | Airtable's file links | Requests to download each upload | After each import |
 | GitHub | A check for a new version | When the app opens, and **Check for updates** (downloaded copies only) |
@@ -38,7 +38,7 @@ The **phone links** and the QR codes on each packet's cover are Google Maps link
 
 ## Rules for volunteers
 
-- Never put real family details in an email, chat, shared document, bug report or screenshot. Use the demo season for screenshots and questions.
+- Never put real family details in an email, chat, shared document, bug report or screenshot. Use a season containing only fictional families for screenshots and questions.
 - Share a passphrase separately from its file: the file by email or drive, the passphrase by phone or text.
 - Keep the season passphrase in the club's password manager, and a sealed copy with the treasurer.
 - Lock the season (**avatar** ▸ **Lock now**) when you step away. It locks itself after 30 minutes.

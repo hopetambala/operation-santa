@@ -19,8 +19,8 @@ The season holds children's names, letters and drawings, and families' addresses
 
 ## Create the season
 
-1. Click the round **avatar** button at the top right (it shows the first letter of your display name). The "Your season" box opens.
-2. Click **Create new season**.
+1. Open Operation Santa. The first screen says **Create or open season**.
+2. Click **Create new season**. If another season is already open, click your initial at the top right to find this command.
 3. In "Season passphrase", type a passphrase of at least 10 characters. A short sentence is easiest to type and hard to guess.
 4. Optional: tick "Remember on this computer (system keychain)". Do this only on the coordinator's own computer.
 5. Click **Choose save location**, pick a folder and keep the suggested name (for example `Operation Santa 2026.opsanta`), then click **Save**.
@@ -34,7 +34,7 @@ The top right now says "Encrypted · saved on this device", and a message says "
 
 ## Open the season
 
-1. Click the **avatar**, then **Open encrypted season**.
+1. Click **Open encrypted season** on the start screen or in the menu under your initial.
 2. Choose the `.opsanta` file.
 3. If the passphrase is remembered on this computer, the season opens straight away. Otherwise the "Unlock your season" box asks for it: type it and click **Open season**.
 
@@ -53,7 +53,7 @@ While the season is open, the file is locked to this app. Anyone else who tries 
 
 ## Locking
 
-- **Lock now**: click the **avatar**, then **Lock now**. The season closes and the app shows the demo again.
+- **Lock now**: click the **avatar**, then **Lock now**. The season closes and the app returns to **Create or open season**.
 - **Automatic lock**: after 30 minutes without a click or a key press, the season locks itself and says "Season locked after 30 minutes of inactivity. Open it again to continue."
 
 Lock the season whenever you step away from a shared computer.

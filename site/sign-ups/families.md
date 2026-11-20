@@ -1,6 +1,6 @@
 ---
 title: Families
-parent: "November: sign-ups"
+parent: "1. Import"
 nav_order: 3
 description: "Find, filter and edit families, add a family by hand, and change many at once."
 ---

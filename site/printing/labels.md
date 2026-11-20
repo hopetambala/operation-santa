@@ -1,6 +1,6 @@
 ---
 title: Bag labels and the alignment test
-parent: "December 19: printing"
+parent: "4. Print"
 nav_order: 2
 description: "Choose the Avery label sheet and line it up with a test page."
 ---
@@ -29,7 +29,7 @@ Children are split into bags by Settings ▸ "Children per bag" (3 by default). 
 
 ## Choose the label sheet
 
-In **Print center**, under the banner:
+In **4 Print**, under the banner:
 
 1. "Labels": choose **Avery 5163 · 4×2 in · 10/sheet** (the default, with room for every child) or **Avery 5160 · 1×2⅝ in · 30/sheet** (address-label size, shorter text).
 2. "Street address on labels" is on for new seasons, as it was in 2025. Turn it off here if you need labels without addresses.

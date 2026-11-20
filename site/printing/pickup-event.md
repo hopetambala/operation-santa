@@ -1,6 +1,6 @@
 ---
 title: Pickup event packet and coordinator holds
-parent: "December 19: printing"
+parent: "4. Print"
 nav_order: 4
 description: "Print the check-in sheet, letters and labels for pickup families, and the letters the coordinator is holding back."
 ---
@@ -27,7 +27,7 @@ Families are on the pickup list when their "Delivery" is **pickup**: set in [Fam
 To print:
 
 1. Look at any of their letters the app flags in [Letter cleanup]({{ '/sign-ups/letter-cleanup/' | relative_url }}). The packet won't print while a pickup family's letter needs a look or an upload is still downloading.
-2. Go to **Print center** ▸ "Other printouts and exports".
+2. Open **4 Print** ▸ "Other printouts and exports".
 3. Click **Pickup event packet (N)**, where N is the number of pickup families. Save the PDF (`Pickup event - v1.pdf`).
 
 The packet holds, sorted by family name:
@@ -44,7 +44,7 @@ Some letters shouldn't go out with the Santa teams: a single letter marked **Don
 
 The coordinator keeps the full letters in a separate PDF:
 
-1. Go to **Print center** ▸ "Other printouts and exports".
+1. Open **4 Print** ▸ "Other printouts and exports".
 2. Click **Coordinator holds (N)**. Save the PDF (`Coordinator holds - 2026-12-19 1430.pdf`).
 
 It has one letter page per held family, by Entry ID. Keep it with the coordinator at the North Pole.

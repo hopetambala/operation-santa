@@ -1,11 +1,11 @@
 ---
-title: "December: routes"
+title: "2. Routes"
 nav_order: 5
 has_children: true
 description: "Add Santa teams, plan balanced routes, and fit in late changes."
 ---
 
-# December: routes
+# 2. Routes
 
 {: .why }
 In 2025 all 45 routes were planned in about half an hour at noon on December 23, roughly 28 hours before the teams left. Late changes, printing, sorting letters and briefing teams were all squeezed into that last day. In the app, **draft routes can start on December 1** while sign-ups are still coming in. Final routing is then a rebalance of a plan you already know, not a first attempt.

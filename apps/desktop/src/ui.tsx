@@ -6,7 +6,10 @@ import {activateTab,dialogTabStop} from './a11y';
 export type Ctx={s:Season;update:(fn:(d:Season)=>void)=>void;withReason:(action:(reason:string)=>void|Promise<void>,required:boolean)=>void;setError:(e:string)=>void;setToast:(t:string)=>void;busy:boolean;setBusy:(b:boolean)=>void;openFamily:(f:Family)=>void;navigate:(p:string)=>void;saved:boolean;backup:()=>Promise<void>;selectedRoute?:number;selectRoute:(n?:number)=>void};
 // The Operation Santa mark (brand system: assets/Logos/opsanta-mark.svg), inline so it needs no file or network.
 export function BrandMark({size=40}:{size?:number}){return <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" style={{fill:'var(--tk-dlite-semantic-color-action-primary)'}}/><path d="M15 49c7-1 7-11 14-12s9-6 11-10" style={{fill:'none',stroke:'var(--tk-dlite-semantic-color-surface-sunken)'}} strokeWidth="3.2" strokeLinecap="round" strokeDasharray="0.01 6.4"/><circle cx="15" cy="49" r="4" style={{fill:'var(--tk-dlite-semantic-color-surface-sunken)'}}/><path d="M45 7l4.4 10.6L60 22l-10.6 4.4L45 37l-4.4-10.6L30 22l10.6-4.4z" style={{fill:'var(--tk-dlite-semantic-color-brand)'}}/></svg>}
-export function BrandLockup({onClick}:{onClick:()=>void}){return <button className="brand-lockup" aria-label="Operation Santa overview" onClick={onClick}><BrandMark/><span><strong>Operation Santa</strong><small>Pasadena Jaycees</small></span></button>}
+export function BrandLockup({onClick}:{onClick?:()=>void}){
+ const brand=<><BrandMark/><span><strong>Operation Santa</strong><small>Pasadena Jaycees</small></span></>;
+ return onClick?<button className="brand-lockup" aria-label="Operation Santa overview" onClick={onClick}>{brand}</button>:<div className="brand-lockup">{brand}</div>;
+}
 export const errText=(e:unknown)=>String(e instanceof Error?e.message:e);
 export function Badge({children,tone=''}:{children:React.ReactNode;tone?:string}){return <span className={`badge ${tone}`}>{children}</span>}
 export function Button({children,onClick,primary=false,disabled=false,title}:{children:React.ReactNode;onClick?:()=>void;primary?:boolean;disabled?:boolean;title?:string}){return <button type={onClick?'button':'submit'} title={title} disabled={disabled} className={primary?'btn primary':'btn'} onClick={onClick}>{children}</button>}

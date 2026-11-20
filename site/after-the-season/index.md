@@ -1,6 +1,6 @@
 ---
 title: After the season
-nav_order: 8
+nav_order: 9
 has_children: true
 description: "Delete children's and families' details once Christmas Eve is over."
 ---

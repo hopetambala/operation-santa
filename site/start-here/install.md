@@ -51,7 +51,7 @@ TestFlight updates the app for you. TestFlight builds expire after 90 days, so t
 
 ## The first time you open it
 
-The app opens on a **demo season** with fictional families, and the top right of the window says "Demo · synthetic data". Explore freely; nothing there is real. When you're ready for real sign-ups, [create a season file]({{ '/start-here/season-file/' | relative_url }}).
+The app opens on **Create or open season**. To begin, [create a season file]({{ '/start-here/season-file/' | relative_url }}).
 
 ## Updates
 
@@ -61,9 +61,9 @@ Downloaded copies (the DMG and Windows) check for a new version each time they o
 2. Click **Install and restart** to update now. Your season is saved first, and the app reopens by itself.
 3. Or click **Later**. The banner comes back the next time you open the app.
 
-To check by hand: Settings ▸ **Check for updates**. If there's nothing new, the app says "You have the latest version."
+To check by hand: your initial ▸ **Check for updates**. If there's nothing new, the app says "You have the latest version."
 
 {: .warning }
 **No updates during delivery week.** From December 20 to December 26 the app never offers an update, and **Check for updates** says "Updates are paused until December 27 so nothing changes during delivery week." The version you print with is the version you deliver with.
 
-TestFlight and App Store copies don't show this banner. TestFlight updates them, and **Check for updates** always says you have the latest version.
+TestFlight and App Store copies receive updates through Apple.

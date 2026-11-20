@@ -1,6 +1,6 @@
 ---
 title: MyRouteOnline fallback
-parent: "December 19: printing"
+parent: "4. Print"
 nav_order: 5
 description: "If the app's routes can't be used, export the addresses for MyRouteOnline, the way 2025 was routed."
 ---
@@ -19,7 +19,7 @@ MyRouteOnline is how the committee routed in 2025, and it stays the backup plan 
 
 ## Export the address list
 
-Go to **Print center** ▸ "Other printouts and exports" and click **MyRouteOnline CSV**. It saves `MyRouteOnline.csv`, with three columns:
+Open **4 Print** ▸ "Other printouts and exports" and click **MyRouteOnline CSV**. It saves `MyRouteOnline.csv`, with three columns:
 
 | Title | Address | Service Time |
 |---|---|---|

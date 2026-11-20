@@ -1,6 +1,6 @@
 ---
 title: Cleanup packets
-parent: "November: sign-ups"
+parent: "3. Letters"
 nav_order: 6
 description: "Share batches of letters with volunteer cleaners as small encrypted files, and merge their work back."
 ---
@@ -24,7 +24,7 @@ Sending letters to helpers is off by default. To turn it on, go to **Settings** 
 
 ## For the coordinator: send a packet
 
-1. Go to **Letter cleanup** and click **Cleanup packet**.
+1. Open **3 Letters** and click **Cleanup packet**.
 2. Choose which families go in it:
    - "From Entry ID" and "To Entry ID" (for example 26001 to 26199), or leave them blank for first and last, and/or
    - "Only route (optional)" for one route.
@@ -37,10 +37,10 @@ You can keep working on the same letters while the packet is out. If you both ch
 ## For letter cleaners: clean a packet
 
 1. [Install the app]({{ '/start-here/install/' | relative_url }}) if you haven't.
-2. Go to **Settings**, put your name in "Your display name", and click **Save settings**. Your name goes on every letter you review and on the file you send back.
-3. Click the **avatar** at the top right (or use Settings), then **Open a cleanup packet**.
-4. Type the "Packet passphrase" the coordinator gave you and click **Choose packet file**. Pick the `.opsanta-packet` file.
-5. The app opens in **packet mode**: the top right says "Cleanup packet · not a season file", and you see only that packet's letters, on the Letter cleanup page.
+2. On **Create or open season**, click **Open encrypted season** and choose the `.opsanta-packet` file.
+3. Type the packet passphrase and click **Open packet**. The **Letters** step opens with only the families in the packet.
+4. Click your initial, choose **Settings**, enter your name under “Your display name”, and click **Save settings**.
+5. Return to **Letters**.
 6. Open the **All letters** tab and read each letter: **Looks good · next**, **Flag** or **Don't print**. See [Letter cleanup]({{ '/sign-ups/letter-cleanup/' | relative_url }}#look-at-the-flagged-letters).
 7. When you're done (or need to stop), click **Save edited packet**, type a packet passphrase, and click **Choose where to save**. The suggested name is like `Cleaned by Ana.opsanta-packet`.
 8. Send that file back to the coordinator, and the passphrase separately.
@@ -52,7 +52,7 @@ Packet mode doesn't save as you go. Click **Save edited packet** before you clos
 
 ## For the coordinator: merge a returned packet
 
-1. Open your season. Go to **Letter cleanup** and click **Import returned packet**.
+1. Open your season. Open **3 Letters** and click **Import returned packet**.
 2. Type the passphrase the cleaner used and click **Choose packet file**.
 3. The app merges the cleaner's changes letter by letter: "14 letter changes merged from Ana. 1 conflicts to resolve."
 4. If you and the cleaner both changed the same letter, a box shows **YOURS** and **THEIRS** side by side. Click **Keep mine** or **Take theirs** for each.

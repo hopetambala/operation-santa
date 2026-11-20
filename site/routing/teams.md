@@ -1,6 +1,6 @@
 ---
 title: Santa teams
-parent: "December: routes"
+parent: "2. Routes"
 nav_order: 1
 description: "Add Santa teams one by one or from a spreadsheet, and give each route a team."
 ---
@@ -19,7 +19,7 @@ A team lead's name and phone number go on the cover of their packet, and on the 
 
 ## Add a team
 
-1. Go to **Teams** and click **Add team**.
+1. Open **2 Routes**, choose **Teams** and click **Add team**.
 2. Fill in the "Santa team" box:
    - "Team name" (required), for example "Team 7"
    - "Team lead"
@@ -49,7 +49,7 @@ Click **Import CSV** and choose the file. The message says how many teams were i
 
 ## Give each route a team
 
-1. Go to **Route planner** and click a route in the list.
+1. Open **2 Routes** and click a route in the list.
 2. Under the map, choose from **Team**. Each choice shows the lead's name, "ES" if the team has a Spanish speaker, and "(also Route 5)" if the team already has a route.
 3. If the route has been printed, the app asks for a reason, and the route will need a reprint, because the team is on the cover.
 

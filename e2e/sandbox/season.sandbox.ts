@@ -5,7 +5,7 @@ import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {homedir} from 'node:os';
 import path from 'node:path';
-import {RUN_DIR,shot,click,fill,nav,toast,noError,dialogText} from '../support/app';
+import {RUN_DIR,shot,seasonAction,click,fill,nav,toast,noError,dialogText} from '../support/app';
 // Season files with the Mac App Store sandbox on (docs/RELEASE.md § Season files under the sandbox). Run by
 // `npm run e2e:sandbox`, which builds a sandboxed, ad-hoc-signed copy of the E2E app under its own bundle id.
 // Synthetic data only. Unlike the other specs, the keychain is real: whether it works under the sandbox is the question.
@@ -38,7 +38,7 @@ describe('Season files in the App Sandbox (Mac App Store build)',()=>{
  const queueOpen=(p:string)=>browser.execute((f:string)=>{(window as unknown as {__opens:string[]}).__opens.push(f)},p);
  it('runs sandboxed: the binary carries the sandbox entitlement',()=>{const e=spawnSync('codesign',['-d','--entitlements','-','--xml',EXE],{encoding:'utf8'});assert.match(`${e.stdout}${e.stderr}`,/com\.apple\.security\.app-sandbox/,`${EXE} is not sandboxed`);});
  it('creates the season in the chosen folder and remembers the passphrase in the keychain',async()=>{
-  await $('button.avatar').click();await click('Create new season');await dialogText('Start a new season');
+  await seasonAction('Create new season');await dialogText('Start a new season');
   await $('[role="dialog"] input[type=password]').setValue(PASS);
   await $('//label[contains(.,"Remember on this computer")]/input').click();
   await click('Choose save location');
@@ -66,7 +66,7 @@ describe('Season files in the App Sandbox (Mac App Store build)',()=>{
  });
  it('locks, then reopens with the passphrase from the keychain and finds the change',async()=>{
   await $('button.avatar').click();await click('Lock now');await toast(/Season locked/);
-  await queueOpen(SEASON);await $('button.avatar').click();await click('Open encrypted season');
+  await queueOpen(SEASON);await seasonAction('Open encrypted season');
   // A remembered passphrase opens the season without asking. If the keychain failed, the unlock form shows instead.
   await browser.waitUntil(async()=>await $('[role="dialog"][aria-label="Unlock your season"]').isExisting()||/Encrypted season open/.test(await $('.toast').isExisting()?await $('.toast').getText():''),{timeout:30000,timeoutMsg:'the season neither opened nor asked for its passphrase'});
   assert.equal(await $('[role="dialog"][aria-label="Unlock your season"]').isExisting(),false,'the keychain did not return the remembered passphrase under the sandbox');

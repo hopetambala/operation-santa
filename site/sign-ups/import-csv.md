@@ -1,6 +1,6 @@
 ---
 title: Import the Airtable CSV
-parent: "November: sign-ups"
+parent: "1. Import"
 nav_order: 1
 description: "Download the sign-ups from Airtable and import them, as often as you like."
 ---
@@ -28,8 +28,8 @@ Use a view that shows **every** field. If the view hides a column, the app impor
 
 ## 2. Import it
 
-1. Open your season. Imports don't work in the demo; you'll see "Create or open an encrypted season before importing family records."
-2. Go to **Overview** or **Families** and click **Import families** at the top right.
+1. Open your encrypted season.
+2. Open **Import** and click **Import Airtable export (.csv)**.
 3. Choose the CSV file you downloaded. Excel files (`.xlsx`) work too.
 
 ## 3. Review the import {#review-the-import}
@@ -48,7 +48,7 @@ Read the yellow warnings, if any. They name the problem and what to do. For exam
 - "… gave a hardship answer the app doesn't recognize, so none … proposed for pickup": check those families in Families and set their delivery yourself.
 - "#26014: form says 3 children but 2 were filled in": open the family and check.
 
-Click **Accept import** to bring it in, or **Cancel import** to change nothing.
+Click **Accept import** to bring in the sign-ups. Address lookup and drawing downloads start automatically. Open **Import** → **Address review** for addresses that need a decision.
 
 !["Review your import" with its five counts and one changed demo family expanded]({{ '/assets/images/import-review.png' | relative_url }})
 

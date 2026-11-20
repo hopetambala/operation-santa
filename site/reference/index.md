@@ -1,6 +1,6 @@
 ---
 title: Reference
-nav_order: 9
+nav_order: 10
 has_children: true
 description: "Settings, the change log, file formats, privacy, troubleshooting, a glossary and the brand."
 ---
