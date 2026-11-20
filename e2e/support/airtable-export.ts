@@ -2,7 +2,7 @@
 // mix of formats the real export had (counts measured from the 2025 export; no real values copied).
 // Every name, phone, address number and letter is invented. Seeded, so every run produces the same file.
 import Papa from 'papaparse';
-import {HEADERS_2025} from './fixture';
+import {HEADERS_2026} from './fixture';
 
 const rng=(seed:number)=>()=>{seed=(seed*1664525+1013904223)>>>0;return seed/2**32;};
 type Rand=ReturnType<typeof rng>;
@@ -72,7 +72,12 @@ export function airtableExport(count=740,seed=2026):SyntheticExport{
    const up=r()<0.08;const ext=weighted(r,[['jpg',52],['jpeg',50],['png',23]] as const);
    row[p+'Name']=name;row[p+'Age']=age;row[p+'Age Grouping']=group;row[p+'Gender']=weighted(r,GENDERS);row[p+'First Choice']=GIFTS[w];row[p+'Second Choice']=GIFTS[(w+1+Math.floor(r()*13))%GIFTS.length];
    row[p+'Letter to Santa']=up&&r()<0.5?'':pick(r,L?ES:EN)(name.split(' ')[0],WISH[w]);
+   // The team translates Spanish letters in Airtable; the form has a translation field for children 1 to 6 only. No r() call, so the seeded rows stay the same.
+   if(L&&k<=6&&row[p+'Letter to Santa'])row[p+'Letter to Santa (Spanish to English translation)']=EN[0](name.split(' ')[0],WISH[w]);
    if(up){files.push({id,n:k,ext});row[p+'Upload Letter to Santa']='';}}
+  if(L&&gate)row['Gate Code / Additional Address Info (Spanish to English translation)']=gate;
+  // Every family has been through the team's review; none is on hold, so the season-size run prints.
+  row['Status']='Checked';
   if(files.length)uploads.push({row,key:id,files});
   rows.push(row);
   // San Gabriel and Arcadia sit inside the San Marino and Sierra Madre circles, so they count as in the area.
@@ -83,6 +88,6 @@ export function airtableExport(count=740,seed=2026):SyntheticExport{
  }
  const fill=(fresh:boolean)=>{for(const u of uploads)for(const f of u.files)u.row[`Child #${f.n}: Upload Letter to Santa`]=`drawing-${f.id}-${f.n}.${f.ext} (${uploadUrl(f.id,f.n,f.ext,fresh)})`;};
  return {families,census,
-  csv:(o={})=>{fill(!!o.fresh);return '﻿'+Papa.unparse({fields:HEADERS_2025,data:rows.map(row=>HEADERS_2025.map(h=>row[h]??''))});},
+  csv:(o={})=>{fill(!!o.fresh);return '﻿'+Papa.unparse({fields:HEADERS_2026,data:rows.map(row=>HEADERS_2026.map(h=>row[h]??''))});},
   uploadUrls:({fresh})=>uploads.flatMap(u=>u.files.map(f=>uploadUrl(f.id,f.n,f.ext,fresh)))};
 }
