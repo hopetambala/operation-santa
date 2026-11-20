@@ -14,7 +14,7 @@ import {type Ctx,Badge,Button,Field,Modal,Empty,AssetImage,BrandLockup,errText,o
 import {Planner,Teams} from './planner';
 import {Review,reviewQueue,proposalLabel} from './review';
 import {Cleanup,readPacket,downloadAttachments,attachmentCounts,letterStatus} from './cleanup';
-import {ChangeLog,SettingsPage,exportChangeLog} from './more';
+import {ChangeLog,SettingsPage} from './more';
 import {useWindow} from './windowed';
 import {StepBar} from './brand/StepBar';
 import {Welcome,FourSteps,ImportStart,StepFirst} from './welcome';
@@ -215,7 +215,6 @@ if(['street','city','zip'].some(k=>changed.includes(k as keyof Family))){if(old.
      <Button onClick={()=>menuPage('Overview')}>Overview</Button>
      <Button onClick={()=>menuPage('Settings')}><Settings size={16}/>Settings</Button>
      <Button onClick={()=>menuPage('Change log')}><History size={16}/>Change log</Button>
-     <Button onClick={()=>{setModal('');exportChangeLog(s).catch(e=>setError(errText(e)))}}>Export change log</Button>
      {canUpdate&&<Button onClick={()=>{setModal('');checkUpdates()}}>Check for updates</Button>}
      {saved&&<Button onClick={showPurge}>Purge sensitive records</Button>}
    </div></Modal>}
