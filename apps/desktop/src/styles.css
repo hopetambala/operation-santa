@@ -627,3 +627,6 @@ summary { cursor: pointer; display: flex; align-items: center; min-height: var(-
   .four-steps ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .step-first { flex-direction: column; align-items: flex-start; }
 }
+
+/* Unrouted table: why a family can't be added yet (RELEASE-UX-PLAN item 3). */
+.confirm-first { display: block; margin-top: var(--tk-dlite-semantic-spacing-100); color: var(--tk-dlite-semantic-color-text-tertiary); }

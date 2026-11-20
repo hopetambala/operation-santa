@@ -39,7 +39,8 @@ export async function nav(page:string){
  const steps:Record<string,string>={'Families':'Import','Address review':'Import','Route planner':'Routes','Teams':'Routes','Letter cleanup':'Letters','Print center':'Print'};
  if(steps[page]){
    await $(`//nav[@aria-label="Season workflow"]//button[.//strong[normalize-space(.)="${steps[page]}"]]`).click();
-   if(page==='Address review'||page==='Teams')await $(`//nav[contains(@class,"workspace-sections")]/button[normalize-space(.)="${page}"]`).click();
+   // Step 1 opens Address review while Import has work, so Families is chosen by its section button too.
+   if(page==='Address review'||page==='Teams'||page==='Families')await $(`//nav[contains(@class,"workspace-sections")]/button[normalize-space(.)="${page}"]`).click();
  }else await seasonAction(page);
  await browser.waitUntil(async()=>(await $('h1').getText()).replace(/\s+/g,' ')===(steps[page]??page),{timeoutMsg:`${page} did not open`});
 }

@@ -37,7 +37,7 @@ describe('synced folders',()=>{
 });
 
 describe('step check marks',()=>{
-  const none={families:0,importWork:0,routes:0,unrouted:0,children:0,pendingLetters:0,printed:0,stale:0};
+  const none={families:0,importWork:0,routes:0,unrouted:0,children:0,pendingLetters:0,printed:0,stale:0,printBlockers:0};
   it('an empty season has no step done',()=>{expect(Object.values(stepsDone(none)).some(Boolean)).toBe(false);});
   it('a step is done when it had work and none is left',()=>{
     expect(stepsDone({...none,families:40,importWork:0,routes:3,unrouted:2,children:90,pendingLetters:0,printed:3,stale:1}))
