@@ -630,3 +630,6 @@ summary { cursor: pointer; display: flex; align-items: center; min-height: var(-
 
 /* Unrouted table: why a family can't be added yet (RELEASE-UX-PLAN item 3). */
 .confirm-first { display: block; margin-top: var(--tk-dlite-semantic-spacing-100); color: var(--tk-dlite-semantic-color-text-tertiary); }
+/* Letters: why a letter needs a look, under its badge (RELEASE-UX-PLAN item 8). */
+.look-status { display: flex; flex-direction: column; align-items: flex-end; gap: var(--tk-dlite-semantic-spacing-100); }
+.look-reasons { margin: 0; padding: 0; list-style: none; text-align: right; font-size: var(--tk-dlite-semantic-typography-size-300); color: var(--tk-dlite-semantic-color-feedback-warning-fg); }

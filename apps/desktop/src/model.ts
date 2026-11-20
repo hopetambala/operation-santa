@@ -39,6 +39,8 @@ export function attachmentFrom(id:string,name:string,url:string,airtableId:strin
 export function kindOf(name:string,url:string):Attachment['kind']{const n=`${name} ${url}`.toLowerCase();if(/docs\.google\.com|drive\.google\.com|\.gdoc\b/.test(n))return 'gdoc';if(/\.(jpe?g|png|heic|heif|webp|gif)\b/.test(n))return 'image';if(/\.pdf\b/.test(n))return 'pdf';if(/\.docx?\b/.test(n))return 'docx';if(!/^https?:/.test(url))return 'other';return /airtableusercontent|airtable\.com/.test(n)?'image':'other';}
 export function addressLines(f:Pick<Family,'street'|'unit'|'city'|'zip'>){const unit=clean(f.unit);return [clean(f.street).replace(/\s+/g,' '),unit&&(/^(apt|unit|ste|suite|#|spc|space|bldg)/i.test(unit)?unit:`Unit ${unit}`),[clean(f.city),clean(f.zip)].filter(Boolean).join(' ')].filter(Boolean);}
 export const address=(f:Pick<Family,'street'|'unit'|'city'|'zip'>)=>addressLines(f).join(', ');
+// Address review's "Open in Google Maps" in the browser preview; the desktop app builds the same URL in Rust (main.rs map_url).
+export const mapSearchUrl=(address:string)=>`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 export const navAddress=(f:Pick<Family,'street'|'city'|'zip'>)=>[clean(f.street),clean(f.city),clean(f.zip)].filter(Boolean).join(', ');
 export function zip5(zip:string) {
   return /^(\d{5})(?:-\d{4})?$/.exec(String(zip??'').trim())?.[1];
@@ -139,6 +141,8 @@ const contact=/(\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4})|([\w.+-]+@[\w-]+\.[\w.]+)|(ht
 // The translation prints under the letter, so a phone number in it needs a look too (RELEASE-UX-PLAN item 1).
 export function letterChecks(c:Child,limit:number){const t=letterOf(c);const out:string[]=[];if(contact.test(t)||contact.test(c.translation??''))out.push('contains a phone number, email, or link');if(t.length>limit)out.push(`is over ${limit} characters`);if(!t.trim()&&!c.files.length)out.push('is empty');return out;}
 // Phase 3 (Hope, 2026-11-05): letters are cleaned outside the app, so the import is trusted. A letter needs a look only when it has a warning, an upload that failed or can't be shown, or someone flagged it, and until someone says it looks good. Every other letter prints as imported.
+// What the Letters screen says under "Needs a look" (RELEASE-UX-PLAN item 8).
+export function lookReasons(c:Child,limit:number){const out=[...letterChecks(c,limit)];if(c.state==='flagged')out.unshift(c.cleanedBy?`Flagged by ${c.cleanedBy}`:'Flagged');if(c.files.some(a=>a.state==='failed'))out.push('Upload failed');if(c.files.some(a=>a.state==='unsupported'))out.push('Upload can’t be shown');return out;}
 export function needsLook(c:Child,limit:number){if(c.state==='approved'||c.state==='do_not_print')return false;return c.state==='flagged'||letterChecks(c,limit).length>0||c.files.some(a=>a.state==='failed'||a.state==='unsupported');}
 export type RepairPage='Families'|'Address review'|'Route planner'|'Letter cleanup';
 export function familyChecks(f:Family,s:Season){const repairs=new Map<string,RepairPage>();const warnings:string[]=[];if(f.status==='cancelled')repairs.set(`#${f.id}: cancelled family is still routed.`,'Route planner');if(f.mode==='pickup')repairs.set(`#${f.id}: pickup family is still routed.`,'Route planner');if(!zip5(f.zip))repairs.set(`#${f.id}: add a valid ZIP code to the address.`,'Address review');
