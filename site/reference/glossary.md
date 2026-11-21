@@ -29,13 +29,13 @@ description: "Words the app and the committee use."
 : A label on a family: spanish speaker, extra toys, adopt a family, do not share with volunteers, duplicate address ok, eaton impacted, paper letter, include out of area.
 
 **Freeze**
-: Locking the whole plan before printing. No rebalances. Changes still work; they ask for a reason once their route is printed.
+: Locking the whole plan before printing. No re-planning. Changes still work; they ask for a reason once their route is printed.
 
 **Geocoding**
 : Turning an address into a point on the map.
 
 **Lock (a route)**
-: Keeping one route exactly as it is through rebalances and edits.
+: Keeping one route exactly as it is through re-plans and edits.
 
 **Lock (the season)**
 : Closing the season so it needs the passphrase again.
@@ -50,13 +50,13 @@ description: "Words the app and the committee use."
 : The point on the map where a family's front door is. **Pin is right** confirms it.
 
 **Pin (to a route)**
-: Keeping one family on its route through rebalances.
+: Keeping one family on its route through re-plans.
 
 **Proposed flag**
 : A flag the app suggests from the sign-up notes. Nothing changes until a person accepts it.
 
-**Rebalance**
-: Re-planning every unlocked ordinary route at once.
+**Re-plan unlocked routes**
+: Planning every unlocked ordinary route again at once. Before any route exists the button says **Plan routes**.
 
 **Replacement pages**
 : The pages of a team packet that changed, printed after a late change.
@@ -68,7 +68,7 @@ description: "Words the app and the committee use."
 : The ZIP codes in the [Operation Santa FAQ](https://pasadenajaycees.org/operation-santa/). Home deliveries outside the list are **out of area**.
 
 **Special route**
-: A route that keeps its families through every rebalance, such as an apartment complex or an out-of-area run.
+: A route that keeps its families through every re-plan, such as an apartment complex or an out-of-area run.
 
 **Spread**
 : The difference between the longest and shortest route. The goal is 45 minutes or less.

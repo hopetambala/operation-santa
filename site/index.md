@@ -47,7 +47,7 @@ Each guide starts with a short **Why this step exists** note that ties the step 
 
 ## How to read these guides
 
-- **Bold text** is something on screen you click or choose, spelled exactly as the app shows it: **Accept import**, **Rebalance unlocked**.
+- **Bold text** is something on screen you click or choose, spelled exactly as the app shows it: **Accept import**, **Plan routes**.
 - "Field" names are in quotes: "Season passphrase".
 - ▸ means "then": your initial ▸ **Check for updates**.
 - The examples use made-up families like the Rivera and Bennett families, the same fictional households the app's demo season shows. Never copy a real family's details into a guide, a chat or a screenshot.

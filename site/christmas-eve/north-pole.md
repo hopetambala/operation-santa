@@ -20,8 +20,8 @@ Santa visits each family at one time on one evening. There's no second visit to 
 ## The day before
 
 - Make sure every route in the Print center says "Up to date". If any say "Needs reprint", print [replacement pages]({{ '/printing/reprints/' | relative_url }}) and call those leads.
-- Text each team lead their **Phone links** (Print center ▸ the route's card ▸ **Phone links** ▸ **Copy**).
-- Check that the North Pole phone number on the packets (Settings ▸ "North Pole phone (printed on packets)") will be answered all evening.
+- Text each team lead their route links (Print center ▸ the route's card ▸ **QR codes for phones** ▸ **Copy**).
+- Check that the North Pole phone number on the packets (Settings ▸ "North Pole phone (printed on packets)") will be answered all evening. It prints on each cover and at the bottom of every route page.
 
 {: .note }
 The app never offers an update from December 20 to December 26, so the copy you printed with is the copy you have on the day.
@@ -37,7 +37,7 @@ The app never offers an update from December 20 to December 26, so the copy you 
 
 A family calls on the afternoon of December 24 to cancel:
 
-1. Open the season and set the family to **cancelled** with the reason **cancelled by family**.
+1. Open the season and set the family to **cancelled** with the reason **Cancelled by family**.
 2. Call the team lead and tell them to skip that stop.
 3. There's no need to reprint: the app has recorded the change and why.
 

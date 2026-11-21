@@ -64,7 +64,7 @@ Lock the season whenever you step away from a shared computer.
 The app keeps encrypted backup copies of the season in its own data folder:
 
 - every 15 minutes while the season is open,
-- and just before each import, geocoding run, rebalance, returned cleanup packet and purge.
+- and just before each import, geocoding run, re-plan, returned cleanup packet and purge.
 
 It keeps the latest 20. Backups use the same passphrase as the season.
 

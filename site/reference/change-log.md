@@ -23,7 +23,7 @@ Click your initial and choose **Change log**. The page lists every recorded chan
 | CHANGE | What changed. Click it to see before and after. |
 | REASON | The reason given for a change to a printed route, or "Before printing" if none was needed. |
 
-What's recorded: imports and syncs, family edits and merges, address pins, flag decisions, letter reviews, merged cleanup packets, route moves, locks, pins, rebalances, special routes, team changes, freezing, and settings.
+What's recorded: imports and syncs, family edits and merges, address pins, flag decisions, letter reviews, merged cleanup packets, route moves, locks, pins, re-plans, special routes, team changes, freezing, and settings.
 
 ## Find a change
 

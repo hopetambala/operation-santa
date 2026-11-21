@@ -263,8 +263,8 @@ main { min-width: 0; padding-bottom: var(--tk-dlite-semantic-spacing-300); }
 .modal .tabs { box-shadow: none; background: var(--tk-dlite-semantic-color-surface-sunken); }
 
 tr.highlight td { background: var(--tk-dlite-semantic-color-feedback-success-bg); }
-td.flags { display: flex; flex-wrap: wrap; gap: var(--tk-dlite-semantic-spacing-100); }
-td.flags span { padding: var(--tk-dlite-semantic-spacing-xxs) var(--tk-dlite-semantic-spacing-200); border-radius: var(--tk-dlite-semantic-border-radius-md); background: var(--tk-dlite-semantic-color-surface-sunken); color: var(--tk-dlite-semantic-color-text-tertiary); font-size: var(--tk-dlite-semantic-typography-size-300); font-weight: var(--tk-dlite-primitive-fontWeight-bold); }
+/* The cell stays a table cell so its row border lines up; the chips wrap inline instead (docs/UI-CRITIQUE.md #4). */
+td.flags span { display: inline-block; margin: 0 var(--tk-dlite-semantic-spacing-100) var(--tk-dlite-semantic-spacing-100) 0; padding: var(--tk-dlite-semantic-spacing-xxs) var(--tk-dlite-semantic-spacing-200); border-radius: var(--tk-dlite-semantic-border-radius-md); background: var(--tk-dlite-semantic-color-surface-sunken); color: var(--tk-dlite-semantic-color-text-tertiary); font-size: var(--tk-dlite-semantic-typography-size-300); font-weight: var(--tk-dlite-primitive-fontWeight-bold); }
 td.flags .proposed { background: var(--tk-dlite-semantic-color-feedback-warning-bg); color: var(--tk-dlite-semantic-color-feedback-warning-fg); }
 .toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: var(--tk-dlite-semantic-spacing-300); padding: var(--tk-dlite-semantic-spacing-400); border-bottom: var(--tk-dlite-semantic-border-weight-thin) solid var(--tk-dlite-semantic-color-border-subtle); }
 .search {
@@ -388,6 +388,8 @@ td.flags .proposed { background: var(--tk-dlite-semantic-color-feedback-warning-
 .planner-controls > div > strong { color: var(--tk-dlite-semantic-color-text-primary); font-size: var(--tk-dlite-semantic-typography-size-500); font-weight: var(--tk-dlite-primitive-fontWeight-semibold); font-variant-numeric: tabular-nums; }
 .planner-controls > div > strong.amber-text { color: var(--tk-dlite-semantic-color-feedback-warning-fg); }
 .planner-controls > .badge { margin-left: auto; align-self: center; }
+/* U3: the estimate note is plain text on its own line under the read-outs, so Freeze plan keeps its place on the first row. */
+.planner-controls > .planner-note { order: 99; flex-basis: 100%; margin: 0; }
 .planner-controls > .btn, .planner-controls > .checkbox { align-self: center; }
 /* Four comfortable targets is the sticky bar plus the page title, so the list scrolls inside the panel instead of under the chrome. */
 .route-list { align-self: start; max-height: calc(100dvh - var(--tk-dlite-semantic-sizing-target-comfortable) * 4); overflow: auto; }
@@ -553,7 +555,15 @@ summary { cursor: pointer; display: flex; align-items: center; min-height: var(-
   border: var(--tk-dlite-semantic-border-weight-thin) solid currentColor;
   border-radius: var(--tk-dlite-semantic-border-radius-full);
 }
-.workspace-sections { display: flex; flex-wrap: wrap; gap: var(--tk-dlite-semantic-spacing-200); margin-bottom: var(--tk-dlite-semantic-spacing-400); }
+/* A step's sub-pages are segmented tabs (same as Letters); the step's one action sits at the far end (docs/UI-CRITIQUE.md #1–2). */
+.workspace-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--tk-dlite-semantic-spacing-300); margin-bottom: var(--tk-dlite-semantic-spacing-400); }
+.workspace-head .tabs { width: auto; margin-bottom: 0; }
+/* Letters: moving through the queue on the left, deciding on the right, on one row while it fits (docs/UI-CRITIQUE.md #5). */
+/* wrap-reverse: when the panel is too narrow for one row, the decision buttons stay directly under the text box and Previous/Next drop below, so "Looks good · next" stays above the fold. */
+.letter-actions { display: flex; flex-wrap: wrap-reverse; align-items: center; justify-content: space-between; gap: var(--tk-dlite-semantic-spacing-200); }
+.letter-actions > .button-row:last-child { margin-left: auto; }
+/* go() focuses the page title so a screen reader announces the new page. It is not a control and not in the tab order, so it draws no ring (a full-width gold box after every keyboard step). */
+#page-title:focus { outline: none; }
 .start-actions { justify-content: center; }
 @media (--tk-dlite-bp-md-down) {
   .step-bar.nav-pills { grid-template-columns: repeat(2, minmax(0, 1fr)); }

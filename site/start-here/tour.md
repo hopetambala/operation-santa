@@ -37,7 +37,7 @@ The line above each page's title is the name of the season file that's open. The
 
 Once a route's packet has been printed, the app asks why before it accepts a change that touches that route. Changes to routes that haven't been printed yet never ask, even when the plan is frozen.
 
-1. Choose a reason: cancelled by family, no response, duplicate, moved to pickup, address fix, added late, rebalanced, or other.
+1. Choose a reason: **Cancelled by family**, **No response**, **Duplicate**, **Moved to pickup**, **Address fix**, **Added late**, **Rebalanced**, or **Other**.
 2. For **other**, describe the change in a few words.
 3. Click **Record & continue**.
 

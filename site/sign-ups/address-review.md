@@ -32,7 +32,7 @@ Only the street, city, state and ZIP leave the computer, never names, unit numbe
 
 ## Fix the addresses that need a person
 
-The **Addresses** tab lists misses, low-confidence matches and addresses that need a valid ZIP code.
+The **Addresses** tab lists misses, low-confidence matches and addresses that need a valid ZIP code. Each row says why it's there: "Map wasn't sure (72%)", "No match found" or "New since last import".
 
 1. Click a family on the left. The map on the right shows only that family's pin and the North Pole. To see the street, click **Open in Google Maps**: it searches the family's street, city and ZIP in your web browser.
 2. If there's a yellow "Geocoder suggestion" and it's the right place, click **Accept suggestion**.

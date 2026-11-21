@@ -23,7 +23,7 @@ A story: on December 21, after the plan is frozen, the Park family calls the hot
 
 1. Add them: **Families** ▸ **Add family** for a phone call, or import or sync again for late form sign-ups.
 2. After the automatic lookup, open **Import** → **Address review** and fix the pin if needed. For a family added by hand, click **Geocode** there.
-3. Open **2 Routes** and click **Insert new families**. (It's there once the plan is frozen. Before the freeze, use **Rebalance unlocked** instead.)
+3. Open **2 Routes** and click **Insert new families**. (It's there once the plan is frozen. Before the freeze, use **Re-plan unlocked routes** instead.)
 4. If a route has been printed, choose a reason, such as **added late**, and click **Record & continue**.
 5. Read the message, for example "1 families inserted."
 
@@ -37,7 +37,7 @@ When a family cancels, or switches to the pickup event:
 
 1. Open the family in **Families**.
 2. Set "Status" to **cancelled**, or "Delivery" to **pickup**.
-3. Click **Save family**. If their route has been printed, choose a reason, such as **cancelled by family** or **moved to pickup**.
+3. Click **Save family**. If their route has been printed, choose a reason, such as **Cancelled by family** or **Moved to pickup**.
 
 They come off their route at once. The route's packet shows "Needs reprint" in the Print center, and the team lead goes on the [call list]({{ '/printing/reprints/' | relative_url }}).
 
@@ -50,7 +50,7 @@ Freeze the plan when the routes are final, just before printing (about December 
 
 While the plan is frozen:
 
-- **Rebalance unlocked** is replaced by **Insert new families**, so nobody can reshuffle every route by mistake.
+- **Re-plan unlocked routes** is replaced by **Insert new families**, so nobody can reshuffle every route by mistake.
 - You can still insert late families, move single stops, and edit families.
 
 To unfreeze, click **Unfreeze plan**. Once any route has been printed, the app asks for a reason.
@@ -63,14 +63,14 @@ After the freeze, or once a route has been printed, the "Leave a note for the ne
 
 | Reason | Use it when |
 |---|---|
-| cancelled by family | the family called to cancel |
-| no response | the family couldn't be reached to confirm |
-| duplicate | it's a second sign-up for the same family |
-| moved to pickup | they'll come to the pickup event instead |
-| address fix | the address or pin was wrong |
-| added late | a family signed up or was approved late |
-| rebalanced | routes changed to even out times or teams |
-| other | anything else; describe it in a few words |
+| Cancelled by family | the family called to cancel |
+| No response | the family couldn't be reached to confirm |
+| Duplicate | it's a second sign-up for the same family |
+| Moved to pickup | they'll come to the pickup event instead |
+| Address fix | the address or pin was wrong |
+| Added late | a family signed up or was approved late |
+| Rebalanced | routes changed to even out times or teams |
+| Other | anything else; describe it in a few words |
 
 Reasons appear in the [Change log]({{ '/reference/change-log/' | relative_url }}), in the family's History tab, and, through the reprint list, in what you tell the team lead.
 
