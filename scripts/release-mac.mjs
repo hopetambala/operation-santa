@@ -12,6 +12,7 @@ import {basename,join} from 'node:path';
 import {ROOT,TAURI_DIR,TARGET,OUT,fail,run,capture,tauriConf,buildFrontend,gateOrFail,updaterSetup,tauriBuild} from './release-common.mjs';
 import {checkBinary,checkIdentity,UPDATER_MARKERS} from './release-gate.mjs';
 import {checkProfile} from './release-profile.mjs';
+import {appleCredentials} from './release-credentials.mjs';
 
 const BUNDLE_ID='org.pasadenajaycees.opsanta';
 const args=process.argv.slice(2);
@@ -22,6 +23,9 @@ if(!['dmg','mas'].includes(channel))fail(`--channel must be dmg or mas, not ${ch
 if(notarize&&channel!=='dmg')fail('--notarize is for the DMG. Mac App Store builds are checked by App Store Connect on upload.');
 if(upload&&channel!=='mas')fail('--upload is for the Mac App Store build. A DMG is attached to a GitHub Release instead.');
 if(process.platform!=='darwin')fail('macOS release builds run on a Mac.');
+// Notarizing and uploading take the App Store Connect key, key ID and issuer from this Mac (the .p8 file and the keychain
+// item `scripts/release-setup-secrets.sh notary` saves), unless the environment already sets them.
+if(notarize||upload)Object.assign(process.env,appleCredentials());
 
 const conf=tauriConf();
 const version=conf.version;
@@ -65,7 +69,7 @@ if(channel==='dmg'){
   buildNumber=process.env.OPSANTA_BUILD_NUMBER??new Date().toISOString().replace(/\D/g,'').slice(2,12);
   if(upload){
     const {APPLE_API_KEY,APPLE_API_KEY_ID,APPLE_API_ISSUER}=process.env;
-    if(!(APPLE_API_KEY&&APPLE_API_KEY_ID&&APPLE_API_ISSUER))problems.push('upload: set APPLE_API_KEY (path to .p8) + APPLE_API_KEY_ID + APPLE_API_ISSUER');
+    if(!(APPLE_API_KEY&&APPLE_API_KEY_ID&&APPLE_API_ISSUER))problems.push('upload: no App Store Connect credentials. Run scripts/release-setup-secrets.sh notary once (it saves the issuer ID in the keychain), or set APPLE_API_KEY (path to .p8) + APPLE_API_KEY_ID + APPLE_API_ISSUER');
     else if(!existsSync(APPLE_API_KEY))problems.push('upload: APPLE_API_KEY does not point at a file');
   }
 }
