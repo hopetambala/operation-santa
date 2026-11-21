@@ -34,7 +34,7 @@ Only the street, city, state and ZIP leave the computer, never names, unit numbe
 
 The **Addresses** tab lists misses, low-confidence matches and addresses that need a valid ZIP code.
 
-1. Click a family on the left. The map on the right shows where the app thinks they are.
+1. Click a family on the left. The map on the right shows only that family's pin and the North Pole. To see the street, click **Open in Google Maps**: it searches the family's street, city and ZIP in your web browser.
 2. If there's a yellow "Geocoder suggestion" and it's the right place, click **Accept suggestion**.
 3. If the address itself is wrong (a typo, the unit in the street field), click **Edit address**, fix it, and click **Save family**. The family is looked up again next time you geocode.
 4. If the address is right but the pin is wrong, put the pin where the front door is:

@@ -49,6 +49,7 @@ Each route also has its own card saying "Ready to export", "Ready · 2 warnings"
 | Route exceeds the delivery limit. | Route planner: move stops off, or add a team and rebalance |
 | #26014: review the address. | Address review |
 | #26014: placeholder text in the address or name. | Families: remove "None", "N/A" or similar |
+| #26014: on hold in Airtable (Issue, Investigating). Resolve it there, then re-import. | Airtable: sort the family out and set Status to Checked, then import a fresh export. The family stays on its route meanwhile. |
 | #26014: cancelled family is still routed. / pickup family is still routed. | Route planner: **Remove from route** |
 | #26014: child 2's letter needs a look. | Letter cleanup |
 | #26014: child 1's letter is empty and has no upload. | Letter cleanup, or Families ▸ Children & letters |

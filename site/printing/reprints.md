@@ -27,7 +27,7 @@ The app remembers what was on every page of each route's packet when it was prin
 - a child's details, letter or drawing;
 - the team, lead or lead's phone, or the route's start time.
 
-The Overview's task list shows "Reprint changed packets", and the **Print** step in the top bar shows how many need a reprint.
+The **Print** step in the top bar shows how many routes need a reprint.
 
 ## See what changed
 

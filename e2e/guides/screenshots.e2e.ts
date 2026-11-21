@@ -28,14 +28,15 @@ describe('Guide screenshots (demo season)',()=>{
  it('takes every screenshot it can',async function(){this.timeout(15*60_000);
   await snap('create-or-open',async()=>{});
   await practiceSeason();
-  await snap('overview',async()=>{await nav('Overview')});
+  // The tour's picture of the whole window (Overview, which it used to show, is gone: RELEASE-UX-PLAN item 12).
+  await snap('workspace',async()=>{await nav('Families')});
   await snap('families-filter',async()=>{await nav('Families');await $('select[aria-label="Filter families"]').click()});
   await snap('address-review',async()=>{await nav('Address review');const t=await $('//button[starts-with(normalize-space(.),"Addresses (")]');if(await t.isExisting())await t.click();await $('//button[normalize-space(.)="Pin is right"]').scrollIntoView({block:'end'})});
   await snap('letter-cleanup',async()=>{await nav('Letter cleanup')});
   await snap('teams',async()=>{await nav('Teams')});
   await snap('route-planner',async()=>{await nav('Route planner');await (await $('.route-card')).click();await browser.execute(()=>window.scrollTo(0,0))});
   await snap('settings',async()=>{await nav('Settings')});
-  await snap('airtable-token-saved',async()=>{await turnOn('Airtable Sync');await setE2e({secrets:{airtable_token:'patDEMO.not-a-real-token'}});await nav('Overview');await nav('Settings');await $('//*[contains(text(),"Token saved")]').waitForExist({timeout:5000});await $('//*[contains(text(),"Token saved")]').scrollIntoView({block:'center'})});
+  await snap('airtable-token-saved',async()=>{await turnOn('Airtable Sync');await setE2e({secrets:{airtable_token:'patDEMO.not-a-real-token'}});await nav('Families');await nav('Settings');await $('//*[contains(text(),"Token saved")]').waitForExist({timeout:5000});await $('//*[contains(text(),"Token saved")]').scrollIntoView({block:'center'})});
   await snap('new-season-dialog',async()=>{await seasonAction('New season…');await dialogText('Start a new season')});
   // PDFs: a route that passes Check (its cover has the QR codes), and the label alignment test page.
   const pdfNamed=async(prefix:string)=>browser.waitUntil(async()=>readdirSync(RUN_DIR).some(f=>f.startsWith(prefix)&&f.endsWith('.pdf')),{timeout:60000,timeoutMsg:`no ${prefix} PDF`});

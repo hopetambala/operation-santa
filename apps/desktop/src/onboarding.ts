@@ -33,13 +33,24 @@ export function syncedFolder(path:string):string|null{
 
 // ── The four steps ────────────────────────────────────────────────────────────────────────────────────────────────
 // A step is done when it has had work and none is left. "Nothing to check" in an empty season isn't done.
-export type StepCounts={families:number;importWork:number;routes:number;unrouted:number;children:number;pendingLetters:number;printed:number;stale:number};
+// unrouted counts only families Routes can place (model.ts routable); printed counts route prints, not the pickup packet.
+export type StepCounts={families:number;importWork:number;routes:number;unrouted:number;children:number;pendingLetters:number;printed:number;stale:number;printBlockers:number};
 export function stepsDone(c:StepCounts){
   return {
     Import:c.families>0&&c.importWork===0,
     Routes:c.routes>0&&c.unrouted===0,
     Letters:c.children>0&&c.pendingLetters===0,
     Print:c.printed>0&&c.stale===0,
+  };
+}
+// What each step has left (RELEASE-UX-PLAN item 4). Before the first print, Print counts what blocks printing, the same
+// number as Print's check; after it, the routes to reprint.
+export function stepWork(c:StepCounts){
+  return {
+    Import:`${c.importWork} to check`,
+    Routes:`${c.unrouted} without a route`,
+    Letters:`${c.pendingLetters} to look at`,
+    Print:c.printed>0?(c.stale?`${c.stale} to reprint`:'All printed'):c.printBlockers?`${c.printBlockers} to fix`:'Ready to print',
   };
 }
 // One line per step for "How the four steps work" (Help menu, and once above an empty Step 1).

@@ -31,11 +31,11 @@ The list shows the first 400 matches; narrow the search to see others. The foote
 | ENTRY ID | The form's Entry ID. Families added by hand start at #90001. |
 | FAMILY | Name and city, plus "missing from latest import" if the last import didn't include them. |
 | KIDS | Number of children. |
-| DELIVERY | home, pickup or special. Pickup families also show their RSVP. |
-| STATUS | new, verified, routed or cancelled. |
+| DELIVERY | Home, Pickup or Special. Pickup families also show their RSVP. |
+| STATUS | New, Verified, Routed or Cancelled. |
 | ROUTE | The route they're on, or —. |
-| FLAGS | Short codes: SS Spanish speaker, ET extra toys, AAF adopt-a-family, DNSWV held by coordinator ("do not share with volunteers"). A **?** means proposed flags are waiting. |
-| ADDRESS | verified or manual (good to route), or pending, review or failed (needs a look). |
+| FLAGS | Short words: Spanish, Extra toys, Adopt, Held (held by the coordinator: "do not share with volunteers"). **Airtable hold** means the team marked the family "Issue, Investigating" in Airtable. A **?** means proposed flags are waiting. |
+| ADDRESS | **Pin OK** (good to route) or **Check pin** (still to look up or check in Address review). |
 
 ![The Families list on the demo season, with the filter next to the search box]({{ '/assets/images/families-filter.png' | relative_url }})
 

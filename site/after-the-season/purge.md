@@ -39,7 +39,7 @@ The season holds children's names, letters and drawings, and families' addresses
 ## Before you purge
 
 1. Make sure the committee is finished with the season: thank-you notes sent, questions about missed stops answered.
-2. Note any numbers you want for the wrap-up report (families, children, routes) from the Overview. They'll still be there afterwards, but it's easier now.
+2. Note any numbers you want for the wrap-up report (families, children, routes) from Families, Routes and Print. They'll still be there afterwards, but it's easier now.
 
 ## Purge
 

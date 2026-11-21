@@ -10,6 +10,8 @@ export const open=(options:OpenDialogOptions)=>invoke<string|null>('plugin:dialo
 export const save=(options:SaveDialogOptions)=>invoke<string|null>('plugin:dialog|save',{options});
 // Thin wrappers over the Rust commands, with in-memory fallbacks so the browser preview works on synthetic data.
 export const native=isTauri();
+// Street, city and ZIP only. The desktop app opens it in the default browser (main.rs open_map).
+export const openMap=(address:string,url:string)=>native?invoke('open_map',{address}):Promise.resolve(void window.open(url,'_blank','noopener'));
 export const toB64=(bytes:Uint8Array<ArrayBuffer>)=>{let s='';for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(s);};
 export const fromB64=(b64:string)=>Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
 const memory=new Map<string,{mime:string;data:string}>();

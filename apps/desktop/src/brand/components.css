@@ -199,7 +199,6 @@ svg { flex-shrink: 0; }
   font-size: var(--tk-dlite-semantic-typography-size-300);
   line-height: var(--tk-dlite-semantic-typography-line-height-snug);
   font-weight: var(--tk-dlite-primitive-fontWeight-semibold);
-  text-transform: capitalize;
 }
 .badge.green { background: var(--tk-dlite-semantic-color-feedback-success-bg); color: var(--tk-dlite-semantic-color-feedback-success-fg); }
 .badge.amber { background: var(--tk-dlite-semantic-color-feedback-warning-bg); color: var(--tk-dlite-semantic-color-feedback-warning-fg); }
