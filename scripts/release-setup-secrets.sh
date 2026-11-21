@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # One-time release setup that only Hope runs, in Hope's own terminal (docs/RELEASE.md § One-time setup).
 # Prints no secret values.
-#   scripts/release-setup-secrets.sh notary   notarytool keychain profile "opsanta-notary" + GitHub secret APPLE_API_ISSUER
+#   scripts/release-setup-secrets.sh notary   notarytool keychain profile "opsanta-notary", the issuer ID in the login keychain
+#                                             (so release:mac --notarize and release:mas --upload never ask), and the
+#                                             GitHub secret APPLE_API_ISSUER
 #   scripts/release-setup-secrets.sh certs    Developer ID, Apple Distribution and Mac Installer identities → GitHub secrets
 #                                             (macOS asks to allow exporting each private key)
 set -euo pipefail
@@ -18,13 +20,16 @@ notary(){
   ISSUER=""
   until [[ "$ISSUER" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; do
     [ -n "$ISSUER" ] && echo "That is not a UUID (8-4-4-4-12 hex digits). Try again."
-    read -r -p "Issuer ID: " ISSUER
+    read -r -s -p "Issuer ID (hidden as you type): " ISSUER; echo
     ISSUER="$(printf '%s' "$ISSUER" | tr -d '[:space:]')"
     [ -n "$ISSUER" ] || ISSUER=" "
   done
   xcrun notarytool store-credentials opsanta-notary --key "$P8" --key-id "$KID" --issuer "$ISSUER"
+  # Read back by scripts/release-credentials.mjs. -U replaces an older copy.
+  security add-generic-password -U -s "Operation Santa App Store Connect issuer" -a opsanta -l "Operation Santa App Store Connect issuer" -w "$ISSUER"
   printf '%s' "$ISSUER" | gh secret set APPLE_API_ISSUER --repo "$REPO"
-  echo "Done: keychain profile opsanta-notary, GitHub secret APPLE_API_ISSUER."
+  unset ISSUER
+  echo "Done: keychain profile opsanta-notary, issuer ID in the login keychain, GitHub secret APPLE_API_ISSUER."
 }
 
 certs(){
