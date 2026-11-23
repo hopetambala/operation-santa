@@ -31,8 +31,8 @@ Change any value under "Season settings", then click **Save** in the "Unsaved ch
 
 | Setting | Default | What it does |
 |---|---|---|
-| North Pole address | 150 N Madison Ave, Pasadena, CA 91101 | Where every route starts and ends. Printed on covers and used in phone links. If you change it, change "North Pole latitude" and "North Pole longitude" under Advanced too. |
-| North Pole phone (printed on packets) | blank | The number team leads call on the night. Fill it in. |
+| North Pole address | 150 N Madison Ave, Pasadena, CA 91101 | Where every route starts and ends. Printed on covers and used in the QR codes for phones. If you change it, change "North Pole latitude" and "North Pole longitude" under Advanced too. |
+| North Pole phone (printed on packets) | blank | The number team leads call on the night. Printed on each packet cover and at the bottom of every route page. Fill it in. |
 | Departure time | 4:30 PM | When routes leave (a single route can start at a different time in the Route planner). |
 | Delivery window ends | 8:30 PM | The end of the visiting window. |
 | Target route (minutes) | 195 (3h 15m) | Routes should come in under this; over it is a warning. |

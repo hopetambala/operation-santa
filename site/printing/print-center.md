@@ -43,10 +43,10 @@ Each route also has its own card saying "Ready to export", "Ready · 2 warnings"
 
 | Problem | Fix it in |
 |---|---|
-| 36 home deliveries have no route: 30 don’t fit…, 4 need an address, 2 are out of area. (blocks **All routes, one PDF** and **One PDF per route** only) | Route planner: add teams or rebalance; Address review for addresses; use a special route where appropriate or record cancellations |
+| 36 home deliveries have no route: 30 don’t fit…, 4 need an address, 2 are out of area. (blocks **All routes, one PDF** and **One PDF per route** only) | Route planner: add teams and re-plan; Address review for addresses; use a special route where appropriate or record cancellations |
 | Assign a team. | Route planner ▸ the route ▸ **Team** |
 | Route has no stops. | Route planner: add stops or **Delete** the route |
-| Route exceeds the delivery limit. | Route planner: move stops off, or add a team and rebalance |
+| Route exceeds the delivery limit. | Route planner: move stops off, or add a team and re-plan |
 | #26014: review the address. | Address review |
 | #26014: placeholder text in the address or name. | Families: remove "None", "N/A" or similar |
 | #26014: on hold in Airtable (Issue, Investigating). Resolve it there, then re-import. | Airtable: sort the family out and set Status to Checked, then import a fresh export. The family stays on its route meanwhile. |
@@ -82,9 +82,9 @@ Each print is recorded. The route's card changes from "Not printed" to "Up to da
 {: .warning }
 Once a route is printed, any change that touches it asks for a reason and marks the packet "Needs reprint". See [Reprints and the call list]({{ '/printing/reprints/' | relative_url }}).
 
-## Phone links for team leads
+## QR codes for phones
 
-Each route card has a **Phone links** button. It opens the route as a short text message: one Google Maps link per leg of up to 9 stops, the last leg ending back at the North Pole. Click **Copy** and paste it into a text to the team lead.
+Each route card has a **QR codes for phones** button. It opens the route as a short text message: one Google Maps link per leg of up to 9 stops, the last leg ending back at the North Pole. Click **Copy** and paste it into a text to the team lead.
 
 The links contain addresses only, never names. They work best in the Google Maps app: phone web browsers only show a few stops of a long route. The same links are the QR codes on the packet's cover.
 

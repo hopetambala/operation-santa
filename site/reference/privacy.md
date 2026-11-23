@@ -34,7 +34,7 @@ The season holds children's names, letters and drawings, and families' addresses
 
 Nothing else leaves the computer: no names, phone numbers, emails or letters, and no usage tracking.
 
-The **phone links** and the QR codes on each packet's cover are Google Maps links that contain the route's addresses, but no names. Google receives them only when a team lead opens one.
+The route links behind **QR codes for phones** and the QR codes on each packet's cover are Google Maps links that contain the route's addresses, but no names. Google receives them only when a team lead opens one.
 
 ## Rules for volunteers
 

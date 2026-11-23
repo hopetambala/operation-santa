@@ -1,6 +1,6 @@
 import {$,$$} from '@wdio/globals';
 import {csv} from './fixture';
-import {PASSPHRASE,SEASON_PATH,seasonAction,click,fill,nav,toast,noError,dialogText,importCsv,installMocks,queueOpen,setInput,newPassphrase} from './app';
+import {PASSPHRASE,SEASON_PATH,seasonAction,click,fill,nav,toast,noError,dialogText,importCsv,installMocks,queueOpen,setInput,newPassphrase,plan} from './app';
 // The committee's setup steps, shared by specs that start from a season with routes.
 // journey.e2e.ts walks the same steps with assertions at each one; these only wait for each step to land.
 export const TEAMS=[{name:'Team Rudolph',lead:'Robin Lead',phone:'(626) 555-0101',spanish:false},{name:'Team Comet',lead:'Casey Lead',phone:'(626) 555-0102',spanish:true}];
@@ -12,7 +12,7 @@ export async function addTeams(){await nav('Teams');for(const t of TEAMS){await 
 export async function lookAtFlagged(){await nav('Letter cleanup');let n=0;while(!(await $('//*[contains(text(),"Nothing to look at")]').isExisting())){await click('Looks good · next');if(++n>40)throw Error('the letters to look at did not drain');}return n;}
 // route label → family names in stop order, as the planner shows them
 export async function readRoutes(){const routes:Record<string,string[]>={};for(const card of await $$('.route-card')){await card.click();const label=(await card.$('strong').getText()).trim();routes[label]=await Promise.all(await $$('.stop .stop-family strong').map(s=>s.getText()));}return routes;}
-export async function planRoutes(teams=2){await nav('Route planner');await setInput($('input[aria-label="Team count"]'),String(teams));await click('Rebalance unlocked');await toast(new RegExp(`${teams} routes planned`));await noError();return readRoutes();}
+export async function planRoutes(teams=2){await nav('Route planner');await setInput($('input[aria-label="Team count"]'),String(teams));await plan();await toast(new RegExp(`${teams} routes planned`));await noError();return readRoutes();}
 export async function lockSeason(){await $('button.avatar').click();await click('Lock now');await toast(/Season locked/);}
 export async function openSeason(){await queueOpen(SEASON_PATH);await seasonAction('Open season…');await dialogText('Unlock your season');await newPassphrase(PASSPHRASE);await click('Open season');await toast(/Encrypted season open/);}
 // A fresh app with an encrypted season: sign-ups imported, addresses resolved, two teams, routes planned.

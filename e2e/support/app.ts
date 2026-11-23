@@ -13,6 +13,9 @@ export const shot=(name:string)=>browser.saveScreenshot(path.join(RUN_DIR,`${Str
 export const field=(label:string)=>$(`//label[contains(@class,"field")][span[normalize-space()="${label}"]]//*[self::input or self::textarea or self::select]`);
 // Exact visible text: a partial match would let one button's name hit a longer one that contains it.
 export const button=(text:string)=>$(`//button[normalize-space(.)="${text}"]`);
+// U3: the planner's main button says "Plan routes" before any route exists and "Re-plan unlocked routes" after (it was "Rebalance unlocked").
+export const planButton=()=>$('//button[normalize-space(.)="Plan routes" or normalize-space(.)="Re-plan unlocked routes"]');
+export async function plan(){const b=await planButton();await b.waitForEnabled({timeout:10000});await b.click();}
 export const enabledButton=async(text:string)=>{const b=await button(text);await b.waitForEnabled({timeout:15000});return b;};
 // WebDriver's elementClick scrolls the target into view itself; an explicit scrollIntoView runs as an async script,
 // which WebKit never completes while the Mac's screen is locked.

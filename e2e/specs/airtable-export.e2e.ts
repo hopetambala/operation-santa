@@ -4,7 +4,7 @@ import {writeFileSync,statSync} from 'node:fs';
 import path from 'node:path';
 import Papa from 'papaparse';
 import {airtableExport} from '../support/airtable-export';
-import {RUN_DIR,field,shot,click,fill,nav,noError,dialogText,pageText,importCsv,installMocks,setE2e,setInput,newestPdf,choose,lookTab} from '../support/app';
+import {RUN_DIR,field,shot,click,fill,nav,noError,dialogText,pageText,importCsv,installMocks,setE2e,setInput,newestPdf,choose,lookTab,plan} from '../support/app';
 import {createSeason} from '../support/season';
 import {readPdf} from '../support/pdf';
 import {inArea,defaults} from '../../apps/desktop/src/model';
@@ -57,13 +57,13 @@ describe('A coordinator’s season from an Airtable export',function(){this.time
  it('lets a person pin the addresses the geocoder missed',async()=>{await nav('Address review');let left=await count(/Addresses/);timings['addresses a person pins']=left;start();while(left>0){const id=(await $('.panel-padding h3').getText()).match(/#(\d+)/)![1];const f=x.families.find(z=>z.id===id)!;const at=f.city.startsWith('Altadena')?[34.19,-118.13]:[34.15,-118.13];await fill('Latitude',String(at[0]+Number(id)%50/5000));await fill('Longitude',String(at[1]-Number(id)%37/5000));await click('Pin is right');await browser.waitUntil(async()=>(await count(/Addresses/))<left,{timeout:15000});left=await count(/Addresses/);}stop('pin missed addresses');await shot('addresses-done');});
  it('plans with 2025’s 45 teams, keeps saying when they don’t fit, and finds how many teams it takes',async()=>{const sheet=(n:number)=>Papa.unparse(Array.from({length:n},(_,i)=>({Team:`Team ${String(i+1).padStart(2,'0')}`,Lead:`Lead ${i+1}`,Phone:`(626) 555-${String(100+i).padStart(4,'0')}`,Spanish:i%4===0?'Yes':'No'})));writeFileSync(path.join(RUN_DIR,'teams-45.csv'),sheet(45));
   await nav('Teams');await importCsv(sheet(45),'teams-45.csv','.planner-actions input[type=file]');await $('//*[contains(text(),"Team 45")]').waitForExist();
-  await nav('Route planner');await setInput($('input[aria-label="Team count"]'),'45');start();await click('Rebalance unlocked');await browser.waitUntil(async()=>(await $$('.route-card')).length===45,{timeout:120000,timeoutMsg:'45 routes were not planned'});stop('plan 45 routes');await noError();
+  await nav('Route planner');await setInput($('input[aria-label="Team count"]'),'45');start();await plan();await browser.waitUntil(async()=>(await $$('.route-card')).length===45,{timeout:120000,timeoutMsg:'45 routes were not planned'});stop('plan 45 routes');await noError();
   // 2025's flat 10 minutes a stop put 13 routes past 3h30 (P10). With real stop times 45 teams may not be enough,
   // and the planner has to say so after the toast is gone.
   const short=Number((await pageText()).match(/UNROUTED\s*(\d+)/)?.[1]);timings['unrouted with 45 teams']=short;if(short>0){await browser.pause(7000);assert.match(await pageText(),/don’t fit on 45 teams within the 3h 45m limit\. Set Fleet to “Fewest that fit”/,'the note outlives the toast');await nav('Print center');await click('Show details');assert.match(await pageText(),/home deliveries have no route: \d+ don’t fit/,'Check names the unrouted families before anyone prints every route');await click('Review routes');assert.equal(await $('h1').getText(),'Routes');}await shot('routes-45');
-  await choose(field('Fleet'),'auto');start();await click('Rebalance unlocked');await browser.waitUntil(async()=>/UNROUTED\s*0/.test(await pageText()),{timeout:180000,timeoutMsg:'fewest that fit left families unrouted'});stop('plan fewest that fit');const needed=(await $$('.route-card')).length;timings['teams needed']=needed;
+  await choose(field('Fleet'),'auto');start();await plan();await browser.waitUntil(async()=>/UNROUTED\s*0/.test(await pageText()),{timeout:180000,timeoutMsg:'fewest that fit left families unrouted'});stop('plan fewest that fit');const needed=(await $$('.route-card')).length;timings['teams needed']=needed;
   await nav('Teams');await importCsv(sheet(needed),`teams-${needed}.csv`,'.planner-actions input[type=file]');await $(`//*[contains(text(),"Team ${needed}")]`).waitForExist();
-  await nav('Route planner');await click('Rebalance unlocked');
+  await nav('Route planner');await plan();
   // The plan already shows 0 unrouted before this rebalance, so wait for what it does: every route gets a team.
   await browser.waitUntil(async()=>{const t=await pageText();return /UNROUTED\s*0/.test(t)&&!/No team assigned/.test(t)},{timeout:180000,timeoutMsg:'the rebalance left a route without a team'});const t=await pageText();assert.ok(!/No team (yet|assigned)|don’t fit/.test(t),t.slice(0,600));await noError();await shot(`routes-${needed}`);});
  // About 2,000 letters at season size. Phase 3: the import is trusted, so only letters with a warning, a problem upload

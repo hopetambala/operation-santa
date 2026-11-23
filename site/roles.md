@@ -58,6 +58,6 @@ Checks the plan, prints the team packets and labels, and prints replacement page
 
 ## Santa team lead
 
-Never runs the app. Gets a printed packet and a text with phone links.
+Never runs the app. Gets a printed packet and a text with the route's map links.
 
 1. [Your team packet]({{ '/christmas-eve/team-lead/' | relative_url }})

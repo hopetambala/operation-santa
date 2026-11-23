@@ -9,7 +9,7 @@ description: "Plan balanced routes that fit the evening, then adjust them with l
 {: .no_toc }
 
 **Who:** route planner.
-**When:** first draft from about December 1, again whenever sign-ups change, and a final rebalance before the freeze.
+**When:** first draft from about December 1, again whenever sign-ups change, and a final re-plan before the freeze.
 
 1. TOC
 {:toc}
@@ -31,7 +31,7 @@ Every route leaves the North Pole at the departure time (4:30 PM by default) and
 - **Target** (3h 15m by default): routes should come in under this. Over it is a warning.
 - **Hard maximum** (3h 45m by default, and never later than 15 minutes before the window ends): a route over this can't print.
 
-The "Estimated travel" badge is a reminder that times are estimates from straight-line distance, not live traffic.
+"Drive times are estimates" is a reminder that times come from straight-line distance, not live traffic.
 
 ## Plan the routes
 
@@ -39,7 +39,7 @@ The "Estimated travel" badge is a reminder that times are estimates from straigh
 2. Choose how many teams to plan for, under "Fleet":
    - **Fixed count**: type the number of teams you have in "Teams".
    - **Fewest that fit**: the app works out the smallest number of teams that gets every family home within the hard maximum.
-3. Click **Rebalance unlocked**. It shows "Planning…" for a few seconds. (Once the plan is frozen, this button is replaced by **Insert new families**; see [Late changes]({{ '/routing/late-changes/' | relative_url }}).)
+3. Click **Plan routes** (once routes exist it says **Re-plan unlocked routes**). It shows "Planning…" for a few seconds. (Once the plan is frozen, this button is replaced by **Insert new families**; see [Late changes]({{ '/routing/late-changes/' | relative_url }}).)
 4. Read the message: for example "38 routes planned. Longest 3h 12m, spread 41 min."
 
 The read-outs at the top show:
@@ -47,7 +47,8 @@ The read-outs at the top show:
 - "TARGET · LIMIT": your two time limits.
 - "LONGEST · SPREAD": the longest route, and the gap between the longest and shortest. Aim for a spread of 45 minutes or less.
 - "LATEST BACK": when the last team is expected back at the North Pole.
-- "UNROUTED": home-delivery families not on any route, with out-of-area families counted separately. While this isn't 0, the Print center won't print every route at once.
+- "UNROUTED": home-delivery families that could go on a route but aren't on one, with out-of-area families counted separately. While this isn't 0, the Print center won't print every route at once.
+- "WAITING ON ADDRESS": shown instead when every family off a route is still waiting on an address. Those are step 1's work: confirm them in **Import** → **Address review**.
 
 Each route card reads "N stops · M families": an apartment building with three families is one stop.
 
@@ -57,16 +58,16 @@ Each route card reads "N stops · M families": an apartment building with three 
 
 If there aren't enough teams, a yellow note stays under the controls: "12 families don't fit on 45 teams within the 3h 45m limit." You can:
 
-- switch "Fleet" to **Fewest that fit** and rebalance, to see how many teams it really takes, then recruit to that number;
-- add teams and rebalance; or
+- switch "Fleet" to **Fewest that fit** and re-plan, to see how many teams it really takes, then recruit to that number;
+- add teams and re-plan; or
 - if more teams are unavailable, extend the delivery window only as needed, up to 8:45 PM. Update both **Delivery window ends** and **Hard maximum (minutes)** in Settings.
 
 {: .note }
 Because the app counts real stop times, it may need more teams than 2025's 45 for the same number of families. That's the honest number: in 2025 the shortfall showed up as routes running late.
 
-### What a rebalance keeps
+### What re-planning keeps
 
-**Rebalance unlocked** rebuilds every ordinary, unlocked route from scratch, but it keeps:
+**Re-plan unlocked routes** rebuilds every ordinary, unlocked route from scratch, but it keeps:
 
 - **locked routes** exactly as they are;
 - **special routes** and their families;
@@ -100,18 +101,18 @@ Local knowledge beats the map. All of these work on a whole building at a time.
 | Take a stop off its route | Choose **Remove from route** from that menu. |
 | Put an unrouted family on a route | In the "home deliveries without a route" table below the routes, choose a route under "ADD TO ROUTE". |
 | Re-order one route for the shortest drive | Click **Re-sequence**. Only that route changes. |
-| Keep a family on this route through rebalances | Click the **pin** icon next to the stop. Click again to unpin. |
+| Keep a family on this route through re-plans | Click the **pin** icon next to the stop. Click again to unpin. |
 | Keep a whole route exactly as it is | Click **Lock**. **Unlock** to allow changes again. |
 | Remove a route with no stops | Click **Delete**. Only empty routes show this button. |
 
-A story: Team 4's lead has delivered to the same senior apartment complex for years and knows which door to use. After the first rebalance, the planner moves the complex's families onto Route 4, re-orders the stops so the complex comes first, and clicks **Lock**. Later rebalances move other routes around Route 4 but never touch it.
+A story: Team 4's lead has delivered to the same senior apartment complex for years and knows which door to use. After the first plan, the planner moves the complex's families onto Route 4, re-orders the stops so the complex comes first, and clicks **Lock**. Later re-plans move other routes around Route 4 but never touch it.
 
 {: .note }
 A locked route can't be changed at all: no moves in or out, no reordering. Unlock it first. A pinned family can't be moved either until you unpin them.
 
 ## Special routes
 
-A special route keeps its families through every rebalance. Use one for:
+A special route keeps its families through every re-plan. Use one for:
 
 - a named apartment complex or site that one team covers;
 - an out-of-area run for families outside the service area;

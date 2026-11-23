@@ -94,8 +94,8 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 | Feature | Where in the app | Code | Who | Evidence | Guide |
 |---|---|---|---|---|---|
 | Teams count and Fleet: **Fixed count** / **Fewest that fit** | planner controls | `planner.tsx`, `solver.ts` | RP | `airtable-export.e2e.ts`, unit | `routing/route-planner.md` |
-| Read-outs: TARGET · LIMIT, LONGEST · SPREAD, UNROUTED, "Estimated travel" | planner controls | `planner.tsx` | RP | `airtable-export.e2e.ts` | `routing/route-planner.md` |
-| **Rebalance unlocked**, shown only before the freeze (keeps locked and special routes, pinned families, route numbers and teams) | planner | `planner.tsx` `rebalance`, `solver.ts`, `solver.worker.ts` | RP | `journey.e2e.ts`, `planning-and-pickup.e2e.ts`, unit | `routing/route-planner.md` |
+| Read-outs: TARGET · LIMIT, LONGEST · SPREAD, UNROUTED (or WAITING ON ADDRESS), "Drive times are estimates" | planner controls | `planner.tsx` | RP | `airtable-export.e2e.ts` | `routing/route-planner.md` |
+| **Plan routes** / **Re-plan unlocked routes**, shown only before the freeze (keeps locked and special routes, pinned families, route numbers and teams) | planner | `planner.tsx` `rebalance`, `solver.ts`, `solver.worker.ts` | RP | `journey.e2e.ts`, `planning-and-pickup.e2e.ts`, unit | `routing/route-planner.md` |
 | "Families don't fit" note and spread warning | planner | `planner.tsx`, `model.ts` `seasonWarnings` | RP | `airtable-export.e2e.ts` | `routing/route-planner.md` |
 | Route list cards (stops, children, miles, duration bar, team, finish) | planner | `planner.tsx` | RP | none | `routing/route-planner.md` |
 | Route detail: map, stop list with ETAs, Start time | planner | `planner.tsx` | RP | `journey.e2e.ts` | `routing/route-planner.md` |
@@ -135,7 +135,7 @@ Features cut on 2026-10-30 aren't listed and aren't documented anywhere on the s
 | Duplex ("each family starts on a new sheet") | Print center banner | `printcenter.tsx`, `printing.ts` `pad` | PL | none | `printing/print-center.md` |
 | Team packet contents: cover with map and QR codes, route sheet, packing manifest, letters in stop order, bag labels; version stamp and shred footer | the PDF | `printing.ts` | PL, TL | `journey.e2e.ts`, unit | `printing/print-center.md`, `christmas-eve/team-lead.md` |
 | Print state per route: Not printed / Up to date / Needs reprint; **Review** | Print center cards | `printcenter.tsx`, `model.ts` `printState` | PL | `journey.e2e.ts`, unit | `printing/reprints.md` |
-| **Phone links** (Google Maps legs, addresses only), **Copy** | Print center cards | `printcenter.tsx`, `printing.ts` `navigationText` | PL, TL | `scope.e2e.ts` (present), unit | `printing/print-center.md`, `christmas-eve/team-lead.md` |
+| **QR codes for phones** (Google Maps legs, addresses only), **Copy** | Print center cards | `printcenter.tsx`, `printing.ts` `navigationText` | PL, TL | `scope.e2e.ts` (present), unit | `printing/print-center.md`, `christmas-eve/team-lead.md` |
 | Labels: Avery 5163 or 5160, "Street address on labels" (each route starts on a fresh sheet) | Print center | `printcenter.tsx`, `printing.ts` `labels` | PL | `journey.e2e.ts` (5163 geometry) | `printing/labels.md` |
 | **Alignment test page** | Print center | `printing.ts` `labelTest` | PL | none | `printing/labels.md` |
 | **Needs reprint (N)** (one PDF of the stale packets) | Print center | `printcenter.tsx` | PL | none | `printing/reprints.md` |

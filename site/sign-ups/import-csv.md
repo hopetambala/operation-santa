@@ -42,9 +42,10 @@ The app also reads two things the team adds in Airtable:
 The "Review your import" box shows what will change before anything does:
 
 - **new**: Entry IDs the season hasn't seen.
-- **changed**: families whose sign-up changed since the last import. Click one to see each field as old → new. "2 in-app edits kept" means you'd fixed two things by hand; those stay as you left them.
+- **changed**: families whose sign-up changed since the last import. Click one to see each field as old → new. "2 in-app edits kept" means you'd fixed two things by hand; those stay as you left them. Everything else follows Airtable, including children added there after a letter was looked at.
 - **missing**: families in the season that aren't in this file (for example, someone deleted a duplicate in Airtable). They're marked, never deleted.
 - **uploads to download**: drawings and uploaded letters.
+- **letters changed in Airtable after you looked at them**: shown only when there are some. Those letters go back to "to look at" in step 3, with the new text.
 - **with proposed flags**: families whose notes suggest a flag, such as Spanish speaker or pickup. Nothing is applied until you confirm it in [Address review]({{ '/sign-ups/address-review/' | relative_url }}).
 
 Read the yellow warnings, if any. They name the problem and what to do. For example:

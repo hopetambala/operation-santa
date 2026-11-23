@@ -226,6 +226,20 @@ select, input, textarea {
   color: var(--tk-dlite-semantic-color-text-secondary);
   font-size: var(--tk-dlite-semantic-typography-size-400);
 }
+/* WebKit draws a native macOS popup that ignores min-height, so selects came out ~30px beside 44px fields (docs/UI-CRITIQUE.md #3). Draw our own; the chevron is two token-coloured triangles, so no literal colour. */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: calc(var(--tk-dlite-semantic-spacing-300) * 2 + 10px);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--tk-dlite-semantic-color-text-tertiary) 50%),
+    linear-gradient(135deg, var(--tk-dlite-semantic-color-text-tertiary) 50%, transparent 50%);
+  background-position:
+    calc(100% - var(--tk-dlite-semantic-spacing-300) - 5px) 50%,
+    calc(100% - var(--tk-dlite-semantic-spacing-300)) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
 textarea { padding: var(--tk-dlite-semantic-spacing-300); line-height: var(--tk-dlite-semantic-typography-line-height-normal); resize: vertical; width: 100%; }
 input[type=checkbox], input[type=radio] {
   width: var(--tk-dlite-semantic-sizing-target-min);

@@ -50,7 +50,8 @@ export function stepWork(c:StepCounts){
     Import:`${c.importWork} to check`,
     Routes:`${c.unrouted} without a route`,
     Letters:`${c.pendingLetters} to look at`,
-    Print:c.printed>0?(c.stale?`${c.stale} to reprint`:'All printed'):c.printBlockers?`${c.printBlockers} to fix`:'Ready to print',
+    // U3: before the first print, Print waits on steps 1–3 instead of re-counting their work as its own blockers.
+    Print:c.printed>0?(c.stale?`${c.stale} to reprint`:'All printed'):(c.importWork||c.unrouted||c.pendingLetters)?'After steps 1–3':c.printBlockers?`${c.printBlockers} to fix`:'Ready to print',
   };
 }
 // One line per step for "How the four steps work" (Help menu, and once above an empty Step 1).
